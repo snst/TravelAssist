@@ -11,6 +11,7 @@ class PackedItemPage extends StatefulWidget {
       required this.orgItem,
       required this.item,
       required this.categories,
+      //required this.categoryItems,
       required this.onItemModified,
       required this.onItemAdded,
       required this.onItemDeleted});
@@ -19,6 +20,7 @@ class PackedItemPage extends StatefulWidget {
   final PackingListItem item;
   final PackingListItem? orgItem;
   List<String> categories;
+  //List<IconData> categoryItems;
   final void Function(PackingListItem? oldItem, PackingListItem newItem)
       onItemModified;
   final void Function(PackingListItem item) onItemAdded;
@@ -29,8 +31,6 @@ class PackedItemPage extends StatefulWidget {
 }
 
 class _PackedItemPageState extends State<PackedItemPage> {
-  
-
   void saveAndClose() {
     if (widget.item.name.isNotEmpty) {
       if (widget.orgItem == null) {
@@ -49,7 +49,7 @@ class _PackedItemPageState extends State<PackedItemPage> {
             //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: Text(widget.title)),
         body: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -60,6 +60,26 @@ class _PackedItemPageState extends State<PackedItemPage> {
                     decoration: const InputDecoration(hintText: 'Name'),
                     onChanged: (value) => widget.item.name = value,
                     autofocus: false,
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Scrollbar(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: ToggleSwitch(
+                          initialLabelIndex: widget.item.categoryItem,
+                          totalSwitches: CategoryIcons.length,
+                          customWidths:
+                              List.filled(CategoryIcons.length, 40),
+                          icons: CategoryIcons,
+                          onToggle: (index) {
+                            widget.item.categoryItem =
+                                (index != null) ? index : 0;
+                            //print('switched to: $index');
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                   TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(

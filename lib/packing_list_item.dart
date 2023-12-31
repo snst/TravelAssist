@@ -1,8 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 enum PackingListItemStateEnum {
   todo,
   skipped,
   packed;
 }
+
+final List<IconData> CategoryIcons = [
+  FontAwesomeIcons.shirt,
+  FontAwesomeIcons.socks,
+  FontAwesomeIcons.suitcaseMedical,
+  FontAwesomeIcons.headphones,
+  FontAwesomeIcons.cookieBite,
+  FontAwesomeIcons.creditCard,
+  FontAwesomeIcons.book,
+  FontAwesomeIcons.volleyball,
+  FontAwesomeIcons.binoculars,
+  FontAwesomeIcons.pumpSoap,
+];
+
+
 class PackingListItem {
   PackingListItem(
       {this.name = "",
@@ -10,13 +28,15 @@ class PackingListItem {
       this.used = 0,
       this.state = PackingListItemStateEnum.todo,
       this.category = "",
-      this.comment = ""});
+      this.comment = "",
+      this.categoryItem=0});
   String name;
   String category;
   String comment;
   int quantity;
   int used;
   PackingListItemStateEnum state;
+  int categoryItem;
 
   PackingListItem clone() {
     return PackingListItem(
@@ -25,7 +45,8 @@ class PackingListItem {
         used: used,
         state: state,
         category: category,
-        comment: comment);
+        comment: comment,
+        categoryItem:categoryItem);
   }
 
   PackingListItem.copy(PackingListItem other)
@@ -34,5 +55,6 @@ class PackingListItem {
         quantity = other.quantity,
         used = other.used,
         category = other.category,
-        comment = other.comment;
+        comment = other.comment,
+        categoryItem = other.categoryItem;
 }

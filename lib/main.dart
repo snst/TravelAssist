@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter/services.dart';
 //import 'package:flutter_spinbox/material.dart';
+//import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'packing_list_item.dart';
 import 'packing_list_item_widget.dart';
@@ -12,6 +13,7 @@ void main() {
 }
 
 enum FilterPackingListEnum { all, skipped, todo, packed }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -45,12 +47,20 @@ class _PackingListPageState extends State<PackingListPage> {
   final List<PackingListItem> _packingList = <PackingListItem>[];
   FilterPackingListEnum _packingListFilter = FilterPackingListEnum.all;
   bool _listEditable = false;
-  List<String> _categories = [
-    'Clothing',
-    'Medicine',
-    'Documents',
-    'Electronics',
-  ];
+
+/*
+  List<IconData> _categoryIcons = [
+    FontAwesomeIcons.shirt,
+    FontAwesomeIcons.socks,
+    FontAwesomeIcons.suitcaseMedical,
+    FontAwesomeIcons.headphones,
+    FontAwesomeIcons.cookieBite,
+    FontAwesomeIcons.creditCard,
+    FontAwesomeIcons.book,
+    FontAwesomeIcons.volleyball,
+    FontAwesomeIcons.binoculars,
+    FontAwesomeIcons.pumpSoap,
+  ];*/
 
   void _handlePackingListItemUpdate(
       PackingListItem? oldItem, PackingListItem newItem) {
@@ -130,6 +140,7 @@ class _PackingListPageState extends State<PackingListPage> {
               orgItem: item,
               item: item.clone(),
               categories: getCategories(),
+              //categoryItems: _categoryIcons,
               onItemModified: _handlePackingListItemUpdate,
               onItemAdded: _handlePackingListItemAdd,
               onItemDeleted: _handlePackingListItemDelete)),
@@ -205,6 +216,7 @@ class _PackingListPageState extends State<PackingListPage> {
                     orgItem: null,
                     item: PackingListItem(quantity: 1),
                     categories: getCategories(),
+                    //categoryItems: _categoryIcons,
                     onItemModified: _handlePackingListItemUpdate,
                     onItemAdded: _handlePackingListItemAdd,
                     onItemDeleted: _handlePackingListItemDelete)),

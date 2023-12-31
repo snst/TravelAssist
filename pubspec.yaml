@@ -38,6 +38,8 @@ dependencies:
   flutter_spinbox: ^0.13.1
   flutter_typeahead: ^4.8.0
   toggle_switch: ^2.1.0
+  font_awesome_flutter: ^10.6.0
+
 
 dev_dependencies:
   flutter_test:

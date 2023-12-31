@@ -34,6 +34,7 @@ class PackingListItemWidget extends StatelessWidget {
       onTap: () {
         onEditItem(item);
       },
+      leading: Icon(CategoryIcons[item.categoryItem]),
       title: Row(children: <Widget>[
         Expanded(
           child: Text(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'packing_list_item.dart';
+import 'packinglist.dart';
 
 class PackingListItemWidget extends StatelessWidget {
   PackingListItemWidget(
@@ -16,9 +16,9 @@ class PackingListItemWidget extends StatelessWidget {
 
   TextStyle? _getTextStyle(PackingListItemStateEnum state) {
     switch(state) {
-      case PackingListItemStateEnum.todo:
+      case PackingListItemStateEnum.missing:
       return const TextStyle(
-      color: Colors.red,
+      color: Colors.deepOrange,
     );
     case PackingListItemStateEnum.skipped:
     return const TextStyle(
@@ -34,14 +34,16 @@ class PackingListItemWidget extends StatelessWidget {
       onTap: () {
         onEditItem(item);
       },
-      leading: Icon(CategoryIcons[item.categoryItem]),
+      //leading: Icon(CategoryIcons[item.categoryItem]),
       title: Row(children: <Widget>[
         Expanded(
           child: Text(
+            item.name,
             
+            /*
               item.category.isNotEmpty
                   ? '${item.name} (${item.category})'
-                  : item.name,
+                  : item.name,*/
               style: _getTextStyle(
                   item.state)),
                   
@@ -67,9 +69,9 @@ class PackingListItemWidget extends StatelessWidget {
             value: item.state == PackingListItemStateEnum.packed,
             onChanged: (value) {
               item.state = switch (item.state) {
-                PackingListItemStateEnum.todo =>
+                PackingListItemStateEnum.missing =>
                   PackingListItemStateEnum.packed,
-                _ => PackingListItemStateEnum.todo
+                _ => PackingListItemStateEnum.missing
               };
               onItemChanged(item);
             },

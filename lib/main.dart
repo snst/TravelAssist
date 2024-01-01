@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+//import 'package:path_provider/path_provider.dart';
 //import 'package:flutter/services.dart';
 //import 'package:flutter_spinbox/material.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'packing_list_item.dart';
+import 'package:sticky_grouped_list/sticky_grouped_list.dart';
+import 'packinglist.dart';
 import 'packing_list_item_widget.dart';
-//import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'packing_item_page.dart';
+import 'packinglist_page.dart';
 
-void main() {
+void main() async {
+  Hive.registerAdapter(PackingListItemStateFilterEnumAdapter());
+  Hive.registerAdapter(PackingListItemStateEnumAdapter());
+  Hive.registerAdapter(PackingListItemAdapter());
+  Hive.registerAdapter(PackingListAdapter());
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('packinglist');
+
   runApp(const MyApp());
 }
-
-enum FilterPackingListEnum { all, skipped, todo, packed }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -44,85 +53,69 @@ class PackingListPage extends StatefulWidget {
 }
 
 class _PackingListPageState extends State<PackingListPage> {
-  final List<PackingListItem> _packingList = <PackingListItem>[];
-  FilterPackingListEnum _packingListFilter = FilterPackingListEnum.all;
+  final PackingList _packingList =
+      Hive.box('packinglist').get('1', defaultValue: PackingList("default"));
+  //PackingListItemStateFilterEnum _packingListFilter = Hive.box('settings')
+  //    .get('packingListFilter', defaultValue: PackingListItemStateFilterEnum.all);
   bool _listEditable = false;
 
-/*
-  List<IconData> _categoryIcons = [
-    FontAwesomeIcons.shirt,
-    FontAwesomeIcons.socks,
-    FontAwesomeIcons.suitcaseMedical,
-    FontAwesomeIcons.headphones,
-    FontAwesomeIcons.cookieBite,
-    FontAwesomeIcons.creditCard,
-    FontAwesomeIcons.book,
-    FontAwesomeIcons.volleyball,
-    FontAwesomeIcons.binoculars,
-    FontAwesomeIcons.pumpSoap,
-  ];*/
-
-  void _handlePackingListItemUpdate(
-      PackingListItem? oldItem, PackingListItem newItem) {
-    setState(() {
-      //addCategory(newItem.category);
-      _packingList[_packingList.indexWhere((element) => element == oldItem)] =
-          newItem;
-    });
+  void saveData() {
+    Hive.box('packinglist').put('1', _packingList);
   }
 
   List<PackingListItem> filterPackingList() {
-    switch (_packingListFilter) {
-      case FilterPackingListEnum.all:
-        return _packingList;
-      case FilterPackingListEnum.packed:
-        return _packingList
+    switch (_packingList.stateFilter) {
+      case PackingListItemStateFilterEnum.all:
+        return _packingList.items;
+      case PackingListItemStateFilterEnum.packed:
+        return _packingList.items
             .where((i) => i.state == PackingListItemStateEnum.packed)
             .toList();
-      case FilterPackingListEnum.skipped:
-        return _packingList
+      case PackingListItemStateFilterEnum.skipped:
+        return _packingList.items
             .where((i) => i.state == PackingListItemStateEnum.skipped)
             .toList();
-      case FilterPackingListEnum.todo:
-        return _packingList
-            .where((i) => i.state == PackingListItemStateEnum.todo)
+      case PackingListItemStateFilterEnum.missing:
+        return _packingList.items
+            .where((i) => i.state == PackingListItemStateEnum.missing)
             .toList();
     }
   }
 
-  void setPackingListFilter(FilterPackingListEnum filter) {
-    _packingListFilter = filter;
+  void _handlePackingListItemUpdate(
+      PackingListItem? oldItem, PackingListItem newItem) {
+    _packingList.items[_packingList.items
+        .indexWhere((element) => element == oldItem)] = newItem;
+    saveData();
+    setState(() {});
+  }
+
+  void setPackingListFilter(PackingListItemStateFilterEnum filter) {
+    _packingList.stateFilter = filter;
+    saveData();
     setState(() {});
   }
 
   void _handlePackingListItemDelete(PackingListItem item) {
-    setState(() {
-      _packingList.removeWhere((element) => element.name == item.name);
-    });
+    _packingList.items.removeWhere((element) => element.name == item.name);
+    saveData();
+    setState(() {});
   }
 
-  //void addCategory(String category) {
-  //if (!_categories.contains(category)) {
-  //  _categories.insert(0, category);
-  //}
-  //}
-
   void _handlePackingListItemAdd(PackingListItem item) {
-    setState(() {
-      _packingList.add(item);
-      //addCategory(item.category);
-    });
+    _packingList.items.add(item);
+    saveData();
+    setState(() {});
   }
 
   void toggleEdit() {
-    setState(() {
-      _listEditable = !_listEditable;
-    });
+    _listEditable = !_listEditable;
+    setState(() {});
   }
 
   List<String> getCategories() {
     List<String> ret = [];
-    for (final item in _packingList) {
+    for (final item in _packingList.items) {
       if (!ret.contains(item.category)) {
         ret.add(item.category);
       }
@@ -140,73 +133,100 @@ class _PackingListPageState extends State<PackingListPage> {
               orgItem: item,
               item: item.clone(),
               categories: getCategories(),
-              //categoryItems: _categoryIcons,
               onItemModified: _handlePackingListItemUpdate,
               onItemAdded: _handlePackingListItemAdd,
               onItemDeleted: _handlePackingListItemDelete)),
     );
   }
 
+  Widget _getGroupSeparator(PackingListItem element) {
+    return SizedBox(
+      height: 50,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: double.infinity,
+          child: Card(
+              color: Colors.grey.shade900,
+              child: Text(
+                element.category,
+                textAlign: TextAlign.center,
+              )),
+        ),
+      ),
+    );
+  }
+
+  Widget _getItem(BuildContext ctx, PackingListItem item) {
+    return PackingListItemWidget(
+        item: item,
+        onItemChanged: (item) {
+          setState(() {});
+        },
+        onEditItem: _showEditDialog,
+        editable: _listEditable);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              if (_packingListFilter != FilterPackingListEnum.all)
-                PopupMenuItem(value: 1, child: Text("Show all")),
-              if (_packingListFilter != FilterPackingListEnum.skipped)
-                PopupMenuItem(value: 2, child: Text("Show skipped")),
-              if (_packingListFilter != FilterPackingListEnum.packed)
-                PopupMenuItem(value: 3, child: Text("Show packed")),
-              if (_packingListFilter != FilterPackingListEnum.todo)
-                PopupMenuItem(value: 4, child: Text("Show todo")),
+              if (_packingList.stateFilter !=
+                  PackingListItemStateFilterEnum.all)
+                const PopupMenuItem(value: 1, child: Text("Show all")),
+              if (_packingList.stateFilter !=
+                  PackingListItemStateFilterEnum.skipped)
+                const PopupMenuItem(value: 2, child: Text("Show skipped")),
+              if (_packingList.stateFilter !=
+                  PackingListItemStateFilterEnum.packed)
+                const PopupMenuItem(value: 3, child: Text("Show packed")),
+              if (_packingList.stateFilter !=
+                  PackingListItemStateFilterEnum.missing)
+                const PopupMenuItem(value: 4, child: Text("Show missing")),
               PopupMenuItem(
                   value: 5,
-                  child: Text(_listEditable ? "No edit" : "Fast edit")),
+                  child: Text(_listEditable ? "Hide check" : "Check")),
             ],
-            //offset: Offset(0, 100),
-            //color: Colors.grey,
             elevation: 2,
             onSelected: (value) {
               switch (value) {
                 case 1:
-                  setPackingListFilter(FilterPackingListEnum.all);
+                  setPackingListFilter(PackingListItemStateFilterEnum.all);
                   break;
                 case 2:
-                  setPackingListFilter(FilterPackingListEnum.skipped);
+                  setPackingListFilter(PackingListItemStateFilterEnum.skipped);
                   break;
                 case 3:
-                  setPackingListFilter(FilterPackingListEnum.packed);
+                  setPackingListFilter(PackingListItemStateFilterEnum.packed);
                   break;
                 case 4:
-                  setPackingListFilter(FilterPackingListEnum.todo);
+                  setPackingListFilter(PackingListItemStateFilterEnum.missing);
                   break;
                 case 5:
                   toggleEdit();
                   break;
               }
             },
-          )
+          ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        children: filterPackingList().map((PackingListItem item) {
-          return PackingListItemWidget(
-              item: item,
-              onItemChanged: (item) {
-                setState(() {});
-              },
-              onEditItem: _showEditDialog,
-              editable: _listEditable);
-        }).toList(),
+      body: StickyGroupedListView<PackingListItem, String>(
+        elements: filterPackingList(),
+        order: StickyGroupedListOrder.ASC,
+        groupBy: (PackingListItem element) => element.category,
+        groupComparator: (String value1, String value2) =>
+            value2.compareTo(value1),
+        itemComparator: (PackingListItem element1, PackingListItem element2) =>
+            element1.name.compareTo(element2.name),
+        floatingHeader: true,
+        groupSeparatorBuilder: _getGroupSeparator,
+        itemBuilder: _getItem,
       ),
       floatingActionButton: FloatingActionButton(
-        //onPressed: _showAddDialog,
         onPressed: () {
           Navigator.push(
             context,
@@ -216,7 +236,6 @@ class _PackingListPageState extends State<PackingListPage> {
                     orgItem: null,
                     item: PackingListItem(quantity: 1),
                     categories: getCategories(),
-                    //categoryItems: _categoryIcons,
                     onItemModified: _handlePackingListItemUpdate,
                     onItemAdded: _handlePackingListItemAdd,
                     onItemDeleted: _handlePackingListItemDelete)),
@@ -224,7 +243,7 @@ class _PackingListPageState extends State<PackingListPage> {
         },
         tooltip: 'Add item',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

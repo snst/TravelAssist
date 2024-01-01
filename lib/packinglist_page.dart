@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
-import 'packing_list_item.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'packinglist.dart';
 
 class PackedItemPage extends StatefulWidget {
-  PackedItemPage(
+  const PackedItemPage(
       {super.key,
       required this.title,
       required this.orgItem,
       required this.item,
       required this.categories,
-      //required this.categoryItems,
       required this.onItemModified,
       required this.onItemAdded,
       required this.onItemDeleted});
@@ -19,8 +18,7 @@ class PackedItemPage extends StatefulWidget {
   final String title;
   final PackingListItem item;
   final PackingListItem? orgItem;
-  List<String> categories;
-  //List<IconData> categoryItems;
+  final List<String> categories;
   final void Function(PackingListItem? oldItem, PackingListItem newItem)
       onItemModified;
   final void Function(PackingListItem item) onItemAdded;
@@ -44,6 +42,9 @@ class _PackedItemPageState extends State<PackedItemPage> {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+    controller.text = widget.item.category;
+
     return Scaffold(
         appBar: AppBar(
             //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -61,37 +62,21 @@ class _PackedItemPageState extends State<PackedItemPage> {
                     onChanged: (value) => widget.item.name = value,
                     autofocus: false,
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Scrollbar(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: ToggleSwitch(
-                          initialLabelIndex: widget.item.categoryItem,
-                          totalSwitches: CategoryIcons.length,
-                          customWidths:
-                              List.filled(CategoryIcons.length, 40),
-                          icons: CategoryIcons,
-                          onToggle: (index) {
-                            widget.item.categoryItem =
-                                (index != null) ? index : 0;
-                            //print('switched to: $index');
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
                   TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(
                       decoration: InputDecoration(
-                        hintText: 'Category',
-                      ),
-                      controller: TextEditingController()
-                        ..text = widget.item.category,
+                          hintText: 'Category',
+                          suffixIcon: IconButton(
+                            onPressed: controller.clear,
+                            icon: const Icon(Icons.clear),
+                          )),
+                      controller: controller, //TextEditingController()
+                      //..text = widget.item.category,
                     ),
                     suggestionsCallback: (pattern) {
+                      widget.item.category = pattern;
                       List<String> strlist = widget.categories
-                          .where((fruit) => fruit
+                          .where((item) => item
                               .toLowerCase()
                               .contains(pattern.toLowerCase()))
                           .toList();
@@ -113,9 +98,10 @@ class _PackedItemPageState extends State<PackedItemPage> {
                   ),
                   Row(children: [
                     Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
                       child: SpinBox(
                         value: widget.item.quantity.toDouble(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             constraints: BoxConstraints.tightFor(
                               width: 150,
                             ),
@@ -123,20 +109,19 @@ class _PackedItemPageState extends State<PackedItemPage> {
                         onChanged: (value) =>
                             widget.item.quantity = value.toInt(),
                       ),
-                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
                       child: SpinBox(
                         value: widget.item.used.toDouble(),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             constraints: BoxConstraints.tightFor(
                               width: 150,
                             ),
                             labelText: 'Used'),
                         onChanged: (value) => widget.item.used = value.toInt(),
                       ),
-                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
                     )
                   ]),
                   Padding(
@@ -144,25 +129,25 @@ class _PackedItemPageState extends State<PackedItemPage> {
                       child: Center(
                           child: ToggleSwitch(
                         initialLabelIndex: switch (widget.item.state) {
-                          PackingListItemStateEnum.todo => 0,
+                          PackingListItemStateEnum.missing => 0,
                           PackingListItemStateEnum.skipped => 1,
                           PackingListItemStateEnum.packed => 2
                         },
                         totalSwitches: 3,
-                        labels: ['Todo', 'Skipped', 'Packed'],
+                        labels: const ['Missing', 'Skipped', 'Packed'],
                         onToggle: (index) {
                           widget.item.state = switch (index) {
-                            0 => PackingListItemStateEnum.todo,
+                            0 => PackingListItemStateEnum.missing,
                             1 => PackingListItemStateEnum.skipped,
                             2 => PackingListItemStateEnum.packed,
-                            _ => PackingListItemStateEnum.todo
+                            _ => PackingListItemStateEnum.missing
                           };
                           //print('switched to: $index');
                           saveAndClose();
                         },
                       ))),
                   Row(children: [
-                    Spacer(),
+                    const Spacer(),
                     if (widget.orgItem != null)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),

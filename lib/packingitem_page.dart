@@ -33,7 +33,7 @@ class _PackedItemPageState extends State<PackedItemPage> {
         getPackingList(context).addItem(widget.modifiedItem);
       } else {
         widget.item.update(widget.modifiedItem);
-        getPackingList(context).notifyItemChanged();
+        getPackingList(context).notifyItemChanged(widget.item);
       }
       Navigator.of(context).pop();
     }

@@ -23,14 +23,13 @@ class PackingListItemAdapter extends TypeAdapter<PackingListItem> {
       state: fields[5] as PackingListItemStateEnum,
       category: fields[1] as String,
       comment: fields[2] as String,
-      id: fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, PackingListItem obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -42,9 +41,7 @@ class PackingListItemAdapter extends TypeAdapter<PackingListItem> {
       ..writeByte(4)
       ..write(obj.used)
       ..writeByte(5)
-      ..write(obj.state)
-      ..writeByte(6)
-      ..write(obj.id);
+      ..write(obj.state);
   }
 
   @override
@@ -54,42 +51,6 @@ class PackingListItemAdapter extends TypeAdapter<PackingListItem> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PackingListItemAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class PackingListAdapter extends TypeAdapter<PackingList> {
-  @override
-  final int typeId = 3;
-
-  @override
-  PackingList read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return PackingList(
-      fields[0] as String,
-    ).._items = (fields[1] as List).cast<PackingListItem>();
-  }
-
-  @override
-  void write(BinaryWriter writer, PackingList obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj._name)
-      ..writeByte(1)
-      ..write(obj._items);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PackingListAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

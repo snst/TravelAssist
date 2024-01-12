@@ -10,15 +10,14 @@ void main() async {
   //Hive.registerAdapter(PackingListItemStateFilterEnumAdapter());
   Hive.registerAdapter(PackingListItemStateEnumAdapter());
   Hive.registerAdapter(PackingListItemAdapter());
-  Hive.registerAdapter(PackingListAdapter());
+  //Hive.registerAdapter(PackingListAdapter());
 
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('packinglist2');
 
   runApp(
     ChangeNotifierProvider(
-      create: (context) => PackingList("a"),
+      create: (context) => PackingList("default1"),
       child: MyApp(),
     ),
   );

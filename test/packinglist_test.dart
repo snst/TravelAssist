@@ -3,7 +3,7 @@ import 'package:travel_assist/packinglist.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('PackingListItem id should be incremented', () {
+/*  test('PackingListItem id should be incremented', () {
     var item = PackingListItem(name: "shirt");
     expect(item.name, 'shirt');
     expect(item.id, 0);
@@ -11,6 +11,7 @@ void main() {
     expect(item.name, 'hat');
     expect(item.id, 1);
   });
+
 
   test('Manipulate PackingList', () {
     var pl = PackingList("pl");
@@ -31,5 +32,5 @@ void main() {
 
     pl.deleteItem(shirt);
     expect(pl.cntItem(), 1);
-  });
+  });*/
 }

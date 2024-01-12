@@ -13,17 +13,14 @@ enum PackingListItemStateEnum {
 }
 
 @HiveType(typeId: 2)
-class PackingListItem {
+class PackingListItem extends HiveObject {
   PackingListItem(
       {this.name = "",
       this.quantity = 0,
       this.used = 0,
       this.state = PackingListItemStateEnum.missing,
       this.category = "",
-      this.comment = "",
-      this.id = 0}) {
-    assignNextId();
-  }
+      this.comment = ""});
 
   @HiveField(0)
   String name;
@@ -37,14 +34,6 @@ class PackingListItem {
   int used;
   @HiveField(5)
   PackingListItemStateEnum state;
-  @HiveField(6)
-  int id;
-
-  static int nextid = 0;
-
-  void assignNextId() {
-    id = PackingListItem.nextid++;
-  }
 
   PackingListItem clone() {
     return PackingListItem(
@@ -53,8 +42,7 @@ class PackingListItem {
         used: used,
         state: state,
         category: category,
-        comment: comment,
-        id: id);
+        comment: comment);
   }
 
   PackingListItem.copy(PackingListItem other)
@@ -63,8 +51,7 @@ class PackingListItem {
         quantity = other.quantity,
         used = other.used,
         category = other.category,
-        comment = other.comment,
-        id = other.id;
+        comment = other.comment;
 
   void update(PackingListItem other) {
     name = other.name;
@@ -76,41 +63,27 @@ class PackingListItem {
   }
 }
 
-@HiveType(typeId: 3)
 class PackingList extends ChangeNotifier {
   PackingList(this._name);
 
-  //UnmodifiableListView<PackingListItem> get items => UnmodifiableListView(_items);
-
-  @HiveField(0)
-  String _name;
-  @HiveField(1)
-  List<PackingListItem> _items = [];
   bool _loaded = false;
-  final String _hiveBoxName = 'packingList2';
+  String _name;
+  Box<PackingListItem>? _box;
 
-  void load() {
+  String get hiveName => 'packinglist_${_name}';
+  List<PackingListItem> get items => _box != null ? _box!.values.toList() : [];
+
+  void load() async {
     if (!_loaded) {
-      final PackingList pl = Hive.box(_hiveBoxName)
-          .get(_name, defaultValue: PackingList(_name));
+      _box = await Hive.openBox(hiveName);
       _loaded = true;
-      update(pl);
+      notifyListeners();
     }
-  }
-
-  void save() {
-    Hive.box(_hiveBoxName).put(_name, this);
-  }
-
-  void update(PackingList other) {
-    _name = other._name;
-    _items = other._items;
-    //notifyListeners();
   }
 
   List<String> getCategories() {
     List<String> ret = [];
-    for (final item in _items) {
+    for (final item in items) {
       if (!ret.contains(item.category)) {
         ret.add(item.category);
       }
@@ -119,37 +92,38 @@ class PackingList extends ChangeNotifier {
     return ret;
   }
 
-  void notifyItemChanged() {
-    save();
+  void notifyItemChanged(PackingListItem item) {
+    _box?.delete(item.key);
+    _box?.add( item);
     notifyListeners();
   }
 
   void deleteItem(PackingListItem item) {
-    _items.removeWhere((element) => element.id == item.id);
-    notifyItemChanged();
+    _box?.delete(item.key);
+    notifyListeners();
   }
 
   void addItem(PackingListItem item) {
-    _items.add(item);
-    notifyItemChanged();
+    _box?.add(item);
+    notifyListeners();
   }
 
-  int cntItem() => _items.length;
+  //int cntItem() => _items.length;
 
-  PackingListItem getItem(int i) => _items.elementAt(i);
+  //PackingListItem getItem(int i) => _items.elementAt(i);
 
   List<PackingListItem> getFilteredItems(PackingListItemStateEnum state) {
     switch (state) {
       case PackingListItemStateEnum.packed:
-        return _items
+        return items
             .where((i) => i.state == PackingListItemStateEnum.packed)
             .toList();
       case PackingListItemStateEnum.skipped:
-        return _items
+        return items
             .where((i) => i.state == PackingListItemStateEnum.skipped)
             .toList();
       case PackingListItemStateEnum.missing:
-        return _items
+        return items
             .where((i) => i.state == PackingListItemStateEnum.missing)
             .toList();
     }

@@ -1,205 +1,194 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinbox/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'packinglist.dart';
+import 'packingitem_widget.dart';
+import 'packingitem_page.dart';
 
-class PackedItemPage extends StatefulWidget {
-  const PackedItemPage(
-      {super.key,
-      required this.title,
-      required this.orgItem,
-      required this.item,
-      required this.categories,
-      required this.onItemModified,
-      required this.onItemAdded,
-      required this.onItemDeleted});
-
+class PackingListPage extends StatefulWidget {
+  const PackingListPage(
+      {super.key, required this.title, required this.createDrawer});
   final String title;
-  final PackingListItem item;
-  final PackingListItem? orgItem;
-  final List<String> categories;
-  final void Function(PackingListItem? oldItem, PackingListItem newItem)
-      onItemModified;
-  final void Function(PackingListItem item) onItemAdded;
-  final void Function(PackingListItem item) onItemDeleted;
-
+  final Drawer Function(BuildContext context) createDrawer;
   @override
-  State<PackedItemPage> createState() => _PackedItemPageState();
+  State<PackingListPage> createState() => _PackingListPageState();
 }
 
-class _PackedItemPageState extends State<PackedItemPage> {
-  void saveAndClose() {
-    if (widget.item.name.isNotEmpty) {
-      if (widget.orgItem == null) {
-        widget.onItemAdded(widget.item);
-      } else {
-        widget.onItemModified(widget.orgItem, widget.item);
-      }
-      Navigator.of(context).pop();
-    }
+class _PackingListPageState extends State<PackingListPage> {
+  //final PackingList _packingList =
+  //    Hive.box('packinglist').get('1', defaultValue: PackingList("default"));
+  bool _listEditable = false;
+  int _selectedFilterIndex = 1;
+
+  void saveData() {
+    //Hive.box('packinglist').put('1', _packingList);
+  }
+
+  PackingListItemStateEnum bottomIndexToStateEnum(int index) {
+    final filters = [
+      PackingListItemStateEnum.packed,
+      PackingListItemStateEnum.missing,
+      PackingListItemStateEnum.skipped
+    ];
+    return filters[index];
+  }
+
+  void toggleEdit() {
+    _listEditable = !_listEditable;
+    setState(() {});
+  }
+
+  Future<void> _showEditDialog(PackingListItem item) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => /*const*/ PackedItemPage(
+                newItem: false,
+                item: item,
+              )),
+    );
+  }
+
+  Widget _getGroupSeparator(PackingListItem element) {
+    return SizedBox(
+      height: 50,
+      child: Align(
+        alignment: Alignment.center,
+        child: SizedBox(
+          width: double.infinity,
+          child: Card(
+              color: Colors.grey.shade900,
+              child: Text(
+                element.category,
+                textAlign: TextAlign.center,
+              )),
+        ),
+      ),
+    );
+  }
+
+  Widget _getItem(BuildContext ctx, PackingListItem item) {
+    return PackingListItemWidget(
+        item: item,
+        onItemChanged: (item) {
+          setState(() {});
+        },
+        onEditItem: _showEditDialog,
+        editable: _listEditable);
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
-    controller.text = widget.item.category;
-
     return Scaffold(
-        appBar: AppBar(
-            //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Text(widget.title)),
-        body: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    controller: TextEditingController()
-                      ..text = widget.item.name,
-                    decoration: const InputDecoration(hintText: 'Name'),
-                    onChanged: (value) => widget.item.name = value,
-                    autofocus: false,
-                  ),
-                  TypeAheadField(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      decoration: InputDecoration(
-                          hintText: 'Category',
-                          suffixIcon: IconButton(
-                            onPressed: controller.clear,
-                            icon: const Icon(Icons.clear),
-                          )),
-                      controller: controller, //TextEditingController()
-                      //..text = widget.item.category,
-                    ),
-                    suggestionsCallback: (pattern) {
-                      widget.item.category = pattern;
-                      List<String> strlist = widget.categories
-                          .where((item) => item
-                              .toLowerCase()
-                              .contains(pattern.toLowerCase()))
-                          .toList();
-                      if (!strlist.contains(pattern)) {
-                        strlist.insert(0, pattern);
-                      }
-                      return strlist;
-                    },
-                    itemBuilder: (context, suggestion) {
-                      return ListTile(
-                        title: Text(suggestion),
-                      );
-                    },
-                    onSuggestionSelected: (suggestion) {
-                      setState(() {
-                        widget.item.category = suggestion;
-                      });
-                    },
-                  ),
-                  Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
-                      child: SpinBox(
-                        value: widget.item.quantity.toDouble(),
-                        decoration: const InputDecoration(
-                            constraints: BoxConstraints.tightFor(
-                              width: 150,
-                            ),
-                            labelText: 'Quantity'),
-                        onChanged: (value) =>
-                            widget.item.quantity = value.toInt(),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
-                      child: SpinBox(
-                        value: widget.item.used.toDouble(),
-                        decoration: const InputDecoration(
-                            constraints: BoxConstraints.tightFor(
-                              width: 150,
-                            ),
-                            labelText: 'Used'),
-                        onChanged: (value) => widget.item.used = value.toInt(),
-                      ),
-                    )
-                  ]),
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
-                      child: Center(
-                          child: ToggleSwitch(
-                        initialLabelIndex: switch (widget.item.state) {
-                          PackingListItemStateEnum.missing => 0,
-                          PackingListItemStateEnum.skipped => 1,
-                          PackingListItemStateEnum.packed => 2
-                        },
-                        totalSwitches: 3,
-                        labels: const ['Missing', 'Skipped', 'Packed'],
-                        onToggle: (index) {
-                          widget.item.state = switch (index) {
-                            0 => PackingListItemStateEnum.missing,
-                            1 => PackingListItemStateEnum.skipped,
-                            2 => PackingListItemStateEnum.packed,
-                            _ => PackingListItemStateEnum.missing
-                          };
-                          //print('switched to: $index');
-                          saveAndClose();
-                        },
-                      ))),
-                  Row(children: [
-                    const Spacer(),
-                    if (widget.orgItem != null)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
-                        child: IconButton(
-                            // Delete
-                            iconSize: 30,
-                            icon: const Icon(
-                              Icons.delete_outline,
-                            ),
-                            //alignment: Alignment.centerRight,
-                            onPressed: () {
-                              widget.onItemDeleted(widget.item);
-                              Navigator.of(context).pop();
-                            }),
-                      ),
-                    /*
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
-                      child: IconButton(
-                          // Cancel
-                          iconSize: 30,
-                          icon: const Icon(
-                            Icons.cancel_outlined,
-                          ),
-                          //alignment: Alignment.centerRight,
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          }),
-                    ),*/
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),
-                      child: IconButton(
-                          // Save
-                          iconSize: 30,
-                          icon: const Icon(
-                            Icons.check,
-                          ),
-                          //alignment: Alignment.centerRight,
-                          onPressed: () {
-                            saveAndClose();
-                          }),
-                    ),
-                  ]),
-                  TextField(
-                    controller: TextEditingController()
-                      ..text = widget.item.comment,
-                    decoration: const InputDecoration(hintText: 'Comment'),
-                    onChanged: (value) => widget.item.comment = value,
-                    keyboardType: TextInputType.multiline,
-                    minLines: 10, //Normal textInputField will be displayed
-                    maxLines: 10, // when user presses enter it will adapt to it
-                  )
-                ])));
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                  value: 5,
+                  child: Text(_listEditable ? "Hide check" : "Check")),
+            ],
+            elevation: 2,
+            onSelected: (value) {
+              switch (value) {
+                case 5:
+                  toggleEdit();
+                  break;
+              }
+            },
+          ),
+        ],
+      ),
+      body: Consumer<PackingList>(
+        builder: (context, packinglist, child) {
+          packinglist.load();
+          return
+              /*
+          StickyGroupedListView<PackingListItem, String>(
+            elements: packinglist.getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
+       //     elements: packinglist.items,
+            order: StickyGroupedListOrder.ASC,
+            groupBy: (PackingListItem element) => element.category,
+            groupComparator: (String value1, String value2) =>
+                value2.compareTo(value1),
+            itemComparator:
+                (PackingListItem element1, PackingListItem element2) =>
+                    element1.name.compareTo(element2.name),
+            floatingHeader: true,
+            groupSeparatorBuilder: _getGroupSeparator,
+            */
+              GroupedListView<PackingListItem, String>(
+            elements: packinglist
+                .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
+            groupBy: (PackingListItem element) => element.category,
+            groupComparator: (value1, value2) => value2.compareTo(value1),
+            itemComparator:
+                (PackingListItem element1, PackingListItem element2) =>
+                    element1.name.compareTo(element2.name),
+            order: GroupedListOrder.DESC,
+            useStickyGroupSeparators: false,
+            groupSeparatorBuilder: (String value) => SizedBox(
+              height: 50,
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                      color: Colors.grey.shade900,
+                      child: Text(
+                        value,
+                        textAlign: TextAlign.center,
+                      )),
+                ),
+              ),
+            ),
+            itemBuilder: _getItem,
+          );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.squareCheck),
+            label: 'Packed',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.square),
+            label: 'Missing',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.ban),
+            label: 'Skipped',
+          ),
+        ],
+        currentIndex: _selectedFilterIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: (index) {
+          setState(() {
+            _selectedFilterIndex = index;
+          });
+        },
+      ),
+      drawer: widget.createDrawer(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => /*const*/ PackedItemPage(
+                      newItem: true,
+                      item: PackingListItem(quantity: 1),
+                    )),
+          );
+        },
+        tooltip: 'Add item',
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }

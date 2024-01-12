@@ -18,7 +18,7 @@ class PackingListItemWidget extends StatelessWidget {
     switch(state) {
       case PackingListItemStateEnum.missing:
       return const TextStyle(
-      color: Colors.deepOrange,
+      color: Colors.amber
     );
     case PackingListItemStateEnum.skipped:
     return const TextStyle(

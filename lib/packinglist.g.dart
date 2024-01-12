@@ -23,13 +23,14 @@ class PackingListItemAdapter extends TypeAdapter<PackingListItem> {
       state: fields[5] as PackingListItemStateEnum,
       category: fields[1] as String,
       comment: fields[2] as String,
+      id: fields[6] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, PackingListItem obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class PackingListItemAdapter extends TypeAdapter<PackingListItem> {
       ..writeByte(4)
       ..write(obj.used)
       ..writeByte(5)
-      ..write(obj.state);
+      ..write(obj.state)
+      ..writeByte(6)
+      ..write(obj.id);
   }
 
   @override
@@ -67,21 +70,17 @@ class PackingListAdapter extends TypeAdapter<PackingList> {
     };
     return PackingList(
       fields[0] as String,
-    )
-      ..items = (fields[1] as List).cast<PackingListItem>()
-      ..stateFilter = fields[2] as PackingListItemStateFilterEnum;
+    ).._items = (fields[1] as List).cast<PackingListItem>();
   }
 
   @override
   void write(BinaryWriter writer, PackingList obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.name)
-      ..writeByte(1)
-      ..write(obj.items)
       ..writeByte(2)
-      ..write(obj.stateFilter);
+      ..writeByte(0)
+      ..write(obj._name)
+      ..writeByte(1)
+      ..write(obj._items);
   }
 
   @override
@@ -91,56 +90,6 @@ class PackingListAdapter extends TypeAdapter<PackingList> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PackingListAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class PackingListItemStateFilterEnumAdapter
-    extends TypeAdapter<PackingListItemStateFilterEnum> {
-  @override
-  final int typeId = 0;
-
-  @override
-  PackingListItemStateFilterEnum read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return PackingListItemStateFilterEnum.all;
-      case 1:
-        return PackingListItemStateFilterEnum.skipped;
-      case 2:
-        return PackingListItemStateFilterEnum.missing;
-      case 3:
-        return PackingListItemStateFilterEnum.packed;
-      default:
-        return PackingListItemStateFilterEnum.all;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, PackingListItemStateFilterEnum obj) {
-    switch (obj) {
-      case PackingListItemStateFilterEnum.all:
-        writer.writeByte(0);
-        break;
-      case PackingListItemStateFilterEnum.skipped:
-        writer.writeByte(1);
-        break;
-      case PackingListItemStateFilterEnum.missing:
-        writer.writeByte(2);
-        break;
-      case PackingListItemStateFilterEnum.packed:
-        writer.writeByte(3);
-        break;
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PackingListItemStateFilterEnumAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

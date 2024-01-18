@@ -15,16 +15,15 @@ class PackingListItemWidget extends StatelessWidget {
   final bool editable;
 
   TextStyle? _getTextStyle(PackingListItemStateEnum state) {
-    switch(state) {
+    switch (state) {
       case PackingListItemStateEnum.missing:
-      return const TextStyle(
-      color: Colors.amber
-    );
-    case PackingListItemStateEnum.skipped:
-    return const TextStyle(
-      decoration: TextDecoration.lineThrough,
-    );
-    default: return null;
+        return const TextStyle(color: Colors.amber);
+      case PackingListItemStateEnum.skipped:
+        return const TextStyle(
+          decoration: TextDecoration.lineThrough,
+        );
+      default:
+        return null;
     }
   }
 
@@ -37,20 +36,16 @@ class PackingListItemWidget extends StatelessWidget {
       //leading: Icon(CategoryIcons[item.categoryItem]),
       title: Row(children: <Widget>[
         Expanded(
-          child: Text(
-            item.name,
-            
-            /*
+          child: Text(item.name,
+
+              /*
               item.category.isNotEmpty
                   ? '${item.name} (${item.category})'
                   : item.name,*/
-              style: _getTextStyle(
-                  item.state)),
-                  
+              style: _getTextStyle(item.state)),
         ),
         Text('${item.quantity} / ${item.used}'),
-        
-        if (editable)...[
+        if (editable) ...[
           IconButton(
             iconSize: 30,
             icon: const Icon(
@@ -75,21 +70,8 @@ class PackingListItemWidget extends StatelessWidget {
               };
               onItemChanged(item);
             },
-          )],
-          
-        /*
-          
-        IconButton(
-          iconSize: 30,
-          icon: const Icon(
-            Icons.edit,
-            //color: Color.fromARGB(255, 4, 66, 182),
-          ),
-          alignment: Alignment.centerRight,
-          onPressed: () {
-            onEditItem(item);
-          },
-        ),*/
+          )
+        ],
       ]),
     );
   }

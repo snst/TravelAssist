@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'packinglist.dart';
 import 'packingitem_widget.dart';
 import 'packingitem_page.dart';
+import 'packinglist_model.dart';
 
 class PackingListPage extends StatefulWidget {
   const PackingListPage(
@@ -19,14 +17,8 @@ class PackingListPage extends StatefulWidget {
 }
 
 class _PackingListPageState extends State<PackingListPage> {
-  //final PackingList _packingList =
-  //    Hive.box('packinglist').get('1', defaultValue: PackingList("default"));
   bool _listEditable = false;
   int _selectedFilterIndex = 1;
-
-  void saveData() {
-    //Hive.box('packinglist').put('1', _packingList);
-  }
 
   PackingListItemStateEnum bottomIndexToStateEnum(int index) {
     final filters = [
@@ -104,25 +96,10 @@ class _PackingListPageState extends State<PackingListPage> {
           ),
         ],
       ),
-      body: Consumer<PackingList>(
+      body: Consumer<PackingListModel>(
         builder: (context, packinglist, child) {
           packinglist.load();
-          return
-              /*
-          StickyGroupedListView<PackingListItem, String>(
-            elements: packinglist.getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
-       //     elements: packinglist.items,
-            order: StickyGroupedListOrder.ASC,
-            groupBy: (PackingListItem element) => element.category,
-            groupComparator: (String value1, String value2) =>
-                value2.compareTo(value1),
-            itemComparator:
-                (PackingListItem element1, PackingListItem element2) =>
-                    element1.name.compareTo(element2.name),
-            floatingHeader: true,
-            groupSeparatorBuilder: _getGroupSeparator,
-            */
-              GroupedListView<PackingListItem, String>(
+          return GroupedListView<PackingListItem, String>(
             elements: packinglist
                 .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
             groupBy: (PackingListItem element) => element.category,

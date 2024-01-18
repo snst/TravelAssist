@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 part 'packinglist.g.dart';
 
@@ -60,72 +59,5 @@ class PackingListItem extends HiveObject {
     state = other.state;
     category = other.category;
     comment = other.comment;
-  }
-}
-
-class PackingList extends ChangeNotifier {
-  PackingList(this._name);
-
-  bool _loaded = false;
-  String _name;
-  Box<PackingListItem>? _box;
-
-  String get hiveName => 'packinglist_${_name}';
-  List<PackingListItem> get items => _box != null ? _box!.values.toList() : [];
-
-  void load() async {
-    if (!_loaded) {
-      _box = await Hive.openBox(hiveName);
-      _loaded = true;
-      notifyListeners();
-    }
-  }
-
-  List<String> getCategories() {
-    List<String> ret = [];
-    for (final item in items) {
-      if (!ret.contains(item.category)) {
-        ret.add(item.category);
-      }
-    }
-    ret.sort();
-    return ret;
-  }
-
-  void notifyItemChanged(PackingListItem item) {
-    _box?.delete(item.key);
-    _box?.add( item);
-    notifyListeners();
-  }
-
-  void deleteItem(PackingListItem item) {
-    _box?.delete(item.key);
-    notifyListeners();
-  }
-
-  void addItem(PackingListItem item) {
-    _box?.add(item);
-    notifyListeners();
-  }
-
-  //int cntItem() => _items.length;
-
-  //PackingListItem getItem(int i) => _items.elementAt(i);
-
-  List<PackingListItem> getFilteredItems(PackingListItemStateEnum state) {
-    switch (state) {
-      case PackingListItemStateEnum.packed:
-        return items
-            .where((i) => i.state == PackingListItemStateEnum.packed)
-            .toList();
-      case PackingListItemStateEnum.skipped:
-        return items
-            .where((i) => i.state == PackingListItemStateEnum.skipped)
-            .toList();
-      case PackingListItemStateEnum.missing:
-        return items
-            .where((i) => i.state == PackingListItemStateEnum.missing)
-            .toList();
-    }
   }
 }

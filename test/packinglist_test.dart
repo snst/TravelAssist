@@ -1,8 +1,15 @@
 // Import the test package and Counter class
+import 'package:travel_assist/transaction.dart';
 import 'package:travel_assist/packinglist.dart';
 import 'package:test/test.dart';
 
 void main() {
+   test('Expensed', () {
+    //var item = Expense(name: "shirt");
+
+   });
+
+
 /*  test('PackingListItem id should be incremented', () {
     var item = PackingListItem(name: "shirt");
     expect(item.name, 'shirt');

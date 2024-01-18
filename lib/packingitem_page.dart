@@ -4,6 +4,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'packinglist.dart';
+import 'packinglist_model.dart';
 
 class PackedItemPage extends StatefulWidget {
   PackedItemPage({
@@ -23,8 +24,8 @@ class PackedItemPage extends StatefulWidget {
 
 class _PackedItemPageState extends State<PackedItemPage> {
 
-  PackingList getPackingList(BuildContext context) {
-    return Provider.of<PackingList>(context, listen: false);
+  PackingListModel getPackingList(BuildContext context) {
+    return Provider.of<PackingListModel>(context, listen: false);
   }
 
   void saveAndClose(BuildContext context) {

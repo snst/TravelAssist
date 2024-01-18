@@ -1,36 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/budgetlist_page.dart';
+import 'currency_converter_page.dart';
+import 'packinglist_model.dart';
 import 'packinglist_page.dart';
 import 'packinglist.dart';
-import 'currency_setting_page.dart';
+import 'setting_page.dart';
 import 'currency.dart';
+import 'settings_model.dart';
+import 'transaction.dart';
 
 void main() async {
   //Hive.registerAdapter(PackingListItemStateFilterEnumAdapter());
   Hive.registerAdapter(PackingListItemStateEnumAdapter());
   Hive.registerAdapter(PackingListItemAdapter());
+  Hive.registerAdapter(CurrencyAdapter());
   //Hive.registerAdapter(PackingListAdapter());
 
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => PackingList("default1"),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (context) => PackingListModel("default1")),
+        ChangeNotifierProvider(create: (context) => SettingsModel()),
+        ChangeNotifierProvider(create: (context) => BudgetModel()),
+      ],
       child: MyApp(),
     ),
   );
-
-  //runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  //final CurrencyList _currencyList = CurrencyList();
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,7 +52,6 @@ class MyApp extends StatelessWidget {
       home: PackingListPage(title: 'TravelApp', createDrawer: createDrawer),
     );
   }
-
 }
 
 Drawer createDrawer(BuildContext context) {
@@ -63,11 +68,15 @@ Drawer createDrawer(BuildContext context) {
           child: Text('Drawer Header'),
         ),
         ListTile(
-          title: const Text('Money'),
+          title: const Text('Budget'),
           selected: _selectedIndex == 0,
           onTap: () {
-            //_onItemTapped(0);
-            //Navigator.pop(context);
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        BudgetListPage(createDrawer: createDrawer)));
           },
         ),
         ListTile(
@@ -89,16 +98,20 @@ Drawer createDrawer(BuildContext context) {
           selected: _selectedIndex == 2,
           onTap: () {
             Navigator.pop(context);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CurrencySettingPage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        CurrencyConverterPage(createDrawer: createDrawer)));
           },
         ),
         ListTile(
           title: const Text('Settings'),
           selected: _selectedIndex == 2,
           onTap: () {
-            //_onItemTapped(3);
-            //Navigator.pop(context);
+            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CurrencySettingPage()));
           },
         ),
       ],

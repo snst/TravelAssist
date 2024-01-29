@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'settings_model.dart';
+import 'travel_assist_utils.dart';
 
 class CurrencyConverterPage extends StatefulWidget {
   const CurrencyConverterPage({super.key, required this.createDrawer});
@@ -18,6 +19,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   // Implement your validation logic here
   //}
   List<TextEditingController>? controllers;
+  List<FocusNode>? focusNodes;
 
 /*
   @override
@@ -34,7 +36,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   void onChanged(int index, String text, SettingsModel settings) {
     //print("$index : $text");
     if (controllers != null) {
-      double val = text == "" ? 0 : double.parse(text);
+      double val =  safeConvertToDouble(text);
       for (int j = 0; j < controllers!.length; j++) {
         if (j != index) {
           controllers![j].text = settings.currencies[index]
@@ -56,6 +58,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
           if (controllers == null ||
               controllers!.length != settings.currencies.length) {
             controllers = List.generate(settings.currencies.length, (index) => TextEditingController());
+            focusNodes = List.generate(settings.currencies.length, (index) => FocusNode());
           }
           return ListView.builder(
               shrinkWrap: true,
@@ -65,6 +68,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
                     padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
                     child: TextFormField(
                       controller: controllers![index],
+                      focusNode: focusNodes![index],
                       onChanged: (text) {
                         //_avalueNotifier.value = text;
                         onChanged(index, text, settings);
@@ -81,12 +85,11 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
                         FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
                       ],
                       decoration: InputDecoration(
-                          //border: UnderlineInputBorder(),
                           border: OutlineInputBorder(),
                           labelText: settings.currencies[index].name,
                           labelStyle: TextStyle(fontSize: 30.0),
                           suffixIcon: IconButton(
-                            onPressed: controllers![index].clear,
+                            onPressed: () { controllers![index].clear(); focusNodes![index].requestFocus(); },
                             icon: const Icon(Icons.clear),
                           )),
                     ));

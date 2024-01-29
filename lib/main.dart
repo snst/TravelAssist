@@ -10,6 +10,7 @@ import 'setting_page.dart';
 import 'currency.dart';
 import 'settings_model.dart';
 import 'transaction.dart';
+import 'welcome_page.dart';
 
 void main() async {
   //Hive.registerAdapter(PackingListItemStateFilterEnumAdapter());
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       themeMode: ThemeMode.dark,
-      home: PackingListPage(title: 'TravelApp', createDrawer: createDrawer),
+      home: const WelcomePage(createDrawer: createDrawer),
     );
   }
 }
@@ -68,9 +69,10 @@ Drawer createDrawer(BuildContext context) {
           child: Text('Drawer Header'),
         ),
         ListTile(
-          title: const Text('Budget'),
+          title: const Text('Budget List'),
           selected: _selectedIndex == 0,
           onTap: () {
+            Navigator.pop(context);
             Navigator.pop(context);
             Navigator.push(
                 context,
@@ -80,9 +82,10 @@ Drawer createDrawer(BuildContext context) {
           },
         ),
         ListTile(
-          title: const Text('Packing List.'),
+          title: const Text('Packing List'),
           selected: _selectedIndex == 1,
           onTap: () {
+            Navigator.pop(context);
             Navigator.pop(context);
             Navigator.push(
                 context,
@@ -94,9 +97,10 @@ Drawer createDrawer(BuildContext context) {
           },
         ),
         ListTile(
-          title: const Text('Currency'),
+          title: const Text('Currency Converter'),
           selected: _selectedIndex == 2,
           onTap: () {
+            Navigator.pop(context);
             Navigator.pop(context);
             Navigator.push(
                 context,
@@ -110,8 +114,9 @@ Drawer createDrawer(BuildContext context) {
           selected: _selectedIndex == 2,
           onTap: () {
             Navigator.pop(context);
+            Navigator.pop(context);
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CurrencySettingPage()));
+                MaterialPageRoute(builder: (context) => CurrencySettingPage(createDrawer: createDrawer)));
           },
         ),
       ],

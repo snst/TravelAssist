@@ -45,34 +45,6 @@ class _PackingListPageState extends State<PackingListPage> {
     );
   }
 
-  Widget _getGroupSeparator(PackingListItem element) {
-    return SizedBox(
-      height: 50,
-      child: Align(
-        alignment: Alignment.center,
-        child: SizedBox(
-          width: double.infinity,
-          child: Card(
-              color: Colors.grey.shade900,
-              child: Text(
-                element.category,
-                textAlign: TextAlign.center,
-              )),
-        ),
-      ),
-    );
-  }
-
-  Widget _getItem(BuildContext ctx, PackingListItem item) {
-    return PackingListItemWidget(
-        item: item,
-        onItemChanged: (item) {
-          setState(() {});
-        },
-        onEditItem: _showEditDialog,
-        editable: _listEditable);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,22 +81,25 @@ class _PackingListPageState extends State<PackingListPage> {
                     element1.name.compareTo(element2.name),
             order: GroupedListOrder.DESC,
             useStickyGroupSeparators: false,
-            groupSeparatorBuilder: (String value) => SizedBox(
-              height: 50,
-              child: Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                      color: Colors.grey.shade900,
-                      child: Text(
-                        value,
-                        textAlign: TextAlign.center,
-                      )),
-                ),
+            groupSeparatorBuilder: (String value) => Padding(
+              padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+              child: Container(
+                color: Colors.grey.shade900,
+                child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.center,
+                    )),
               ),
             ),
-            itemBuilder: _getItem,
+            itemBuilder: (context, item) => PackingListItemWidget(
+                item: item,
+                onItemChanged: (item) {
+                  setState(() {});
+                },
+                onEditItem: _showEditDialog,
+                editable: _listEditable),
           );
         },
       ),

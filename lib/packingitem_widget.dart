@@ -29,50 +29,54 @@ class PackingListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        onEditItem(item);
-      },
-      //leading: Icon(CategoryIcons[item.categoryItem]),
-      title: Row(children: <Widget>[
-        Expanded(
-          child: Text(item.name,
+    return SizedBox(
+        height: editable ? 45 : 25,
+        child: ListTile(
+          onTap: () {
+            onEditItem(item);
+          },
+          minVerticalPadding: 0,
+          visualDensity: VisualDensity(vertical: -4),
 
-              /*
-              item.category.isNotEmpty
-                  ? '${item.name} (${item.category})'
-                  : item.name,*/
-              style: _getTextStyle(item.state)),
-        ),
-        Text('${item.quantity} / ${item.used}'),
-        if (editable) ...[
-          IconButton(
-            iconSize: 30,
-            icon: const Icon(
-              Icons.hide_source,
-              //color: Colors.red,
-            ),
-            alignment: Alignment.centerRight,
-            onPressed: () {
-              item.state = PackingListItemStateEnum.skipped;
-              onItemChanged(item);
-            },
-          ),
-          Checkbox(
-            //checkColor: Colors.greenAccent,
-            //activeColor: Colors.red,
-            value: item.state == PackingListItemStateEnum.packed,
-            onChanged: (value) {
-              item.state = switch (item.state) {
-                PackingListItemStateEnum.missing =>
-                  PackingListItemStateEnum.packed,
-                _ => PackingListItemStateEnum.missing
-              };
-              onItemChanged(item);
-            },
-          )
-        ],
-      ]),
-    );
+          //leading: Icon(CategoryIcons[item.categoryItem]),
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    item.name,
+                    //style: _getTextStyle(item.state)
+                  ),
+                ),
+                Text('${item.quantity} / ${item.used}'),
+                if (editable) ...[
+                  IconButton(
+                    //iconSize: 30,
+                    icon: const Icon(
+                      Icons.hide_source,
+                      //color: Colors.red,
+                    ),
+                    alignment: Alignment.centerRight,
+                    onPressed: () {
+                      item.state = PackingListItemStateEnum.skipped;
+                      onItemChanged(item);
+                    },
+                  ),
+                  Checkbox(
+                    //checkColor: Colors.greenAccent,
+                    //activeColor: Colors.red,
+                    value: item.state == PackingListItemStateEnum.packed,
+                    onChanged: (value) {
+                      item.state = switch (item.state) {
+                        PackingListItemStateEnum.missing =>
+                          PackingListItemStateEnum.packed,
+                        _ => PackingListItemStateEnum.missing
+                      };
+                      onItemChanged(item);
+                    },
+                  )
+                ],
+              ]),
+        ));
   }
 }

@@ -28,7 +28,8 @@ class Transaction extends HiveObject {
       this.currency,
       DateTime? date,
       this.method = 0,
-      this.categoryKey=0})
+      this.categoryKey = 0,
+      this.comment = ""})
       : this.date = date ?? DateTime.now();
 
   @HiveField(0)
@@ -45,9 +46,19 @@ class Transaction extends HiveObject {
   int method;
   @HiveField(6)
   int categoryKey;
+  @HiveField(7)
+  String comment;
 
   Currency? currency;
-  final List<String> budgetCatgegories = ['Common', 'Restaurant', 'Food', 'Drink', 'Transport', 'Accomodation', 'Activity'];
+  final List<String> budgetCatgegories = [
+    'Common',
+    'Restaurant',
+    'Food',
+    'Drink',
+    'Transport',
+    'Accomodation',
+    'Activity'
+  ];
 
   @override
   String toString() {
@@ -59,12 +70,33 @@ class Transaction extends HiveObject {
 
   String get dateString => DateFormat('EEEE, d MMMM y').format(date);
 
-  String get category => budgetCatgegories[categoryKey];
+  //String get category => budgetCatgegories[categoryKey];
 
   String get valueStr => Currency.formatValue(value);
 
+  DateTime get groupDate {
+    return date.copyWith(hour:0, minute:0, second:0, millisecond: 0, microsecond: 0);
+  }
+
   String getValueStrInCurrency(Currency targetCurrency) {
     return Currency.formatValue(convertTo(targetCurrency));
+  }
+
+  void update(Transaction other) {
+    name = other.name;
+    value = other.value;
+    currencyKey = other.currencyKey;
+    type = other.type;
+    date = other.date;
+    method = other.method;
+    categoryKey = other.categoryKey;
+    comment = other.comment;
+  }
+
+  Transaction clone() {
+    var item = Transaction();
+    item.update(this);
+    return item;
   }
 }
 
@@ -101,22 +133,68 @@ class BudgetModel extends ChangeNotifier {
       isInit = true;
       transactions = [];
 
-      SettingsModel settings = Provider.of<SettingsModel>(context, listen: false);
+      SettingsModel settings =
+          Provider.of<SettingsModel>(context, listen: false);
       Currency dollar = settings.getCurrency("\$");
       Currency eur = settings.getCurrency("€");
       Currency cordoba = settings.getCurrency("C\$");
 
-      add(Transaction(name:"Bus und Bahn", currency: dollar, value: 4, date: DateTime(2023, 1, 14), categoryKey: 1));
-      add(Transaction(name:"Zopilote", currency: eur, value: 20.3, date: DateTime(2023, 2, 15), categoryKey: 3));
-      add(Transaction(name:"Cola", currency: eur, value: 2.3, date: DateTime(2023, 1, 15), categoryKey: 2));
-      add(Transaction(name:"Chips", currency: cordoba, value: 27, date: DateTime(2023, 1, 12), categoryKey: 4));
-      add(Transaction(name:"Taxi Bla Blub", currency: dollar, value: 2.3, date: DateTime(2023, 1, 15), categoryKey: 1));
-      add(Transaction(name:"Bratwurst", currency: dollar, value: 20.3, date: DateTime(2023, 2, 15), categoryKey: 2));
+      transactions.add(Transaction(
+          name: "Bus und Bahn",
+          currency: dollar,
+          value: 4,
+          date: DateTime(2023, 1, 14),
+          categoryKey: 1));
+      transactions.add(Transaction(
+          name: "Zopilote",
+          currency: eur,
+          value: 20.3,
+          date: DateTime(2023, 2, 15),
+          categoryKey: 3));
+      transactions.add(Transaction(
+          name: "Cola",
+          currency: eur,
+          value: 2.3,
+          date: DateTime(2023, 1, 15),
+          categoryKey: 2));
+      transactions.add(Transaction(
+          name: "Chips",
+          currency: cordoba,
+          value: 27,
+          date: DateTime(2023, 1, 12),
+          categoryKey: 4));
+      transactions.add(Transaction(
+          name: "Taxi Bla Blub",
+          currency: dollar,
+          value: 2.3,
+          date: DateTime(2023, 1, 15),
+          categoryKey: 1));
+      transactions.add(Transaction(
+          name: "Bratwurst",
+          currency: dollar,
+          value: 20.3,
+          date: DateTime(2023, 2, 15),
+          categoryKey: 2));
     }
   }
 
   void add(Transaction transaction) {
     transactions.add(transaction);
+    notifyListeners();
+  }
+
+  void delete(Transaction item) {
+    transactions.remove(item.key);
+    notifyListeners();
+  }
+
+  void notifyItemChanged(Transaction item) {
+    //transactions.put(item.key, item);
+    //transactions.remove(item.key);
+    //transactions.add(item);
+    //_box?.delete(item.key);
+    //_box?.add(item);
+    notifyListeners();
   }
 
   int transactionComparison(Transaction a, Transaction b) {

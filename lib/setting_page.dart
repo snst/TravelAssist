@@ -4,7 +4,8 @@ import 'currency.dart';
 import 'settings_model.dart';
 
 class CurrencySettingPage extends StatefulWidget {
-  CurrencySettingPage({super.key});
+  CurrencySettingPage({super.key, required this.createDrawer});
+  final Drawer Function(BuildContext context) createDrawer;
 
   @override
   State<CurrencySettingPage> createState() => _CurrencySettingPageState();
@@ -104,6 +105,7 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
         tooltip: 'Add currency',
         child: const Icon(Icons.add),
       ),
+      drawer: widget.createDrawer(context),
     );
   }
 }

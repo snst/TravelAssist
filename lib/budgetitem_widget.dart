@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'settings_model.dart';
 import 'transaction.dart';
+import 'expense_category.dart';
 
 class BudgetListItemWidget extends StatelessWidget {
   BudgetListItemWidget({
@@ -31,49 +32,37 @@ class BudgetListItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var currencies = context.watch<SettingsModel>();
     const detailStyle = const TextStyle(color: Colors.grey, fontSize: 14);
-    final valueHome = '${item.getValueStrInCurrency(currencies.getHomeCurrency())} ${currencies.getHomeCurrency().name}';
+    final valueHome =
+        '${item.getValueStrInCurrency(currencies.getHomeCurrency())} ${currencies.getHomeCurrency().name}';
     final valueLocal = '${item.valueStr} ${item.currency!.name}';
 
-    return ListTile(
-      onTap: () {
-        onEditItem(item);
-      },
-      minVerticalPadding: 0,
-      //dense:true,
-      //visualDensity:VisualDensity(horizontal: 0, vertical: 4),
-      leading: Icon(Icons.train),
-/*
-      title: Row(children: [
-        Expanded(child: Column(children: [
-          Text(item.name, textAlign:TextAlign.left),
-          Text(item.category, style: detailStyle),
-        ])),
-        Column(children: [
-        Text(valueHome),
-        Text(valueLocal, style: detailStyle),
-        ]),
-      ]*/
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+        height: 50,
+        child: ListTile(
+          onTap: () {
+            onEditItem(item);
+          },
+          //contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0), // add padding here
+          visualDensity: VisualDensity(vertical: -4),
+          //dense:true,
+          //minVerticalPadding: 0,
+          //dense:true,
+          //visualDensity:VisualDensity(horizontal: 0, vertical: 0),
+          leading: ExpenseCategoryManager.at(item.categoryKey).icon,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(item.name),
-              Text(item.category, style: detailStyle),
+              Text(valueHome),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(valueHome),
+              Text(ExpenseCategoryManager.at(item.categoryKey).name, style: detailStyle),
               Text(valueLocal, style: detailStyle),
             ],
           ),
-        ],
-      ),
-      
-      
-    );
+        ));
   }
 }

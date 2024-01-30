@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/settings_model.dart';
-import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ExpenseCategory {

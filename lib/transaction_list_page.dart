@@ -2,25 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:travel_assist/budgetitem_widget.dart';
-import 'budgetitem_page.dart';
-import 'transaction.dart';
+import 'package:travel_assist/currency.dart';
+import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/transaction_provider.dart';
+import 'package:travel_assist/budgetitem_page.dart';
+import 'package:travel_assist/transaction.dart';
+import 'currency_widget.dart';
 
-class BudgetListPage extends StatefulWidget {
-  const BudgetListPage({super.key, required this.createDrawer});
+class TransactionListPage extends StatefulWidget {
+  TransactionListPage({super.key, required this.createDrawer});
   final Drawer Function(BuildContext context) createDrawer;
   @override
-  State<BudgetListPage> createState() => _BudgetListPageState();
+  State<TransactionListPage> createState() => _TransactionListPageState();
+  Currency? shownCurrency = null;
 }
 
-class _BudgetListPageState extends State<BudgetListPage> {
+class _TransactionListPageState extends State<TransactionListPage> {
+
   Future<void> _showEditDialog(Transaction item) async {
-    
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => /*const*/ BudgetItemPage(
+          builder: (context) => BudgetItemPage(
                 newItem: false,
                 item: item,
               )),
@@ -32,27 +36,41 @@ class _BudgetListPageState extends State<BudgetListPage> {
     super.initState();
   }
 
-*/
   Widget _getItem(BuildContext ctx, Transaction item) {
     return BudgetListItemWidget(
       item: item,
       onEditItem: _showEditDialog,
     );
   }
+*/
 
   @override
   Widget build(BuildContext context) {
-    //Provider.of<SettingsModel>(context, listen: false).load();
+    //final cp = CurrencyProvider.getInstance(context);
+    //final tp = TransactionProvider.getInstance(context);
+    final cp = context.watch<CurrencyProvider>();
+    final tp = context.watch<TransactionProvider>();
+    tp.initCurrencies(cp);
+    widget.shownCurrency ??= cp.getHomeCurrency();
+
+    var res = tp.calculate(widget.shownCurrency!, null);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Budget"),
-        
+        actions: [
+          Text(Currency.formatValue(res.sumExpense)),
+          CurrencyWidget(
+              currencies: cp.items,
+              selected: widget.shownCurrency!,
+              onChanged: (currency) { setState(() {
+                widget.shownCurrency = currency;
+              });})
+        ],
+        title: const Text("Expenses"),
       ),
-      body: Consumer<BudgetModel>(
-        builder: (context, budgetList, child) {
-          budgetList.load(context);
+      body: Consumer<TransactionProvider>(
+        builder: (context, transactions, child) {
           return GroupedListView<Transaction, DateTime>(
-              elements: budgetList.getSortedTransactions(null),
+              elements: transactions.getSortedTransactions(null),
               groupBy: (Transaction element) => element.groupDate,
               //groupComparator: (value1, value2) => value2.date.compareTo(value1.date),
               itemComparator: (Transaction element1, Transaction element2) =>
@@ -73,7 +91,7 @@ class _BudgetListPageState extends State<BudgetListPage> {
                   //height: 28,
                   //child:
                   Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: Container(
                       //height: 20,
                       color: Colors.grey.shade900,
@@ -97,12 +115,17 @@ class _BudgetListPageState extends State<BudgetListPage> {
       drawer: widget.createDrawer(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          final currency =
+              CurrencyProvider.getInstance(context).getCurrencyByName('\$');
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => /*const*/ BudgetItemPage(
+                builder: (context) => BudgetItemPage(
                       newItem: true,
-                      item: Transaction(),
+                      item: Transaction(
+                          date: DateTime.now(),
+                          currencyKey: currency.id,
+                          currency: currency),
                     )),
           );
         },

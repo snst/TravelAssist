@@ -3,39 +3,35 @@ import 'package:flutter_spinbox/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'packinglist.dart';
-import 'packinglist_model.dart';
+import 'todo_item.dart';
+import 'todo_provider.dart';
 
-class PackedItemPage extends StatefulWidget {
-  PackedItemPage({
+class TodoItemPage extends StatefulWidget {
+  TodoItemPage({
     super.key,
     required this.newItem,
     required this.item,
-  }) : title = newItem ? 'Add item' : 'Edit item', modifiedItem = item.clone();
+  })  : title = newItem ? 'Add item' : 'Edit item',
+        modifiedItem = TodoItem.copy(item);
 
   final bool newItem;
   final String title;
-  final PackingListItem item;
-  final PackingListItem modifiedItem;
+  final TodoItem item;
+  final TodoItem modifiedItem;
 
   @override
-  State<PackedItemPage> createState() => _PackedItemPageState();
+  State<TodoItemPage> createState() => _PackedItemPageState();
 }
 
-class _PackedItemPageState extends State<PackedItemPage> {
-
-  PackingListModel getPackingList(BuildContext context) {
-    return Provider.of<PackingListModel>(context, listen: false);
+class _PackedItemPageState extends State<TodoItemPage> {
+  TodoProvider getPackingList(BuildContext context) {
+    return Provider.of<TodoProvider>(context, listen: false);
   }
 
   void saveAndClose(BuildContext context) {
     if (widget.modifiedItem.name.isNotEmpty) {
-      if(widget.newItem) {
-        getPackingList(context).addItem(widget.modifiedItem);
-      } else {
-        widget.item.update(widget.modifiedItem);
-        getPackingList(context).notifyItemChanged(widget.item);
-      }
+      widget.item.update(widget.modifiedItem);
+      getPackingList(context).add(widget.item);
       Navigator.of(context).pop();
     }
   }
@@ -76,7 +72,7 @@ class _PackedItemPageState extends State<PackedItemPage> {
                     ),
                     suggestionsCallback: (pattern) {
                       widget.modifiedItem.category = pattern;
-                      
+
                       List<String> strlist = categories
                           .where((item) => item
                               .toLowerCase()
@@ -122,7 +118,8 @@ class _PackedItemPageState extends State<PackedItemPage> {
                               width: 150,
                             ),
                             labelText: 'Used'),
-                        onChanged: (value) => widget.modifiedItem.used = value.toInt(),
+                        onChanged: (value) =>
+                            widget.modifiedItem.used = value.toInt(),
                       ),
                     )
                   ]),
@@ -131,18 +128,18 @@ class _PackedItemPageState extends State<PackedItemPage> {
                       child: Center(
                           child: ToggleSwitch(
                         initialLabelIndex: switch (widget.modifiedItem.state) {
-                          PackingListItemStateEnum.missing => 0,
-                          PackingListItemStateEnum.skipped => 1,
-                          PackingListItemStateEnum.packed => 2
+                          TodoItemStateEnum.open => 0,
+                          TodoItemStateEnum.skipped => 1,
+                          TodoItemStateEnum.done => 2
                         },
                         totalSwitches: 3,
-                        labels: const ['Missing', 'Skipped', 'Packed'],
+                        labels: const ['Open', 'Skipped', 'Done'],
                         onToggle: (index) {
                           widget.modifiedItem.state = switch (index) {
-                            0 => PackingListItemStateEnum.missing,
-                            1 => PackingListItemStateEnum.skipped,
-                            2 => PackingListItemStateEnum.packed,
-                            _ => PackingListItemStateEnum.missing
+                            0 => TodoItemStateEnum.open,
+                            1 => TodoItemStateEnum.skipped,
+                            2 => TodoItemStateEnum.done,
+                            _ => TodoItemStateEnum.open
                           };
                           //print('switched to: $index');
                           saveAndClose(context);
@@ -161,7 +158,7 @@ class _PackedItemPageState extends State<PackedItemPage> {
                             ),
                             //alignment: Alignment.centerRight,
                             onPressed: () {
-                              getPackingList(context).deleteItem(widget.item);
+                              getPackingList(context).delete(widget.item);
                               //widget.onItemDeleted(widget.item);
                               Navigator.of(context).pop();
                             }),

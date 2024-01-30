@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'settings_model.dart';
+import 'currency_provider.dart';
 import 'transaction.dart';
 import 'expense_category.dart';
 
@@ -13,25 +13,13 @@ class BudgetListItemWidget extends StatelessWidget {
   final Transaction item;
   final void Function(Transaction item) onEditItem;
 
-  TextStyle? _getTextStyle(TransactionEnum state) {
-    return null;
-    /*
-    switch (state) {
-      case PackingListItemStateEnum.missing:
-        return const TextStyle(color: Colors.amber);
-      case PackingListItemStateEnum.skipped:
-        return const TextStyle(
-          decoration: TextDecoration.lineThrough,
-        );
-      default:
-        return null;
-    }*/
-  }
 
   @override
   Widget build(BuildContext context) {
-    var currencies = context.watch<SettingsModel>();
-    const detailStyle = const TextStyle(color: Colors.grey, fontSize: 14);
+    var currencies = context.watch<CurrencyProvider>();
+    const detailStyle = TextStyle(color: Colors.grey, fontSize: 14);
+    if (item.currencyKey==0) item.currencyKey=currencies.getHomeCurrency().id;
+    if (item.currency==null) item.currency = currencies.getCurrencyById(item.currencyKey);
     final valueHome =
         '${item.getValueStrInCurrency(currencies.getHomeCurrency())} ${currencies.getHomeCurrency().name}';
     final valueLocal = '${item.valueStr} ${item.currency!.name}';
@@ -43,7 +31,7 @@ class BudgetListItemWidget extends StatelessWidget {
             onEditItem(item);
           },
           //contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0), // add padding here
-          visualDensity: VisualDensity(vertical: -4),
+          visualDensity: const VisualDensity(vertical: -4),
           //dense:true,
           //minVerticalPadding: 0,
           //dense:true,

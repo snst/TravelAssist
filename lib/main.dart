@@ -1,42 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/budgetlist_page.dart';
+import 'package:travel_assist/transaction_list_page.dart';
 import 'currency_converter_page.dart';
-import 'packinglist_model.dart';
-import 'packinglist_page.dart';
-import 'packinglist.dart';
+import 'todo_provider.dart';
+import 'todo_list_page.dart';
 import 'setting_page.dart';
-import 'currency.dart';
-import 'settings_model.dart';
-import 'transaction.dart';
+import 'currency_provider.dart';
+import 'transaction_provider.dart';
 import 'welcome_page.dart';
 
 void main() async {
-  //Hive.registerAdapter(PackingListItemStateFilterEnumAdapter());
-  Hive.registerAdapter(PackingListItemStateEnumAdapter());
-  Hive.registerAdapter(PackingListItemAdapter());
-  Hive.registerAdapter(CurrencyAdapter());
-  //Hive.registerAdapter(PackingListAdapter());
-
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => PackingListModel("default1")),
-        ChangeNotifierProvider(create: (context) => SettingsModel()),
-        ChangeNotifierProvider(create: (context) => BudgetModel()),
+        ChangeNotifierProvider(create: (context) => TodoProvider()),
+        ChangeNotifierProvider(create: (context) => CurrencyProvider()),
+        ChangeNotifierProvider(create: (context) => TransactionProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +45,7 @@ class MyApp extends StatelessWidget {
 }
 
 Drawer createDrawer(BuildContext context) {
-  int _selectedIndex = 0;
+  int selectedIndex = 0;
   //Function void _onItemTapped(int i) => {};
   return Drawer(
     child: ListView(
@@ -70,7 +59,7 @@ Drawer createDrawer(BuildContext context) {
         ),
         ListTile(
           title: const Text('Budget List'),
-          selected: _selectedIndex == 0,
+          selected: selectedIndex == 0,
           onTap: () {
             Navigator.pop(context);
             Navigator.pop(context);
@@ -78,27 +67,40 @@ Drawer createDrawer(BuildContext context) {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        BudgetListPage(createDrawer: createDrawer)));
+                        TransactionListPage(createDrawer: createDrawer)));
           },
         ),
         ListTile(
-          title: const Text('Packing List'),
-          selected: _selectedIndex == 1,
+          title: const Text('Todo List'),
+          selected: selectedIndex == 1,
           onTap: () {
             Navigator.pop(context);
             Navigator.pop(context);
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => PackingListPage(
-                          title: 'Packing List',
+                    builder: (context) => const TodoListPage(
+                          title: 'Todo List',
                           createDrawer: createDrawer,
                         )));
           },
         ),
         ListTile(
           title: const Text('Currency Converter'),
-          selected: _selectedIndex == 2,
+          selected: selectedIndex == 2,
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const CurrencyConverterPage(
+                        createDrawer: createDrawer)));
+          },
+        ),
+        ListTile(
+          title: const Text('Settings'),
+          selected: selectedIndex == 2,
           onTap: () {
             Navigator.pop(context);
             Navigator.pop(context);
@@ -106,17 +108,7 @@ Drawer createDrawer(BuildContext context) {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        CurrencyConverterPage(createDrawer: createDrawer)));
-          },
-        ),
-        ListTile(
-          title: const Text('Settings'),
-          selected: _selectedIndex == 2,
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CurrencySettingPage(createDrawer: createDrawer)));
+                        CurrencySettingPage(createDrawer: createDrawer)));
           },
         ),
       ],

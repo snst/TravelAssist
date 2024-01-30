@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinbox/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+//import 'package:flutter_spinbox/material.dart';
+//import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+import 'package:travel_assist/transaction_provider.dart';
+//import 'package:toggle_switch/toggle_switch.dart';
 import 'transaction.dart';
-import 'settings_model.dart';
-import 'currency.dart';
+import 'currency_provider.dart';
+//import 'currency.dart';
 import 'expense_category.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'travel_assist_utils.dart';
+import 'currency_widget.dart';
 
 class BudgetItemPage extends StatefulWidget {
   BudgetItemPage({
@@ -20,6 +22,7 @@ class BudgetItemPage extends StatefulWidget {
         modifiedItem = item.clone();
 
   final bool newItem;
+  bool modified = false;
   final String title;
   final Transaction item;
   final Transaction modifiedItem;
@@ -31,18 +34,10 @@ class BudgetItemPage extends StatefulWidget {
 class _BudgetItemPageState extends State<BudgetItemPage> {
   ExpenseCategory selectedExpense = ExpenseCategoryManager.list[0];
 
-  BudgetModel getExpenseList(BuildContext context) {
-    return Provider.of<BudgetModel>(context, listen: false);
-  }
-
   void saveAndClose(BuildContext context) {
     if (widget.modifiedItem.name.isNotEmpty) {
-      if (widget.newItem) {
-        getExpenseList(context).add(widget.modifiedItem);
-      } else {
-        widget.item.update(widget.modifiedItem);
-        getExpenseList(context).notifyItemChanged(widget.item);
-      }
+      widget.item.update(widget.modifiedItem);
+      TransactionProvider.getInstance(context).add(widget.item);
       Navigator.of(context).pop();
     }
   }
@@ -53,27 +48,23 @@ class _BudgetItemPageState extends State<BudgetItemPage> {
     final DateTime? picked = await showDatePicker(
       context: context,
 //      initialDate: _selectedDate ?? DateTime.now(),
-      initialDate:  this.widget.modifiedItem.date,
+      initialDate: widget.modifiedItem.date,
       firstDate: DateTime(2020),
       lastDate: DateTime(2101),
     );
 
-    if (picked != null && picked != this.widget.modifiedItem.date) {
+    if (picked != null && picked != widget.modifiedItem.date) {
       setState(() {
-        this.widget.modifiedItem.date = picked;
+        widget.modifiedItem.date = picked;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    //final TextEditingController controller = TextEditingController();
-    //controller.text = widget.modifiedItem.category;
-    SettingsModel settings = Provider.of<SettingsModel>(context, listen: false);
-    Currency dollar = settings.getCurrency("\$");
-    if (widget.newItem) {
-      widget.modifiedItem.currency = dollar;
-    }
+    CurrencyProvider currencies =
+        Provider.of<CurrencyProvider>(context, listen: false);
+
     selectedExpense =
         ExpenseCategoryManager.at(widget.modifiedItem.categoryKey);
 
@@ -85,25 +76,30 @@ class _BudgetItemPageState extends State<BudgetItemPage> {
         children: [
           Flexible(
             child: TextField(
+              textAlign: TextAlign.right,
               controller: TextEditingController()
-                ..text =
-                    this.widget.newItem ? "" : widget.modifiedItem.valueStr,
+                ..text = widget.modifiedItem.value == 0 ? "" : widget.modifiedItem.valueStr,
               decoration: const InputDecoration(hintText: 'Amount'),
-              onChanged: (value) =>
-                  widget.modifiedItem.value = safeConvertToDouble(value),
+              onChanged: (value) {
+                widget.modified = true;
+                widget.modifiedItem.value = safeConvertToDouble(value);
+              },
               autofocus: true,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 30,
                 //color: Colors.blue.shade700,
                 fontWeight: FontWeight.w600,
               ),
               autocorrect: false,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
               ],
             ),
           ),
+          CurrencyWidget(currencies: currencies.items, selected: widget.modifiedItem.currency!, onChanged: (currency) { widget.modifiedItem.setCurrency(currency); })
+          
         ],
       )),
       body: Padding(
@@ -149,13 +145,13 @@ class _BudgetItemPageState extends State<BudgetItemPage> {
               ),
             ),
             OutlinedButton(
-          onPressed: () {
-            _selectDate(context);
-            //_restorableDatePickerRouteFuture.present();
-          },
-          child: Text(this.widget.modifiedItem.dateString),
-        ),
-        /*
+              onPressed: () {
+                _selectDate(context);
+                //_restorableDatePickerRouteFuture.present();
+              },
+              child: Text(widget.modifiedItem.dateString),
+            ),
+            /*
             GestureDetector(
               onTap: () {},
               child: Text(
@@ -176,7 +172,8 @@ class _BudgetItemPageState extends State<BudgetItemPage> {
                       ),
                       //alignment: Alignment.centerRight,
                       onPressed: () {
-                        getExpenseList(context).delete(widget.item);
+                        TransactionProvider.getInstance(context)
+                            .delete(widget.item);
                         //widget.onItemDeleted(widget.item);
                         Navigator.of(context).pop();
                       }),

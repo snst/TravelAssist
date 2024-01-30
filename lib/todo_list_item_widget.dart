@@ -1,31 +1,18 @@
 import 'package:flutter/material.dart';
-import 'packinglist.dart';
+import 'todo_item.dart';
 
-class PackingListItemWidget extends StatelessWidget {
-  PackingListItemWidget(
+class TodoListItemWidget extends StatelessWidget {
+  TodoListItemWidget(
       {required this.item,
       required this.onItemChanged,
       required this.onEditItem,
       required this.editable})
       : super(key: ObjectKey(item));
 
-  final PackingListItem item;
-  final void Function(PackingListItem item) onItemChanged;
-  final void Function(PackingListItem item) onEditItem;
+  final TodoItem item;
+  final void Function(TodoItem item) onItemChanged;
+  final void Function(TodoItem item) onEditItem;
   final bool editable;
-
-  TextStyle? _getTextStyle(PackingListItemStateEnum state) {
-    switch (state) {
-      case PackingListItemStateEnum.missing:
-        return const TextStyle(color: Colors.amber);
-      case PackingListItemStateEnum.skipped:
-        return const TextStyle(
-          decoration: TextDecoration.lineThrough,
-        );
-      default:
-        return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +23,7 @@ class PackingListItemWidget extends StatelessWidget {
             onEditItem(item);
           },
           minVerticalPadding: 0,
-          visualDensity: VisualDensity(vertical: -4),
+          visualDensity: const VisualDensity(vertical: -4),
 
           //leading: Icon(CategoryIcons[item.categoryItem]),
           title: Row(
@@ -58,19 +45,19 @@ class PackingListItemWidget extends StatelessWidget {
                     ),
                     alignment: Alignment.centerRight,
                     onPressed: () {
-                      item.state = PackingListItemStateEnum.skipped;
+                      item.state = TodoItemStateEnum.skipped;
                       onItemChanged(item);
                     },
                   ),
                   Checkbox(
                     //checkColor: Colors.greenAccent,
                     //activeColor: Colors.red,
-                    value: item.state == PackingListItemStateEnum.packed,
+                    value: item.state == TodoItemStateEnum.done,
                     onChanged: (value) {
                       item.state = switch (item.state) {
-                        PackingListItemStateEnum.missing =>
-                          PackingListItemStateEnum.packed,
-                        _ => PackingListItemStateEnum.missing
+                        TodoItemStateEnum.open =>
+                          TodoItemStateEnum.done,
+                        _ => TodoItemStateEnum.open
                       };
                       onItemChanged(item);
                     },

@@ -2,29 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'packinglist.dart';
-import 'packingitem_widget.dart';
-import 'packingitem_page.dart';
-import 'packinglist_model.dart';
+import 'todo_list_item_widget.dart';
+import 'todo_item_page.dart';
+import 'todo_item.dart';
+import 'todo_provider.dart';
 
-class PackingListPage extends StatefulWidget {
-  const PackingListPage(
+class TodoListPage extends StatefulWidget {
+  const TodoListPage(
       {super.key, required this.title, required this.createDrawer});
   final String title;
   final Drawer Function(BuildContext context) createDrawer;
   @override
-  State<PackingListPage> createState() => _PackingListPageState();
+  State<TodoListPage> createState() => _PackingListPageState();
 }
 
-class _PackingListPageState extends State<PackingListPage> {
+class _PackingListPageState extends State<TodoListPage> {
   bool _listEditable = false;
   int _selectedFilterIndex = 1;
 
-  PackingListItemStateEnum bottomIndexToStateEnum(int index) {
+  TodoItemStateEnum bottomIndexToStateEnum(int index) {
     final filters = [
-      PackingListItemStateEnum.packed,
-      PackingListItemStateEnum.missing,
-      PackingListItemStateEnum.skipped
+      TodoItemStateEnum.done,
+      TodoItemStateEnum.open,
+      TodoItemStateEnum.skipped
     ];
     return filters[index];
   }
@@ -34,12 +34,12 @@ class _PackingListPageState extends State<PackingListPage> {
     setState(() {});
   }
 
-  Future<void> _showEditDialog(PackingListItem item) async {
+  Future<void> _showEditDialog(TodoItem item, bool newItem) async {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => /*const*/ PackedItemPage(
-                newItem: false,
+          builder: (context) => TodoItemPage(
+                newItem: newItem,
                 item: item,
               )),
     );
@@ -68,21 +68,19 @@ class _PackingListPageState extends State<PackingListPage> {
           ),
         ],
       ),
-      body: Consumer<PackingListModel>(
-        builder: (context, packinglist, child) {
-          packinglist.load();
-          return GroupedListView<PackingListItem, String>(
-            elements: packinglist
+      body: Consumer<TodoProvider>(
+        builder: (context, todoList, child) {
+          return GroupedListView<TodoItem, String>(
+            elements: todoList
                 .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
-            groupBy: (PackingListItem element) => element.category,
+            groupBy: (TodoItem element) => element.category,
             groupComparator: (value1, value2) => value2.compareTo(value1),
-            itemComparator:
-                (PackingListItem element1, PackingListItem element2) =>
-                    element1.name.compareTo(element2.name),
+            itemComparator: (TodoItem element1, TodoItem element2) =>
+                element1.name.compareTo(element2.name),
             order: GroupedListOrder.DESC,
             useStickyGroupSeparators: false,
             groupSeparatorBuilder: (String value) => Padding(
-              padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
               child: Container(
                 color: Colors.grey.shade900,
                 child: Align(
@@ -93,12 +91,12 @@ class _PackingListPageState extends State<PackingListPage> {
                     )),
               ),
             ),
-            itemBuilder: (context, item) => PackingListItemWidget(
+            itemBuilder: (context, item) => TodoListItemWidget(
                 item: item,
                 onItemChanged: (item) {
                   setState(() {});
                 },
-                onEditItem: _showEditDialog,
+                onEditItem: (item) => _showEditDialog(item, false),
                 editable: _listEditable),
           );
         },
@@ -107,11 +105,11 @@ class _PackingListPageState extends State<PackingListPage> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.squareCheck),
-            label: 'Packed',
+            label: 'Done',
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.square),
-            label: 'Missing',
+            label: 'Open',
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.ban),
@@ -128,16 +126,7 @@ class _PackingListPageState extends State<PackingListPage> {
       ),
       drawer: widget.createDrawer(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => /*const*/ PackedItemPage(
-                      newItem: true,
-                      item: PackingListItem(quantity: 1),
-                    )),
-          );
-        },
+        onPressed: () => _showEditDialog(TodoItem(quantity: 1), false),
         tooltip: 'Add item',
         child: const Icon(Icons.add),
       ),

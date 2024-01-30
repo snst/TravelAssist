@@ -1,68 +1,54 @@
-//import 'dart:collection';
+import 'package:isar/isar.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/settings_model.dart';
+import 'package:travel_assist/currency_provider.dart';
 import 'package:intl/intl.dart';
+part 'transaction.g.dart';
 
 // flutter packages pub run build_runner build
 
-@HiveType(typeId: 5)
-enum TransactionEnum {
-  @HiveField(0)
+enum TransactionTypeEnum {
   inpayment,
-  @HiveField(1)
   expense,
-  @HiveField(2)
   balance;
 }
 
-@HiveType(typeId: 3)
-class Transaction extends HiveObject {
+@collection
+class Transaction {
   Transaction(
       {this.name = "",
       this.value = 0.0,
       this.currencyKey = 0,
-      this.type = TransactionEnum.expense,
+      this.type = TransactionTypeEnum.expense,
       this.currency,
-      DateTime? date,
+      required DateTime date,
       this.method = 0,
       this.categoryKey = 0,
       this.comment = ""})
-      : this.date = date ?? DateTime.now();
+      : this.date = date;
 
-  @HiveField(0)
+  Id id = Isar.autoIncrement;
   String name;
-  @HiveField(1)
   double value;
-  @HiveField(2)
   int currencyKey;
-  @HiveField(3)
-  TransactionEnum type;
-  @HiveField(4)
   DateTime date;
-  @HiveField(5)
   int method;
-  @HiveField(6)
   int categoryKey;
-  @HiveField(7)
   String comment;
-
+  @enumerated
+  TransactionTypeEnum type;
+  @ignore
   Currency? currency;
-  final List<String> budgetCatgegories = [
-    'Common',
-    'Restaurant',
-    'Food',
-    'Drink',
-    'Transport',
-    'Accomodation',
-    'Activity'
-  ];
 
   @override
   String toString() {
     return "$date $type: $value ${currency!.name} $name";
+  }
+
+  void setCurrency(Currency currency) {
+    this.currency = currency;
+    this.currencyKey = currency.id;
   }
 
   double convertTo(Currency targetCurrency) =>
@@ -70,12 +56,11 @@ class Transaction extends HiveObject {
 
   String get dateString => DateFormat('EEEE, d MMMM y').format(date);
 
-  //String get category => budgetCatgegories[categoryKey];
-
   String get valueStr => Currency.formatValue(value);
 
   DateTime get groupDate {
-    return date.copyWith(hour:0, minute:0, second:0, millisecond: 0, microsecond: 0);
+    return date.copyWith(
+        hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
   }
 
   String getValueStrInCurrency(Currency targetCurrency) {
@@ -91,10 +76,11 @@ class Transaction extends HiveObject {
     method = other.method;
     categoryKey = other.categoryKey;
     comment = other.comment;
+    currency = other.currency;
   }
 
   Transaction clone() {
-    var item = Transaction();
+    var item = Transaction(date: date);
     item.update(this);
     return item;
   }
@@ -133,11 +119,11 @@ class BudgetModel extends ChangeNotifier {
       isInit = true;
       transactions = [];
 
-      SettingsModel settings =
-          Provider.of<SettingsModel>(context, listen: false);
-      Currency dollar = settings.getCurrency("\$");
-      Currency eur = settings.getCurrency("€");
-      Currency cordoba = settings.getCurrency("C\$");
+      CurrencyProvider settings =
+          Provider.of<CurrencyProvider>(context, listen: false);
+      Currency dollar = settings.getCurrencyByName("\$");
+      Currency eur = settings.getCurrencyByName("€");
+      Currency cordoba = settings.getCurrencyByName("C\$");
 
       transactions.add(Transaction(
           name: "Bus und Bahn",
@@ -184,7 +170,7 @@ class BudgetModel extends ChangeNotifier {
   }
 
   void delete(Transaction item) {
-    transactions.remove(item.key);
+    transactions.remove(item.id);
     notifyListeners();
   }
 
@@ -197,55 +183,8 @@ class BudgetModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  int transactionComparison(Transaction a, Transaction b) {
-    /*
-      DateTime normalizedDate1 = DateTime(date1.year, date1.month, date1.day);
-      DateTime normalizedDate2 = DateTime(date2.year, date2.month, date2.day);
-      return normalizedDate1.isAtSameMomentAs(normalizedDate2);
-*/
-    var ret = a.date.compareTo(b.date);
-    //if (ret == 0) {
-    //  ret = a.type.index.compareTo(b.type.index);
-    //}
-    return ret;
-  }
-
   List<Transaction> getTransactions() {
     return transactions;
-  }
-
-  List<Transaction> getSortedTransactions(DateTime? until) {
-    List<Transaction> ret = transactions;
-    if (until != null) {
-      ret = transactions
-          .where((element) => !element.date.isAfter(until))
-          .toList();
-    }
-
-    ret.sort(transactionComparison);
-    return ret;
-  }
-
-  TransactionResult calculate(Currency currency, DateTime? until) {
-    TransactionResult result = TransactionResult();
-    List<Transaction> items = getSortedTransactions(until);
-    for (final item in items) {
-      double value = item.convertTo(currency);
-      switch (item.type) {
-        case TransactionEnum.inpayment:
-          result.sumInpayment += value;
-          break;
-        case TransactionEnum.expense:
-          result.sumExpense += value;
-          break;
-        default:
-          break;
-      }
-    }
-    result.balance = result.sumInpayment - result.sumExpense;
-    result.days = items.last.date.difference(items.first.date).inDays + 1;
-    result.expensePerDay = result.sumExpense / result.days;
-    return result;
   }
 
 /*

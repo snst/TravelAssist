@@ -7,7 +7,7 @@ void main() {
   var eur = Currency(name: "€", value: 1);
   var dollar = Currency(name: "\$", value: 1.1);
   var cordoba = Currency(name: "C\$", value: 40);
-  List<Currency> currencies = [eur, dollar, cordoba];
+  //List<Currency> currencies = [eur, dollar, cordoba];
 
   test('Currency.Currency', () {
     expect(Currency.convert(5, eur, dollar), 5.5);
@@ -32,22 +32,22 @@ void main() {
     t.add(Transaction(
         currency: dollar,
         value: 30,
-        type: TransactionEnum.inpayment,
+        type: TransactionTypeEnum.inpayment,
         date: DateTime(2023, 1, 13)));
     t.add(Transaction(
         currency: cordoba,
         value: 200,
-        type: TransactionEnum.inpayment,
+        type: TransactionTypeEnum.inpayment,
         date: DateTime(2023, 1, 13)));
     t.add(Transaction(
         currency: cordoba,
         value: 100,
-        type: TransactionEnum.inpayment,
+        type: TransactionTypeEnum.inpayment,
         date: DateTime(2023, 1, 15)));
 
-    for (final item in t.getSortedTransactions(DateTime(2024, 1, 14))) {
-      print(item);
-    }
+    //for (final item in t.getSortedTransactions(DateTime(2024, 1, 14))) {
+      //print(item);
+    //}
 
     var result = t.calculate(eur, null);
     expect(result.sumInpayment, closeTo(34.7, 0.1));

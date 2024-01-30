@@ -1,15 +1,16 @@
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 part 'currency.g.dart';
 
 // flutter packages pub run build_runner build
+// flutter pub run build_runner build
 
-@HiveType(typeId: 4)
-class Currency extends HiveObject {
+
+@collection
+class Currency {
   Currency({this.name = "", this.value = 1.0});
 
-  @HiveField(0)
+  Id id = Isar.autoIncrement;
   String name;
-  @HiveField(1)
   double value;
 
   double convertTo(double value, Currency to) {
@@ -24,6 +25,9 @@ class Currency extends HiveObject {
   String convertToString(double value, Currency to) {
     return Currency.formatValue(Currency.convert(value, this, to));
   }
+
+  @override
+  String toString() => name;
 
   static String formatValue(double value) => value.toStringAsFixed(2);
 }

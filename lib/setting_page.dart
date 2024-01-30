@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'currency.dart';
-import 'settings_model.dart';
+import 'currency_provider.dart';
 
 class CurrencySettingPage extends StatefulWidget {
   CurrencySettingPage({super.key, required this.createDrawer});
@@ -12,12 +12,12 @@ class CurrencySettingPage extends StatefulWidget {
 }
 
 class _CurrencySettingPageState extends State<CurrencySettingPage> {
-  SettingsModel getSettings(BuildContext context) {
-    return Provider.of<SettingsModel>(context, listen: false);
+  CurrencyProvider getSettings(BuildContext context) {
+    return Provider.of<CurrencyProvider>(context, listen: false);
   }
 
   Future<void> _showCurrencyDialog(
-      BuildContext context, Currency currency) async {
+      BuildContext context, Currency currency, bool newItem) async {
     TextEditingController numberController = TextEditingController();
     TextEditingController stringController = TextEditingController();
     numberController.text = currency.value.toString();
@@ -26,17 +26,17 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Currency'),
+          title: const Text('Currency'),
           content: Column(
             children: [
               TextField(
                 controller: numberController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Enter value'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Enter value'),
               ),
               TextField(
                 controller: stringController,
-                decoration: InputDecoration(labelText: 'Enter symbol'),
+                decoration: const InputDecoration(labelText: 'Enter symbol'),
               ),
             ],
           ),
@@ -45,25 +45,25 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the AlertDialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
-            if (currency.key != null)
+            if (!newItem)
               TextButton(
                 onPressed: () {
-                  getSettings(context).deleteCurrency(currency);
+                  getSettings(context).delete(currency);
                   Navigator.of(context).pop(); // Close the AlertDialog
                 },
-                child: Text('Delete'),
+                child: const Text('Delete'),
               ),
             TextButton(
               onPressed: () {
                 currency.name = stringController.text;
                 currency.value = double.parse(numberController.text);
-                if (getSettings(context).addCurrency(currency)) {
+                getSettings(context).add(currency);
                   Navigator.of(context).pop(); // Close the AlertDialog
-                }
+                //}
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -75,10 +75,9 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Currencies")),
-      body: Consumer<SettingsModel>(builder: (context, settings, child) {
-        settings.load();
+      body: Consumer<CurrencyProvider>(builder: (context, settings, child) {
         return ListView.builder(
-          itemCount: settings.currencies.length,
+          itemCount: settings.items.length,
           itemBuilder: (context, index) => ListTile(
             /*leading: const Icon(Icons.done),
             trailing: IconButton(
@@ -88,10 +87,10 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
               },
             ),*/
             onTap: () {
-              _showCurrencyDialog(context, settings.currencies[index]);
+              _showCurrencyDialog(context, settings.items[index], false);
             },
             title: Text(
-                '${settings.currencies[index].value} ${settings.currencies[index].name}'
+                '${settings.items[index].value} ${settings.items[index].name}'
                 //cart.items[index].name,
                 //style: itemNameStyle,
                 ),
@@ -100,7 +99,7 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showCurrencyDialog(context, Currency());
+          _showCurrencyDialog(context, Currency(), true);
         },
         tooltip: 'Add currency',
         child: const Icon(Icons.add),

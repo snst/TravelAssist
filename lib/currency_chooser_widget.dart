@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'currency.dart';
 
 class CurrencyChooserWidget extends StatelessWidget {
-  CurrencyChooserWidget({
+  const CurrencyChooserWidget({
     super.key,
     required this.currencies,
     required this.selected,

@@ -124,10 +124,10 @@ class _PackingListPageState extends State<TodoListPage> {
             icon: FaIcon(FontAwesomeIcons.ban),
             label: 'Skipped',
           ),
-          BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.ellipsisVertical),
-            label: 'Bulk',
-          ),
+          //BottomNavigationBarItem(
+          //  icon: FaIcon(FontAwesomeIcons.ellipsisVertical),
+          //  label: 'Bulk',
+          //),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.wrench),
             label: 'Settings',

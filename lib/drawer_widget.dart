@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/currency_converter_page.dart';
-import 'package:travel_assist/setting_page.dart';
+import 'package:travel_assist/currency_page.dart';
+import 'package:travel_assist/currency_setting_widget.dart';
 import 'package:travel_assist/todo_list_page.dart';
 import 'package:travel_assist/transaction_main_page.dart';
 
@@ -58,10 +58,10 @@ class DrawerWidget extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CurrencyConverterPage()));
+                      builder: (context) => const CurrencyPage()));
             },
           ),
-          ListTile(
+          /*ListTile(
             title: const Text('Settings'),
             selected: selectedIndex == 3,
             onTap: () {
@@ -73,7 +73,7 @@ class DrawerWidget extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) => CurrencySettingPage()));
             },
-          ),
+          ),*/
         ],
       ),
     );

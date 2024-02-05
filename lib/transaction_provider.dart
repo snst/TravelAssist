@@ -158,8 +158,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
   String toJson() {
     List<Map<String, dynamic>> jsonList =
         _items.map((item) => item.toJson()).toList();
-    String jsonString = jsonEncode(jsonList);
-    return jsonString;
+    return jsonEncode(jsonList);
   }
 
   void fromJson(String? jsonString) {
@@ -169,7 +168,6 @@ class TransactionProvider extends ChangeNotifier with Storage {
           jsonList.map((json) => Transaction.fromJson(json)).toList();
       clear();
       addList(newItems);
-      return;
     }
   }
 }

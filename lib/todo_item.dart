@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:json_annotation/json_annotation.dart';
 part 'todo_item.g.dart';
 
 enum TodoItemStateEnum {
@@ -8,6 +9,7 @@ enum TodoItemStateEnum {
 }
 
 @collection
+@JsonSerializable()
 class TodoItem {
   TodoItem(
       {this.name = "",
@@ -17,6 +19,7 @@ class TodoItem {
       this.category = "",
       this.comment = ""});
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   Id id = Isar.autoIncrement;
   String name;
   String category;
@@ -44,4 +47,9 @@ class TodoItem {
     category = other.category;
     comment = other.comment;
   }
+
+  factory TodoItem.fromJson(Map<String, dynamic> json) =>
+      _$TodoItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TodoItemToJson(this);
 }

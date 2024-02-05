@@ -2,7 +2,6 @@ import 'package:isar/isar.dart';
 import 'package:travel_assist/currency.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 part 'transaction.g.dart';
 
 // flutter packages pub run build_runner build
@@ -40,25 +39,11 @@ class Transaction {
   @enumerated
   TransactionTypeEnum type;
   bool exlcudeFromAverage;
-  //@ignore
-  //@JsonKey(includeFromJson: false, includeToJson: false)
-  //Currency? currency;
 
   @override
   String toString() {
     return "$date $type: $value $currency $name";
   }
-
-  /*void setCurrency(Currency currency) {
-    this.currency = currency;
-    currencyKey = currency.id;
-  }
-
-  double convertTo(CurrencyProvider cp, Currency to) {
-    var currencyObj = cp.getCurrencyByName(currency);
-    return (null != currencyObj) ? currencyObj.convertTo(value, to) : value;
-  }
-*/
 
   @ignore
   bool get isWithdrawal => type == TransactionTypeEnum.withdrawal;
@@ -82,12 +67,6 @@ class Transaction {
         hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
   }
 
-  //TransactionValue getTransactionValue(CurrencyProvider cp) => TransactionValue(value, currency!);
-
-  // String getValueStrInCurrency(Currency targetCurrency) {
-  //   return Currency.formatValue(convertTo(targetCurrency));
-  // }
-
   void update(Transaction other) {
     name = other.name;
     value = other.value;
@@ -107,5 +86,6 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>
       _$TransactionFromJson(json);
+
   Map<String, dynamic> toJson() => _$TransactionToJson(this);
 }

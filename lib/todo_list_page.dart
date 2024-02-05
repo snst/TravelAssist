@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:travel_assist/export_widget.dart';
 import 'todo_list_widget.dart';
 import 'todo_item_edit_page.dart';
 import 'todo_item.dart';
@@ -48,6 +49,8 @@ class _PackingListPageState extends State<TodoListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final todoProvider = context.watch<TodoProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -69,10 +72,17 @@ class _PackingListPageState extends State<TodoListPage> {
           ),
         ],
       ),
-      body: Consumer<TodoProvider>(
-        builder: (context, todoList, child) {
+      body: () {
+        if (_selectedBottomIndex == 4) {
+          return ExportWidget(
+            name: 'todo',
+            toJson: todoProvider.toJson,
+            fromJson: todoProvider.fromJson,
+            clearJson: todoProvider.clear,
+          );
+        } else {
           return GroupedListView<TodoItem, String>(
-            elements: todoList
+            elements: todoProvider
                 .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
             groupBy: (TodoItem element) => element.category,
             groupComparator: (value1, value2) => value2.compareTo(value1),
@@ -100,8 +110,8 @@ class _PackingListPageState extends State<TodoListPage> {
                 onEditItem: (item) => _showEditDialog(item, false),
                 editable: _listEditable),
           );
-        },
-      ),
+        }
+      }(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

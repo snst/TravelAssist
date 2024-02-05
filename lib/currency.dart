@@ -1,13 +1,13 @@
 import 'package:isar/isar.dart';
+import 'package:json_annotation/json_annotation.dart';
 part 'currency.g.dart';
 
-// flutter packages pub run build_runner build
-// flutter pub run build_runner build
-
 @collection
+@JsonSerializable()
 class Currency {
   Currency({this.name = "", this.value = 1.0});
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   Id id = Isar.autoIncrement;
   String name;
   double value;
@@ -33,6 +33,11 @@ class Currency {
 
   static String formatValue(double value) => value.toStringAsFixed(2);
 
-  static String formatValueCurrency(double value, String currency) => "${Currency.formatValue(value)} $currency";
+  static String formatValueCurrency(double value, String currency) =>
+      "${Currency.formatValue(value)} $currency";
 
+  factory Currency.fromJson(Map<String, dynamic> json) =>
+      _$CurrencyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CurrencyToJson(this);
 }

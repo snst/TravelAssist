@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
@@ -37,11 +39,17 @@ class TodoProvider extends ChangeNotifier with Storage {
   }
 
   void add(TodoItem item) async {
+    addList([item]);
+  }
+
+  void addList(List<TodoItem> items) async {
     final isar = await db;
     await isar!.writeTxn(() async {
-      await isar.todoItems.put(item);
-      if (!_items.contains(item)) {
-        _items.add(item);
+      for (final item in items) {
+        await isar.todoItems.put(item);
+        if (!_items.contains(item)) {
+          _items.add(item);
+        }
       }
       notifyListeners();
     });
@@ -56,6 +64,15 @@ class TodoProvider extends ChangeNotifier with Storage {
     });
   }
 
+  void clear() async {
+    final isar = await db;
+    await isar!.writeTxn(() async {
+      await isar.todoItems.clear();
+      _items.clear();
+      notifyListeners();
+    });
+  }
+
   List<TodoItem> getFilteredItems(TodoItemStateEnum state) {
     switch (state) {
       case TodoItemStateEnum.done:
@@ -66,6 +83,22 @@ class TodoProvider extends ChangeNotifier with Storage {
             .toList();
       case TodoItemStateEnum.open:
         return items.where((i) => i.state == TodoItemStateEnum.open).toList();
+    }
+  }
+
+  String toJson() {
+    List<Map<String, dynamic>> jsonList =
+        _items.map((item) => item.toJson()).toList();
+    return jsonEncode(jsonList);
+  }
+
+  void fromJson(String? jsonString) {
+    if (jsonString != null) {
+      List<dynamic> jsonList = jsonDecode(jsonString);
+      List<TodoItem> newItems =
+          jsonList.map((json) => TodoItem.fromJson(json)).toList();
+      clear();
+      addList(newItems);
     }
   }
 }

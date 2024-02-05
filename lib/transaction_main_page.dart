@@ -7,7 +7,7 @@ import 'package:travel_assist/transaction_list_subpage.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_edit_page.dart';
 import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/transaction_settings_subpage.dart';
+import 'package:travel_assist/export_widget.dart';
 import 'currency_chooser_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -64,7 +64,12 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
           return TransactionBalanceSubPage(
               transactionProvider: tp, currencyProvider: cp);
         } else if (_selectedSubPageIndex == 2) {
-          return TransactionSettingsSubpage(transactionProvider: tp);
+          return ExportWidget(
+            name: 'transaction',
+            toJson: tp.toJson,
+            fromJson: tp.fromJson,
+            clearJson: tp.clear,
+          );
         } else {
           return TransactionListSubpage(onShowEditDialog: _showEditDialog);
         }

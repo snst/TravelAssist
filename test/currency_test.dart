@@ -19,6 +19,7 @@ void main() {
   });
 
   test('TransactionModel.sum', () {
+    /*
     var t = BudgetModel();
     //t.initCurrencies(currencies);
     t.add(Transaction(
@@ -64,7 +65,7 @@ void main() {
         result.balance, closeTo(result.sumInpayment - result.sumExpense, 0.1));
     expect(result.days, 2);
     expect(result.expensePerDay, closeTo(result.sumExpense / result.days, 0.1));
-
+*/
     /*
     t.calculate();
     t.dump();

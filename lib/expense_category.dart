@@ -25,9 +25,10 @@ class ExpenseCategoryManager {
     ExpenseCategory("Activity", const FaIcon(FontAwesomeIcons.personHiking)),
     ExpenseCategory("Fee", const FaIcon(FontAwesomeIcons.moneyBill1)),
     ExpenseCategory("Laundry", const FaIcon(FontAwesomeIcons.shirt)),
-    ExpenseCategory("ATM", const FaIcon(FontAwesomeIcons.sackDollar)),
+    ExpenseCategory("Paypal", const FaIcon(FontAwesomeIcons.paypal)),
     ExpenseCategory("Present", const FaIcon(FontAwesomeIcons.gift)),
     ExpenseCategory("Entertainment", const FaIcon(FontAwesomeIcons.masksTheater)),
+    ExpenseCategory("Credit card", const FaIcon(FontAwesomeIcons.creditCard)),
   ];
 
   static ExpenseCategory at(int i) => list[i];

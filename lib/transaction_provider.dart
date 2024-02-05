@@ -1,12 +1,22 @@
+import 'dart:collection';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/transaction_value.dart';
 import 'storage.dart';
 import 'transaction.dart';
-import 'currency.dart';
 
 class TransactionProvider extends ChangeNotifier with Storage {
+  final Map<String, TransactionValue> expensePerCurrency = HashMap();
+  final Map<String, TransactionValue> withdrawPerCurrency = HashMap();
+  final Map<String, TransactionValue> balancePerCurrency = HashMap();
+  TransactionValue? allExpenses;
+  TransactionValue? allWithdraws;
+  TransactionValue? allBalance;
+
   TransactionProvider() {
     db = openDB();
     init();
@@ -27,18 +37,25 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return Provider.of<TransactionProvider>(context, listen: false);
   }
 
+/*
   void initCurrencies(CurrencyProvider cp) {
-    for(var t in items) {
+    for (var t in items) {
       t.currency = cp.getCurrencyById(t.currencyKey);
     }
-  }
+  }*/
 
   void add(Transaction item) async {
+    addList([item]);
+  }
+
+  void addList(List<Transaction> items) async {
     final isar = await db;
     await isar!.writeTxn(() async {
-      await isar.transactions.put(item);
-      if (!_items.contains(item)) {
-        _items.add(item);
+      for (final item in items) {
+        await isar.transactions.put(item);
+        if (!_items.contains(item)) {
+          _items.add(item);
+        }
       }
       notifyListeners();
     });
@@ -49,6 +66,15 @@ class TransactionProvider extends ChangeNotifier with Storage {
     await isar!.writeTxn(() async {
       await isar.transactions.delete(item.id);
       _items.remove(item);
+      notifyListeners();
+    });
+  }
+
+  void clear() async {
+    final isar = await db;
+    await isar!.writeTxn(() async {
+      await isar.transactions.clear();
+      _items.clear();
       notifyListeners();
     });
   }
@@ -76,6 +102,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return ret;
   }
 
+/*
   TransactionResult calculate(Currency currency, DateTime? until) {
     TransactionResult result = TransactionResult();
     List<Transaction> items = getSortedTransactions(until);
@@ -93,8 +120,56 @@ class TransactionProvider extends ChangeNotifier with Storage {
       }
     }
     result.balance = result.sumInpayment - result.sumExpense;
-    result.days = items.length == 0 ? 1 : items.last.date.difference(items.first.date).inDays + 1;
+    result.days = items.length == 0
+        ? 1
+        : items.last.date.difference(items.first.date).inDays + 1;
     result.expensePerDay = result.sumExpense / result.days;
     return result;
+  }
+  */
+
+  void caluculateAll(CurrencyProvider currencyProvider) {
+    allExpenses = TransactionValue(0, currencyProvider.getHomeCurrency());
+    allWithdraws = TransactionValue(0, currencyProvider.getHomeCurrency());
+    allBalance = TransactionValue(0, currencyProvider.getHomeCurrency());
+
+    for (final currency in currencyProvider.items) {
+      expensePerCurrency[currency.name] = TransactionValue(0, currency);
+      withdrawPerCurrency[currency.name] = TransactionValue(0, currency);
+      balancePerCurrency[currency.name] = TransactionValue(0, currency);
+    }
+
+    for (final transaction in items) {
+      final tv = currencyProvider.getTransactionValue(transaction);
+      if (transaction.isWithdrawal) {
+        allWithdraws?.add(tv);
+        allBalance?.add(tv);
+        withdrawPerCurrency[transaction.currency]?.add(tv);
+        balancePerCurrency[transaction.currency]?.add(tv);
+      } else {
+        allExpenses?.add(tv);
+        allBalance?.sub(tv);
+        expensePerCurrency[transaction.currency]?.add(tv);
+        balancePerCurrency[transaction.currency]?.sub(tv);
+      }
+    }
+  }
+
+  String toJson() {
+    List<Map<String, dynamic>> jsonList =
+        _items.map((item) => item.toJson()).toList();
+    String jsonString = jsonEncode(jsonList);
+    return jsonString;
+  }
+
+  void fromJson(String? jsonString) {
+    if (jsonString != null) {
+      List<dynamic> jsonList = jsonDecode(jsonString);
+      List<Transaction> newItems =
+          jsonList.map((json) => Transaction.fromJson(json)).toList();
+      clear();
+      addList(newItems);
+      return;
+    }
   }
 }

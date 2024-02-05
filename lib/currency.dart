@@ -4,7 +4,6 @@ part 'currency.g.dart';
 // flutter packages pub run build_runner build
 // flutter pub run build_runner build
 
-
 @collection
 class Currency {
   Currency({this.name = "", this.value = 1.0});
@@ -13,16 +12,19 @@ class Currency {
   String name;
   double value;
 
-  double convertTo(double value, Currency to) {
-    return Currency.convert(value, this, to);
+  double convertTo(double value, Currency? to) {
+    return to != null && this != to ? Currency.convert(value, this, to) : value;
   }
 
-  static double convert(double value, Currency from, Currency to) {
-    double ret = value / from.value * to.value;
-    return ret;
+  static double convert(double value, Currency? from, Currency? to) {
+    if (from == null || to == null) {
+      return value;
+    } else {
+      return value / from.value * to.value;
+    }
   }
 
-  String convertToString(double value, Currency to) {
+  String convertToString(double value, Currency? to) {
     return Currency.formatValue(Currency.convert(value, this, to));
   }
 
@@ -30,4 +32,7 @@ class Currency {
   String toString() => name;
 
   static String formatValue(double value) => value.toStringAsFixed(2);
+
+  static String formatValueCurrency(double value, String currency) => "${Currency.formatValue(value)} $currency";
+
 }

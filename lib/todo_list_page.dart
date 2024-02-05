@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'todo_list_item_widget.dart';
-import 'todo_item_page.dart';
+import 'todo_list_widget.dart';
+import 'todo_item_edit_page.dart';
 import 'todo_item.dart';
 import 'todo_provider.dart';
 
@@ -19,6 +19,7 @@ class TodoListPage extends StatefulWidget {
 class _PackingListPageState extends State<TodoListPage> {
   bool _listEditable = false;
   int _selectedFilterIndex = 1;
+  int _selectedBottomIndex = 1;
 
   TodoItemStateEnum bottomIndexToStateEnum(int index) {
     final filters = [
@@ -38,7 +39,7 @@ class _PackingListPageState extends State<TodoListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => TodoItemPage(
+          builder: (context) => TodoItemEditPage(
                 newItem: newItem,
                 item: item,
               )),
@@ -91,7 +92,7 @@ class _PackingListPageState extends State<TodoListPage> {
                     )),
               ),
             ),
-            itemBuilder: (context, item) => TodoListItemWidget(
+            itemBuilder: (context, item) => TodoListWidget(
                 item: item,
                 onItemChanged: (item) {
                   setState(() {});
@@ -115,12 +116,24 @@ class _PackingListPageState extends State<TodoListPage> {
             icon: FaIcon(FontAwesomeIcons.ban),
             label: 'Skipped',
           ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.ellipsisVertical),
+            label: 'Bulk',
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(FontAwesomeIcons.wrench),
+            label: 'Settings',
+          ),
         ],
-        currentIndex: _selectedFilterIndex,
+        currentIndex: _selectedBottomIndex,
         selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.grey,
         onTap: (index) {
           setState(() {
-            _selectedFilterIndex = index;
+            _selectedBottomIndex = index;
+            if (index <= 2) {
+              _selectedFilterIndex = index;
+            }
           });
         },
       ),

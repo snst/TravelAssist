@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/transaction_list_page.dart';
+import 'package:travel_assist/transaction_main_page.dart';
 import 'currency_converter_page.dart';
 import 'todo_provider.dart';
 import 'todo_list_page.dart';
@@ -67,7 +67,7 @@ Drawer createDrawer(BuildContext context) {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        TransactionListPage(createDrawer: createDrawer)));
+                        TransactionMainPage(createDrawer: createDrawer)));
           },
         ),
         ListTile(

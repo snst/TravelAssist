@@ -6,8 +6,8 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'todo_item.dart';
 import 'todo_provider.dart';
 
-class TodoItemPage extends StatefulWidget {
-  TodoItemPage({
+class TodoItemEditPage extends StatefulWidget {
+  TodoItemEditPage({
     super.key,
     required this.newItem,
     required this.item,
@@ -20,10 +20,10 @@ class TodoItemPage extends StatefulWidget {
   final TodoItem modifiedItem;
 
   @override
-  State<TodoItemPage> createState() => _PackedItemPageState();
+  State<TodoItemEditPage> createState() => _PackedItemPageState();
 }
 
-class _PackedItemPageState extends State<TodoItemPage> {
+class _PackedItemPageState extends State<TodoItemEditPage> {
   TodoProvider getPackingList(BuildContext context) {
     return Provider.of<TodoProvider>(context, listen: false);
   }

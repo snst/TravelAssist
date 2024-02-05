@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'todo_item.dart';
 
-class TodoListItemWidget extends StatelessWidget {
-  TodoListItemWidget(
-      {required this.item,
+class TodoListWidget extends StatelessWidget {
+  TodoListWidget(
+      {super.key,
+      required this.item,
       required this.onItemChanged,
       required this.onEditItem,
-      required this.editable})
-      : super(key: ObjectKey(item));
+      required this.editable});
 
   final TodoItem item;
   final void Function(TodoItem item) onItemChanged;
@@ -55,8 +55,7 @@ class TodoListItemWidget extends StatelessWidget {
                     value: item.state == TodoItemStateEnum.done,
                     onChanged: (value) {
                       item.state = switch (item.state) {
-                        TodoItemStateEnum.open =>
-                          TodoItemStateEnum.done,
+                        TodoItemStateEnum.open => TodoItemStateEnum.done,
                         _ => TodoItemStateEnum.open
                       };
                       onItemChanged(item);

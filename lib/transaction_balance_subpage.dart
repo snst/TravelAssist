@@ -1,8 +1,5 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_chooser_widget.dart';
 import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'package:travel_assist/transaction_provider.dart';
@@ -37,7 +34,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         Text("Expense"),
         Text("Withdraw"),
         Text("Balance"),
-       // Text("Currency")
+        // Text("Currency")
       ]),
       TableRow(children: <Widget>[
         TableCell(
@@ -77,7 +74,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         TransactionCell(
             value: widget.transactionProvider.balancePerCurrency[currencyName],
             currency: currency),
-       /* CurrencyChooserWidget(
+        /* CurrencyChooserWidget(
             style: _style,
             currencies: widget.currencyProvider.items,
             selected: widget.selCurrencyMap[k],

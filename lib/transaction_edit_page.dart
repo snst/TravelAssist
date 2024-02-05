@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:toggle_switch/toggle_switch.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'transaction.dart';
 import 'currency_provider.dart';
@@ -188,6 +187,41 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 secondary: const FaIcon(FontAwesomeIcons.sackDollar),
               ),*/
               Padding(
+                padding: const EdgeInsets.fromLTRB(0, 18, 0, 12),
+                child: SegmentedButton<TransactionTypeEnum>(
+                  showSelectedIcon: false,
+                  segments: const <ButtonSegment<TransactionTypeEnum>>[
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.cashPayment,
+                      icon: FaIcon(FontAwesomeIcons.coins),
+                    ),
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.cardPayment,
+                      icon: FaIcon(FontAwesomeIcons.creditCard),
+                    ),
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.electronicPayment,
+                      icon: FaIcon(FontAwesomeIcons.paypal),
+                    ),
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.withdrawal,
+                      icon: FaIcon(FontAwesomeIcons.moneyBills),
+                    ),
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.balance,
+                      icon: FaIcon(FontAwesomeIcons.scaleBalanced),
+                    )
+                  ],
+                  selected: <TransactionTypeEnum>{widget.modifiedItem.type},
+                  onSelectionChanged: (Set<TransactionTypeEnum> newSelection) {
+                    setState(() {
+                      widget.modifiedItem.type = newSelection.first;
+                    });
+                  },
+                ),
+              ),
+              /*
+              Padding(
                   padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
                   child: Center(
                       child: ToggleSwitch(
@@ -215,7 +249,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                         _ => TransactionTypeEnum.cashPayment
                       };
                     },
-                  ))),
+                  ))),*/
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: OutlinedButton(

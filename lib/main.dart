@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/transaction_main_page.dart';
-import 'currency_converter_page.dart';
 import 'todo_provider.dart';
-import 'todo_list_page.dart';
-import 'setting_page.dart';
 import 'currency_provider.dart';
 import 'transaction_provider.dart';
 import 'welcome_page.dart';
@@ -37,13 +33,17 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        useMaterial3: true,
+        //colorSchemeSeed: Color.fromARGB(255, 4, 125, 146),
       ),
       themeMode: ThemeMode.dark,
-      home: const WelcomePage(createDrawer: createDrawer),
+      home: const WelcomePage(),
     );
   }
 }
 
+
+/*
 Drawer createDrawer(BuildContext context) {
   int selectedIndex = 0;
   //Function void _onItemTapped(int i) => {};
@@ -53,9 +53,9 @@ Drawer createDrawer(BuildContext context) {
       children: [
         const DrawerHeader(
           decoration: BoxDecoration(
-            color: Colors.blue,
+            //color: Theme.of(context).primaryColor,
           ),
-          child: Text('Drawer Header'),
+          child: Text('Menu'),
         ),
         ListTile(
           title: const Text('Budget List'),
@@ -115,3 +115,4 @@ Drawer createDrawer(BuildContext context) {
     ),
   );
 }
+*/

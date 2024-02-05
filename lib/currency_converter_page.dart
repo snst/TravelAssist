@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/drawer_widget.dart';
 import 'currency_provider.dart';
 import 'travel_assist_utils.dart';
 
 class CurrencyConverterPage extends StatefulWidget {
-  const CurrencyConverterPage({super.key, required this.createDrawer});
-  final Drawer Function(BuildContext context) createDrawer;
+  const CurrencyConverterPage({super.key});
   @override
   State<CurrencyConverterPage> createState() => _CurrencyConverterPageState();
 }
@@ -14,18 +14,6 @@ class CurrencyConverterPage extends StatefulWidget {
 class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   List<TextEditingController>? controllers;
   List<FocusNode>? focusNodes;
-
-/*
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-*/
 
   void onChanged(int index, String text, CurrencyProvider currencies) {
     if (controllers != null) {
@@ -43,7 +31,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Currency Converter"),
+        title: const Text("Currency"),
       ),
       body: Consumer<CurrencyProvider>(
         builder: (context, currencies, child) {
@@ -88,7 +76,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
               });
         },
       ),
-      drawer: widget.createDrawer(context),
+      drawer: DrawerWidget(),
     );
   }
 }

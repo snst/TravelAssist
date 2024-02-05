@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/currency_chooser_widget.dart';
 import 'package:travel_assist/currency_provider.dart';
-import 'package:travel_assist/transaction.dart';
 import 'package:travel_assist/transaction_value.dart';
-import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_value_widget.dart';
 
 class BalanceWidget extends StatelessWidget {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:travel_assist/drawer_widget.dart';
 import 'package:travel_assist/export_widget.dart';
 import 'todo_list_widget.dart';
 import 'todo_item_edit_page.dart';
@@ -9,10 +10,7 @@ import 'todo_item.dart';
 import 'todo_provider.dart';
 
 class TodoListPage extends StatefulWidget {
-  const TodoListPage(
-      {super.key, required this.title, required this.createDrawer});
-  final String title;
-  final Drawer Function(BuildContext context) createDrawer;
+  const TodoListPage({super.key});
   @override
   State<TodoListPage> createState() => _PackingListPageState();
 }
@@ -53,7 +51,7 @@ class _PackingListPageState extends State<TodoListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text("To-do"),
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
@@ -147,7 +145,7 @@ class _PackingListPageState extends State<TodoListPage> {
           });
         },
       ),
-      drawer: widget.createDrawer(context),
+      drawer: const DrawerWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditDialog(TodoItem(quantity: 1), false),
         tooltip: 'Add item',

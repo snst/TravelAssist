@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_chooser_widget.dart';
-import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/transaction.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_list_item_widget.dart';
@@ -26,7 +23,6 @@ class _TransactionListSubpageState extends State<TransactionListSubpage> {
     //final currencyProvider = context.watch<CurrencyProvider>();
     final transactionProvider = context.watch<TransactionProvider>();
 
-
     return GroupedListView<Transaction, DateTime>(
       shrinkWrap: true,
       elements: transactionProvider.getSortedTransactions(null),
@@ -38,7 +34,8 @@ class _TransactionListSubpageState extends State<TransactionListSubpage> {
       groupSeparatorBuilder: (DateTime value) => Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
         child: Container(
-          color: Colors.grey.shade900,
+          //color: Colors.grey.shade900,
+          color: Theme.of(context).hoverColor,
           child: Text(
             DateFormat('  EEEE, d MMMM y').format(value),
             textAlign: TextAlign.left,

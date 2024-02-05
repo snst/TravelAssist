@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
-import 'package:toggle_switch/toggle_switch.dart';
 import 'todo_item.dart';
 import 'todo_provider.dart';
 
@@ -124,27 +123,35 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                     )
                   ]),
                   Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
-                      child: Center(
-                          child: ToggleSwitch(
-                        initialLabelIndex: switch (widget.modifiedItem.state) {
-                          TodoItemStateEnum.open => 0,
-                          TodoItemStateEnum.skipped => 1,
-                          TodoItemStateEnum.done => 2
-                        },
-                        totalSwitches: 3,
-                        labels: const ['Open', 'Skipped', 'Done'],
-                        onToggle: (index) {
-                          widget.modifiedItem.state = switch (index) {
-                            0 => TodoItemStateEnum.open,
-                            1 => TodoItemStateEnum.skipped,
-                            2 => TodoItemStateEnum.done,
-                            _ => TodoItemStateEnum.open
-                          };
-                          //print('switched to: $index');
-                          saveAndClose(context);
-                        },
-                      ))),
+                    padding: const EdgeInsets.fromLTRB(0, 18, 0, 12),
+                    child: SegmentedButton<TodoItemStateEnum>(
+                      showSelectedIcon: false,
+                      segments: const <ButtonSegment<TodoItemStateEnum>>[
+                        ButtonSegment<TodoItemStateEnum>(
+                          value: TodoItemStateEnum.open,
+                          label: Text('open'),
+                          // icon: Icon(Icons.calendar_view_day)
+                        ),
+                        ButtonSegment<TodoItemStateEnum>(
+                          value: TodoItemStateEnum.skipped,
+                          label: Text('skipped'),
+                          //  icon: Icon(Icons.calendar_view_week)
+                        ),
+                        ButtonSegment<TodoItemStateEnum>(
+                          value: TodoItemStateEnum.done,
+                          label: Text('done'),
+                          //  icon: Icon(Icons.calendar_view_month)
+                        ),
+                      ],
+                      selected: <TodoItemStateEnum>{widget.modifiedItem.state},
+                      onSelectionChanged:
+                          (Set<TodoItemStateEnum> newSelection) {
+                        setState(() {
+                          widget.modifiedItem.state = newSelection.first;
+                        });
+                      },
+                    ),
+                  ),
                   Row(children: [
                     const Spacer(),
                     if (!widget.newItem)

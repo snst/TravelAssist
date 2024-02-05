@@ -32,17 +32,17 @@ void showInputDialog(BuildContext context, String value, Function func) {
       TextEditingController nameController = TextEditingController();
       nameController.text = value;
       return AlertDialog(
-        title: Text('Name'),
+        title: const Text('Name'),
         content: TextField(
           controller: nameController,
-          decoration: InputDecoration(hintText: 'Name'),
+          decoration: const InputDecoration(hintText: 'Name'),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -50,7 +50,7 @@ void showInputDialog(BuildContext context, String value, Function func) {
               func(nameController.text);
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       );

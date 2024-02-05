@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/drawer_widget.dart';
 import 'package:travel_assist/transaction_balance_subpage.dart';
 import 'package:travel_assist/transaction_list_subpage.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_edit_page.dart';
 import 'package:travel_assist/transaction.dart';
 import 'package:travel_assist/export_widget.dart';
-import 'currency_chooser_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionMainPage extends StatefulWidget {
-  TransactionMainPage({super.key, required this.createDrawer});
-  final Drawer Function(BuildContext context) createDrawer;
+  TransactionMainPage({super.key});
   @override
   State<TransactionMainPage> createState() => _TransactionMainPageState();
-  Currency? shownCurrency = null;
+  Currency? shownCurrency;
 }
 
 class _TransactionMainPageState extends State<TransactionMainPage> {
@@ -57,7 +56,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
                 });
               })
         ],*/
-        title: const Text("Expenses"),
+        title: const Text("Budget"),
       ),
       body: () {
         if (_selectedSubPageIndex == 1) {
@@ -88,7 +87,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
       //if (_selectedSubPageIndex==0) TransactionListWidget(
       //transactionProvider: tp, onShowEditDialog: _showEditDialog),
 
-      drawer: widget.createDrawer(context),
+      drawer: const DrawerWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //final currency =

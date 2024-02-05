@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/drawer_widget.dart';
 import 'currency.dart';
 import 'currency_provider.dart';
 
 class CurrencySettingPage extends StatefulWidget {
-  CurrencySettingPage({super.key, required this.createDrawer});
-  final Drawer Function(BuildContext context) createDrawer;
+  CurrencySettingPage({super.key});
 
   @override
   State<CurrencySettingPage> createState() => _CurrencySettingPageState();
@@ -104,7 +104,7 @@ class _CurrencySettingPageState extends State<CurrencySettingPage> {
         tooltip: 'Add currency',
         child: const Icon(Icons.add),
       ),
-      drawer: widget.createDrawer(context),
+      drawer: const DrawerWidget(),
     );
   }
 }

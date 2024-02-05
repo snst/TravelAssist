@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/travel_assist_utils.dart';
 
 class ExportWidget extends StatelessWidget {
@@ -23,13 +22,13 @@ class ExportWidget extends StatelessWidget {
     return Row(
       children: [
         ElevatedButton(
-          child: Text("Export"),
+          child: const Text("Export"),
           onPressed: () {
             saveJson(context, name, toJson() /*transactionProvider.toJson()*/);
           },
         ),
         ElevatedButton(
-          child: Text("Import"),
+          child: const Text("Import"),
           onPressed: () {
             Future<String?> jsonData = loadJson();
             jsonData.then((jsonString) { fromJson(jsonString);
@@ -38,7 +37,7 @@ class ExportWidget extends StatelessWidget {
           },
         ),
         ElevatedButton(
-          child: Text("Clear"),
+          child: const Text("Clear"),
           onPressed: () { clearJson(); /*transactionProvider.clear();*/},
         ),
       ],

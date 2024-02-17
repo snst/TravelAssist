@@ -4,9 +4,9 @@ import 'currency_provider.dart';
 import 'travel_assist_utils.dart';
 
 class CurrencyConverterWidget extends StatefulWidget {
-  CurrencyConverterWidget({super.key, required this.currencyProvider});
+  const CurrencyConverterWidget({super.key, required this.currencyProvider});
 
-  CurrencyProvider currencyProvider;
+  final CurrencyProvider currencyProvider;
   @override
   State<CurrencyConverterWidget> createState() =>
       _CurrencyConverterWidgetState();
@@ -22,7 +22,7 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
       for (int j = 0; j < controllers!.length; j++) {
         if (j != index) {
           controllers![j].text =
-              currencies.items[index].convertToString(val, currencies.items[j]);
+              currencies.visibleItems[index].convertToString(val, currencies.visibleItems[j]);
         }
       }
     }
@@ -31,18 +31,18 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
   @override
   Widget build(BuildContext context) {
     if (controllers == null ||
-        controllers!.length != widget.currencyProvider.items.length) {
-      controllers = List.generate(widget.currencyProvider.items.length,
+        controllers!.length != widget.currencyProvider.visibleItems.length) {
+      controllers = List.generate(widget.currencyProvider.visibleItems.length,
           (index) => TextEditingController());
       focusNodes = List.generate(
-          widget.currencyProvider.items.length, (index) => FocusNode());
+          widget.currencyProvider.visibleItems.length, (index) => FocusNode());
     }
     return ListView.builder(
         shrinkWrap: true,
-        itemCount: widget.currencyProvider.items.length,
+        itemCount: widget.currencyProvider.visibleItems.length,
         itemBuilder: (context, index) {
           return Padding(
-              padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+              padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               child: TextFormField(
                 controller: controllers![index],
                 focusNode: focusNodes![index],
@@ -51,7 +51,7 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
                   onChanged(index, text, widget.currencyProvider);
                 },
                 style: const TextStyle(
-                  fontSize: 30,
+                  fontSize: 15,
                   //color: Colors.blue.shade700,
                   fontWeight: FontWeight.w600,
                 ),
@@ -63,7 +63,7 @@ class _CurrencyConverterWidgetState extends State<CurrencyConverterWidget> {
                 ],
                 decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    labelText: widget.currencyProvider.items[index].name,
+                    labelText: widget.currencyProvider.visibleItems[index].name,
                     labelStyle: const TextStyle(fontSize: 30.0),
                     suffixIcon: IconButton(
                       onPressed: () {

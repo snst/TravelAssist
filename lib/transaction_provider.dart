@@ -133,7 +133,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
     allWithdraws = TransactionValue(0, currencyProvider.getHomeCurrency());
     allBalance = TransactionValue(0, currencyProvider.getHomeCurrency());
 
-    for (final currency in currencyProvider.items) {
+    for (final currency in currencyProvider.visibleItems) {
       expensePerCurrency[currency.name] = TransactionValue(0, currency);
       withdrawPerCurrency[currency.name] = TransactionValue(0, currency);
       balancePerCurrency[currency.name] = TransactionValue(0, currency);

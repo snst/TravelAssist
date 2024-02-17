@@ -7,7 +7,7 @@ import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_list_item_widget.dart';
 
 class TransactionListSubpage extends StatefulWidget {
-  TransactionListSubpage({
+  const TransactionListSubpage({
     super.key,
     required this.onShowEditDialog,
   });
@@ -35,7 +35,7 @@ class _TransactionListSubpageState extends State<TransactionListSubpage> {
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
         child: Container(
           //color: Colors.grey.shade900,
-          color: Theme.of(context).hoverColor,
+          //color: Theme.of(context).hoverColor,
           child: Text(
             DateFormat('  EEEE, d MMMM y').format(value),
             textAlign: TextAlign.left,

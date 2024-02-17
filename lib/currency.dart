@@ -1,16 +1,25 @@
 import 'package:isar/isar.dart';
+// ignore: depend_on_referenced_packages
 import 'package:json_annotation/json_annotation.dart';
 part 'currency.g.dart';
+
+enum CurrencyStateEnum {
+  home,
+  show,
+  hide;
+}
 
 @collection
 @JsonSerializable()
 class Currency {
-  Currency({this.name = "", this.value = 1.0});
+  Currency(
+      {this.name = "", this.value = 1.0, this.state = CurrencyStateEnum.show});
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   Id id = Isar.autoIncrement;
   String name;
   double value;
+  CurrencyStateEnum state;
 
   double convertTo(double value, Currency? to) {
     return to != null && this != to ? Currency.convert(value, this, to) : value;

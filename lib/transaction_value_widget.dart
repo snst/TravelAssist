@@ -1,47 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_chooser_widget.dart';
 import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
-import 'currency.dart';
 
 class TransactionValueWidget extends StatefulWidget {
-  TransactionValueWidget({
-    super.key,
-    required this.value,
-    required this.currencyProvider,
-    this.style
-  }) : selected = value.currency;
+  const TransactionValueWidget(
+      {super.key,
+      required this.value,
+      required this.currencyProvider,
+      this.style});
 
-  Currency? selected;
-  TransactionValue value;
-  CurrencyProvider currencyProvider;
-  TextStyle? style;
+  final TransactionValue value;
+  final CurrencyProvider currencyProvider;
+  final TextStyle? style;
 
   @override
   State<TransactionValueWidget> createState() => _TransactionValueWidgetState();
 }
 
 class _TransactionValueWidgetState extends State<TransactionValueWidget> {
+  Currency? selected;
 
-  void onChanged( Currency currency) {
+  void onChanged(Currency currency) {
     setState(() {
-      widget.selected = currency;
+      selected = currency;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    selected = widget.value.currency;
     return Row(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(0,0,6,0),
-          child: Text(widget.value.convertTo(widget.selected).valueString, style: widget.style,),
+          padding: const EdgeInsets.fromLTRB(0, 0, 6, 0),
+          child: Text(
+            widget.value.convertTo(selected).valueString,
+            style: widget.style,
+          ),
         ),
         CurrencyChooserWidget(
-            currencies: widget.currencyProvider.items,
-            selected: widget.selected,
-            onChanged: onChanged,
-            style: widget.style,)
+          currencies: widget.currencyProvider.visibleItems,
+          selected: selected,
+          onChanged: onChanged,
+          style: widget.style,
+        )
       ],
     );
   }

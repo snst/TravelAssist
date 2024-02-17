@@ -18,7 +18,6 @@ class TransactionEditPage extends StatefulWidget {
         modifiedItem = item.clone();
 
   final bool newItem;
-  bool modified = false;
   final String title;
   final Transaction item;
   final Transaction modifiedItem;
@@ -29,6 +28,7 @@ class TransactionEditPage extends StatefulWidget {
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
   ExpenseCategory selectedExpense = ExpenseCategoryManager.list[0];
+  //bool modified = false;
 
   void saveAndClose(BuildContext context) {
     if (widget.modifiedItem.name.isNotEmpty) {
@@ -76,7 +76,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                     : widget.modifiedItem.valueString,
               decoration: const InputDecoration(hintText: 'Amount'),
               onChanged: (value) {
-                widget.modified = true;
+                //modified = true;
                 widget.modifiedItem.value = safeConvertToDouble(value);
               },
               autofocus: true,
@@ -94,7 +94,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
             ),
           ),
           CurrencyChooserWidget(
-              currencies: currencyProvider.items,
+              currencies: currencyProvider.getVisibleItemsWith(currencyProvider
+                  .getCurrencyFromTransaction(widget.modifiedItem)),
               selected: currencyProvider
                   .getCurrencyFromTransaction(widget.modifiedItem),
               onChanged: (currency) {

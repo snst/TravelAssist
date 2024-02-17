@@ -5,14 +5,13 @@ import 'package:travel_assist/transaction_value.dart';
 import 'package:travel_assist/transaction_provider.dart';
 
 class TransactionBalanceSubPage extends StatefulWidget {
-  TransactionBalanceSubPage({
+  const TransactionBalanceSubPage({
     super.key,
     required this.transactionProvider,
     required this.currencyProvider,
   });
   final TransactionProvider transactionProvider;
   final CurrencyProvider currencyProvider;
-  Currency? selCurrencyAll;
 
   @override
   State<TransactionBalanceSubPage> createState() =>
@@ -21,13 +20,14 @@ class TransactionBalanceSubPage extends StatefulWidget {
 
 class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
   final TextStyle _style = const TextStyle(fontSize: 16);
+  Currency? selCurrencyAll;
 
   @override
   Widget build(BuildContext context) {
     widget.transactionProvider.caluculateAll(widget.currencyProvider);
-    widget.selCurrencyAll ??= widget.currencyProvider.getHomeCurrency();
+    selCurrencyAll ??= widget.currencyProvider.getHomeCurrency();
 
-    final currencyAll = widget.selCurrencyAll;
+    final currencyAll = selCurrencyAll;
     var tableRows = <TableRow>[
       const TableRow(children: <Widget>[
         Text("Curreny"),

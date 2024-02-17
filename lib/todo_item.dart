@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+// ignore: depend_on_referenced_packages
 import 'package:json_annotation/json_annotation.dart';
 part 'todo_item.g.dart';
 

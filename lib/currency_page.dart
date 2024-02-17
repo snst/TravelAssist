@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency_converter_page.dart';
-import 'package:travel_assist/currency_setting_widget.dart';
+import 'package:travel_assist/currency_rate_widget.dart';
 import 'package:travel_assist/drawer_widget.dart';
 import 'currency_provider.dart';
 
@@ -25,7 +25,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
       ),
       body: () {
         if (_selectedBottomIndex == 1) {
-          return CurrencySettingPage(currencyProvider: cp);
+          return CurrencyRatesPage(currencyProvider: cp);
         } else {
           return CurrencyConverterWidget(currencyProvider: cp);
         }

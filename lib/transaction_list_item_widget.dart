@@ -7,7 +7,7 @@ import 'expense_category.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionListItemWidget extends StatelessWidget {
-  TransactionListItemWidget({
+  const TransactionListItemWidget({
     super.key,
     required this.transaction,
     required this.onEditItem,
@@ -36,8 +36,8 @@ class TransactionListItemWidget extends StatelessWidget {
     final valueHome = currencyProvider.convertTo(transaction, currencyProvider.getHomeCurrency()).toString();
     final valueLocal = transaction.valueCurrencyString;
 
-    return SizedBox(
-        height: 50,
+    return Card(
+        //height: 50,
         child: ListTile(
           onTap: () {
             onEditItem(transaction);

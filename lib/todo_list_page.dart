@@ -91,7 +91,7 @@ class _PackingListPageState extends State<TodoListPage> {
             groupSeparatorBuilder: (String value) => Padding(
               padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
               child: Container(
-                color: Colors.grey.shade900,
+                //color: Colors.grey.shade900,
                 child: Align(
                     alignment: Alignment.center,
                     child: Text(

@@ -12,13 +12,13 @@ import 'package:travel_assist/export_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionMainPage extends StatefulWidget {
-  TransactionMainPage({super.key});
+  const TransactionMainPage({super.key});
   @override
   State<TransactionMainPage> createState() => _TransactionMainPageState();
-  Currency? shownCurrency;
 }
 
 class _TransactionMainPageState extends State<TransactionMainPage> {
+  Currency? shownCurrency;
   int _selectedSubPageIndex = 0;
   Future<void> _showEditDialog(Transaction item) async {
     Navigator.push(
@@ -36,9 +36,9 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
     final cp = context.watch<CurrencyProvider>();
     final tp = context.watch<TransactionProvider>();
     //tp.initCurrencies(cp);
-    widget.shownCurrency ??= cp.getHomeCurrency();
+    shownCurrency ??= cp.getHomeCurrency();
 
-    if (null == widget.shownCurrency) {
+    if (null == shownCurrency) {
       return const CircularProgressIndicator();
     }
 

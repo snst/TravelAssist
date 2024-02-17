@@ -15,7 +15,22 @@ class CurrencyProvider extends ChangeNotifier with Storage {
   }
 
   final HashMap<String, Currency> _currencyMap = HashMap();
-  List<Currency> get items => _currencyMap.values.toList();
+  List<Currency> get allItems => _currencyMap.values.toList();
+  List<Currency> get visibleItems => allItems
+      .where((element) => element.state != CurrencyStateEnum.hide)
+      .toList();
+  List<Currency> getVisibleItemsWith(Currency? currency) {
+    var list = allItems
+        .where((element) => element.state != CurrencyStateEnum.hide)
+        .toList();
+    if (currency != null) {
+      if (!list.contains(currency)) {
+        list.insert(0, currency);
+      }
+    }
+    return list;
+  }
+
   Currency? _homeCurrency;
 
   void init() async {
@@ -25,6 +40,7 @@ class CurrencyProvider extends ChangeNotifier with Storage {
       for (final currency in currencyList) {
         _currencyMap[currency.name] = currency;
       }
+      updateHomeCurrency(null);
       notifyListeners();
     });
   }
@@ -33,7 +49,26 @@ class CurrencyProvider extends ChangeNotifier with Storage {
     return Provider.of<CurrencyProvider>(context, listen: false);
   }
 
+  void updateHomeCurrency(Currency? currency) {
+    if (currency?.state == CurrencyStateEnum.home) {
+      for (var iter in _currencyMap.values) {
+        if (iter.state == CurrencyStateEnum.home && iter != currency) {
+          iter.state = CurrencyStateEnum.show;
+        }
+      }
+    }
+    _homeCurrency = null;
+    for (var iter in _currencyMap.values) {
+      if (iter.state == CurrencyStateEnum.home) {
+        _homeCurrency = iter;
+      }
+    }
+    _homeCurrency ??= _currencyMap.values.firstOrNull;
+    _homeCurrency?.state = CurrencyStateEnum.home;
+  }
+
   void add(Currency item) async {
+    updateHomeCurrency(item);
     final isar = await db;
     await isar!.writeTxn(() async {
       await isar.currencys.put(item);
@@ -44,6 +79,7 @@ class CurrencyProvider extends ChangeNotifier with Storage {
   }
 
   void delete(Currency item) async {
+    updateHomeCurrency(item);
     final isar = await db;
     await isar!.writeTxn(() async {
       await isar.currencys.delete(item.id);
@@ -53,7 +89,6 @@ class CurrencyProvider extends ChangeNotifier with Storage {
   }
 
   Currency? getHomeCurrency() {
-    _homeCurrency ??= getCurrencyByName('€');
     return _homeCurrency;
   }
 
@@ -62,7 +97,7 @@ class CurrencyProvider extends ChangeNotifier with Storage {
   }
 
   Currency getCurrencyById(int id) {
-    return items
+    return allItems
         .firstWhere((element) => element.id == id); //, orElse: () => Null);
   }
 

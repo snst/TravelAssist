@@ -45,6 +45,21 @@ class _PackingListPageState extends State<TodoListPage> {
     );
   }
 
+  void showTodoSettingsPage(BuildContext context, TodoProvider todoProvider) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Settings"),
+          ),
+          body: ExportWidget(
+            name: 'todo',
+            toJson: todoProvider.toJson,
+            fromJson: todoProvider.fromJson,
+            clearJson: todoProvider.clear,
+          ));
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     final todoProvider = context.watch<TodoProvider>();
@@ -55,61 +70,52 @@ class _PackingListPageState extends State<TodoListPage> {
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              PopupMenuItem(
-                  value: 5,
-                  child: Text(_listEditable ? "Hide check" : "Check")),
+              const PopupMenuItem(value: 1, child: Text("Quick edit")),
+              const PopupMenuItem(value: 2, child: Text("Settings")),
             ],
             elevation: 2,
             onSelected: (value) {
               switch (value) {
-                case 5:
+                case 1:
                   toggleEdit();
                   break;
+                case 2:
+                showTodoSettingsPage(context, todoProvider);
+                break;
               }
             },
           ),
         ],
       ),
-      body: () {
-        if (_selectedBottomIndex == 4) {
-          return ExportWidget(
-            name: 'todo',
-            toJson: todoProvider.toJson,
-            fromJson: todoProvider.fromJson,
-            clearJson: todoProvider.clear,
-          );
-        } else {
-          return GroupedListView<TodoItem, String>(
-            elements: todoProvider
-                .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
-            groupBy: (TodoItem element) => element.category,
-            groupComparator: (value1, value2) => value2.compareTo(value1),
-            itemComparator: (TodoItem element1, TodoItem element2) =>
-                element1.name.compareTo(element2.name),
-            order: GroupedListOrder.DESC,
-            useStickyGroupSeparators: false,
-            groupSeparatorBuilder: (String value) => Padding(
-              padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-              child: Container(
-                //color: Colors.grey.shade900,
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      value,
-                      textAlign: TextAlign.center,
-                    )),
-              ),
-            ),
-            itemBuilder: (context, item) => TodoListWidget(
-                item: item,
-                onItemChanged: (item) {
-                  setState(() {});
-                },
-                onEditItem: (item) => _showEditDialog(item, false),
-                editable: _listEditable),
-          );
-        }
-      }(),
+      body: GroupedListView<TodoItem, String>(
+        elements: todoProvider
+            .getFilteredItems(bottomIndexToStateEnum(_selectedFilterIndex)),
+        groupBy: (TodoItem element) => element.category,
+        groupComparator: (value1, value2) => value2.compareTo(value1),
+        itemComparator: (TodoItem element1, TodoItem element2) =>
+            element1.name.compareTo(element2.name),
+        order: GroupedListOrder.DESC,
+        useStickyGroupSeparators: false,
+        groupSeparatorBuilder: (String value) => Padding(
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+          child: Container(
+            child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  value,
+                  textAlign: TextAlign.center,
+                )),
+          ),
+        ),
+        itemBuilder: (context, item) => TodoListWidget(
+            item: item,
+            onItemChanged: (item) {
+              setState(() {});
+            },
+            onEditItem: (item) => _showEditDialog(item, false),
+            editable: _listEditable,
+            filterIndex: bottomIndexToStateEnum(_selectedFilterIndex)),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -123,14 +129,6 @@ class _PackingListPageState extends State<TodoListPage> {
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.ban),
             label: 'Skipped',
-          ),
-          //BottomNavigationBarItem(
-          //  icon: FaIcon(FontAwesomeIcons.ellipsisVertical),
-          //  label: 'Bulk',
-          //),
-          BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.wrench),
-            label: 'Settings',
           ),
         ],
         currentIndex: _selectedBottomIndex,

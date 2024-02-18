@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/calculator.dart';
 import 'todo_provider.dart';
 import 'currency_provider.dart';
 import 'transaction_provider.dart';
@@ -14,6 +15,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TodoProvider()),
         ChangeNotifierProvider(create: (context) => CurrencyProvider()),
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
+        ChangeNotifierProvider(create: (context) => Calculator()),
       ],
       child: const MyApp(),
     ),
@@ -34,85 +36,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        //colorSchemeSeed: Color.fromARGB(255, 4, 125, 146),
       ),
       themeMode: ThemeMode.dark,
       home: const WelcomePage(),
     );
   }
 }
-
-
-/*
-Drawer createDrawer(BuildContext context) {
-  int selectedIndex = 0;
-  //Function void _onItemTapped(int i) => {};
-  return Drawer(
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        const DrawerHeader(
-          decoration: BoxDecoration(
-            //color: Theme.of(context).primaryColor,
-          ),
-          child: Text('Menu'),
-        ),
-        ListTile(
-          title: const Text('Budget List'),
-          selected: selectedIndex == 0,
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        TransactionMainPage(createDrawer: createDrawer)));
-          },
-        ),
-        ListTile(
-          title: const Text('Todo List'),
-          selected: selectedIndex == 1,
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const TodoListPage(
-                          title: 'Todo List',
-                          createDrawer: createDrawer,
-                        )));
-          },
-        ),
-        ListTile(
-          title: const Text('Currency Converter'),
-          selected: selectedIndex == 2,
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const CurrencyConverterPage(
-                        createDrawer: createDrawer)));
-          },
-        ),
-        ListTile(
-          title: const Text('Settings'),
-          selected: selectedIndex == 2,
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        CurrencySettingPage(createDrawer: createDrawer)));
-          },
-        ),
-      ],
-    ),
-  );
-}
-*/

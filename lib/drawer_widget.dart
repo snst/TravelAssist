@@ -16,13 +16,10 @@ class DrawerWidget extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(
-            //decoration: BoxDecoration(
-            //  color: Theme.of(context).drawerTheme.surfaceTintColor,
-            //),
             child: Text('Menu'),
           ),
           ListTile(
-            title: const Text('Budget'),
+            title: const Text('Money'),
             selected: selectedIndex == 0,
             onTap: () {
               selectedIndex = 0;
@@ -47,32 +44,6 @@ class DrawerWidget extends StatelessWidget {
                       builder: (context) => const TodoListPage()));
             },
           ),
-          ListTile(
-            title: const Text('Currency'),
-            selected: selectedIndex == 2,
-            onTap: () {
-              selectedIndex = 2;
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CurrencyPage()));
-            },
-          ),
-          /*ListTile(
-            title: const Text('Settings'),
-            selected: selectedIndex == 3,
-            onTap: () {
-              selectedIndex = 3;
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CurrencySettingPage()));
-            },
-          ),*/
         ],
       ),
     );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
+import 'package:travel_assist/currency_converter_page.dart';
 import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/currency_rate_widget.dart';
 import 'package:travel_assist/drawer_widget.dart';
 import 'package:travel_assist/transaction_balance_subpage.dart';
 import 'package:travel_assist/transaction_list_subpage.dart';
@@ -31,67 +33,80 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
     );
   }
 
+  void showCurrenyRatesPage(
+      BuildContext context, CurrencyProvider currencyProvider) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Currency rates"),
+          ),
+          body: CurrencyRatesPage(currencyProvider: currencyProvider));
+    }));
+  }
+
+  void showCurrencySettingsPage(BuildContext context, TransactionProvider tp) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Settings"),
+          ),
+          body: ExportWidget(
+            name: 'transaction',
+            toJson: tp.toJson,
+            fromJson: tp.fromJson,
+            clearJson: tp.clear,
+          ));
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     final cp = context.watch<CurrencyProvider>();
     final tp = context.watch<TransactionProvider>();
-    //tp.initCurrencies(cp);
     shownCurrency ??= cp.getHomeCurrency();
 
     if (null == shownCurrency) {
       return const CircularProgressIndicator();
     }
 
-    //var res = tp.calculate(widget.shownCurrency!, null);
     return Scaffold(
       appBar: AppBar(
-        /* actions: [
-          Text("??"),//Currency.formatValue(res.sumExpense)),
-          CurrencyChooserWidget(
-              currencies: cp.items,
-              selected: widget.shownCurrency!,
-              onChanged: (currency) {
-                setState(() {
-                  widget.shownCurrency = currency;
-                });
-              })
-        ],*/
-        title: const Text("Budget"),
+        title: const Text("Money"),
+        actions: [
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 0, child: Text("Currency rates")),
+              const PopupMenuItem(value: 1, child: Text("Settings")),
+            ],
+            elevation: 2,
+            onSelected: (value) {
+              switch (value) {
+                case 0:
+                  showCurrenyRatesPage(context, cp);
+                  break;
+                case 1:
+                  showCurrencySettingsPage(context, tp);
+                  break;
+              }
+            },
+          ),
+        ],
       ),
       body: () {
         if (_selectedSubPageIndex == 1) {
           return TransactionBalanceSubPage(
               transactionProvider: tp, currencyProvider: cp);
         } else if (_selectedSubPageIndex == 2) {
-          return ExportWidget(
-            name: 'transaction',
-            toJson: tp.toJson,
-            fromJson: tp.fromJson,
-            clearJson: tp.clear,
+          return CurrencyConverterWidget(
+            currencyProvider: cp,
           );
         } else {
           return TransactionListSubpage(onShowEditDialog: _showEditDialog);
         }
       }(),
-      //() {
-      //if (_selectedSubPageIndex==0) {TransactionListWidget(
-      //  transactionProvider: tp, onShowEditDialog: _showEditDialog)} else {
-      //    null
-      //  }
-      // return TransactionListWidget(
-      //     transactionProvider: tp, onShowEditDialog: _showEditDialog);
-      //  return Text('tis true');
-
-      //(())}
-
-      //if (_selectedSubPageIndex==0) TransactionListWidget(
-      //transactionProvider: tp, onShowEditDialog: _showEditDialog),
-
       drawer: const DrawerWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //final currency =
-          //    CurrencyProvider.getInstance(context).getCurrencyByName('\$');
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -115,8 +130,8 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
             label: 'Statistics',
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.wrench),
-            label: 'Settings',
+            icon: FaIcon(FontAwesomeIcons.calculator),
+            label: 'Calculator',
           ),
         ],
         currentIndex: _selectedSubPageIndex,

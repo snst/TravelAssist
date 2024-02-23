@@ -42,22 +42,25 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
     List<String> categories = getPackingList(context).getCategories();
 
     return Scaffold(
-        appBar: AppBar(
+        appBar: /*AppBar(
             //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Text(widget.title)),
+            title: Text(widget.title)),*/
+            AppBar(
+          automaticallyImplyLeading: false,
+          title: TextField(
+            controller: TextEditingController()
+              ..text = widget.modifiedItem.name,
+            decoration: const InputDecoration(hintText: 'Name'),
+            onChanged: (value) => widget.modifiedItem.name = value,
+            autofocus: widget.newItem,
+          ),
+        ),
         body: Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  TextField(
-                    controller: TextEditingController()
-                      ..text = widget.modifiedItem.name,
-                    decoration: const InputDecoration(hintText: 'Name'),
-                    onChanged: (value) => widget.modifiedItem.name = value,
-                    autofocus: false,
-                  ),
                   TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(
                       decoration: InputDecoration(
@@ -128,14 +131,14 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                       showSelectedIcon: false,
                       segments: const <ButtonSegment<TodoItemStateEnum>>[
                         ButtonSegment<TodoItemStateEnum>(
-                          value: TodoItemStateEnum.open,
-                          label: Text('open'),
-                          // icon: Icon(Icons.calendar_view_day)
-                        ),
-                        ButtonSegment<TodoItemStateEnum>(
                           value: TodoItemStateEnum.skipped,
                           label: Text('skipped'),
                           //  icon: Icon(Icons.calendar_view_week)
+                        ),
+                        ButtonSegment<TodoItemStateEnum>(
+                          value: TodoItemStateEnum.open,
+                          label: Text('open'),
+                          // icon: Icon(Icons.calendar_view_day)
                         ),
                         ButtonSegment<TodoItemStateEnum>(
                           value: TodoItemStateEnum.done,
@@ -149,11 +152,24 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                         setState(() {
                           widget.modifiedItem.state = newSelection.first;
                         });
+                        if (!widget.newItem) {
+                          saveAndClose(context);
+                        }
                       },
                     ),
                   ),
                   Row(children: [
                     const Spacer(),
+                    IconButton(
+                        // Back
+                        iconSize: 30,
+                        icon: const Icon(
+                          Icons.arrow_back,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                    // const Spacer(),
                     if (!widget.newItem)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(32, 0, 0, 0),

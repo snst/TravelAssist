@@ -63,6 +63,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
           //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: //Text(widget.title)),
               Row(
@@ -79,7 +80,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 //modified = true;
                 widget.modifiedItem.value = safeConvertToDouble(value);
               },
-              autofocus: true,
+              autofocus: widget.newItem,
               style: const TextStyle(
                 fontSize: 30,
                 //color: Colors.blue.shade700,

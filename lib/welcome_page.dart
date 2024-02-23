@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:travel_assist/drawer_widget.dart';
-//import 'package:grouped_list/grouped_list.dart';
-//import 'package:provider/provider.dart';
-//import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:travel_assist/todo_list_page.dart';
+import 'package:travel_assist/transaction_main_page.dart';
+import 'package:travel_assist/currency_converter_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -13,12 +13,17 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-      ),
-      body: null,
-      drawer: const DrawerWidget(),
+    final PageController controller = PageController();
+    final drawer = DrawerWidget(controller: controller);
+    return PageView(
+      scrollDirection: Axis.horizontal,
+      controller: controller,
+      onPageChanged: (value) => DrawerWidget.selectedPageIndex = value,
+      children: <Widget>[
+        TransactionMainPage(drawer: drawer),
+        CurrencyConverterPage(drawer: drawer),
+        TodoListPage(drawer: drawer),
+      ],
     );
   }
 }

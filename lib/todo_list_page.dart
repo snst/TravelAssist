@@ -10,7 +10,9 @@ import 'todo_item.dart';
 import 'todo_provider.dart';
 
 class TodoListPage extends StatefulWidget {
-  const TodoListPage({super.key});
+  const TodoListPage({super.key, required this.drawer});
+  static int pageIndex = 2;
+  final DrawerWidget drawer;
   @override
   State<TodoListPage> createState() => _PackingListPageState();
 }
@@ -22,9 +24,9 @@ class _PackingListPageState extends State<TodoListPage> {
 
   TodoItemStateEnum bottomIndexToStateEnum(int index) {
     final filters = [
-      TodoItemStateEnum.done,
+      TodoItemStateEnum.skipped,
       TodoItemStateEnum.open,
-      TodoItemStateEnum.skipped
+      TodoItemStateEnum.done,
     ];
     return filters[index];
   }
@@ -80,8 +82,8 @@ class _PackingListPageState extends State<TodoListPage> {
                   toggleEdit();
                   break;
                 case 2:
-                showTodoSettingsPage(context, todoProvider);
-                break;
+                  showTodoSettingsPage(context, todoProvider);
+                  break;
               }
             },
           ),
@@ -98,14 +100,12 @@ class _PackingListPageState extends State<TodoListPage> {
         useStickyGroupSeparators: false,
         groupSeparatorBuilder: (String value) => Padding(
           padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-          child: Container(
-            child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  value,
-                  textAlign: TextAlign.center,
-                )),
-          ),
+          child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                value,
+                textAlign: TextAlign.center,
+              )),
         ),
         itemBuilder: (context, item) => TodoListWidget(
             item: item,
@@ -119,16 +119,16 @@ class _PackingListPageState extends State<TodoListPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.squareCheck),
-            label: 'Done',
+            icon: FaIcon(FontAwesomeIcons.ban),
+            label: 'Skipped',
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.square),
             label: 'Open',
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.ban),
-            label: 'Skipped',
+            icon: FaIcon(FontAwesomeIcons.squareCheck),
+            label: 'Done',
           ),
         ],
         currentIndex: _selectedBottomIndex,
@@ -143,9 +143,9 @@ class _PackingListPageState extends State<TodoListPage> {
           });
         },
       ),
-      drawer: const DrawerWidget(),
+      drawer: widget.drawer,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEditDialog(TodoItem(quantity: 1), false),
+        onPressed: () => _showEditDialog(TodoItem(quantity: 1), true),
         tooltip: 'Add item',
         child: const Icon(Icons.add),
       ),

@@ -13,7 +13,7 @@ class CalculatorOp {
 }
 
 class Calculator extends ChangeNotifier {
-  List<CalculatorOp> _operations = [];
+  final List<CalculatorOp> _operations = [];
   String inputString = "";
   String resultString = "dd";
   TransactionValue sum = TransactionValue(0, null);
@@ -21,7 +21,6 @@ class Calculator extends ChangeNotifier {
   void update() {
     inputString = "";
     sum.reset();
-    double sign = 1;
     String lastOp = "+";
     for (final operation in _operations) {
       inputString += operation.toString();
@@ -41,7 +40,7 @@ class Calculator extends ChangeNotifier {
         lastOp = operation.op;
       }
     }
-    print("$inputString = ${sum.toString()}");
+    //print("$inputString = ${sum.toString()}");
     notifyListeners();
   }
 

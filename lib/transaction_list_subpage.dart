@@ -33,13 +33,9 @@ class _TransactionListSubpageState extends State<TransactionListSubpage> {
       useStickyGroupSeparators: false,
       groupSeparatorBuilder: (DateTime value) => Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-        child: Container(
-          //color: Colors.grey.shade900,
-          //color: Theme.of(context).hoverColor,
-          child: Text(
-            DateFormat('  EEEE, d MMMM y').format(value),
-            textAlign: TextAlign.left,
-          ),
+        child: Text(
+          DateFormat('  EEEE, d MMMM y').format(value),
+          textAlign: TextAlign.left,
         ),
       ),
       itemBuilder: (context, item) => TransactionListItemWidget(

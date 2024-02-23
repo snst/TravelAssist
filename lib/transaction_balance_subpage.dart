@@ -31,20 +31,20 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     var tableRows = <TableRow>[
       const TableRow(children: <Widget>[
         Text("Curreny"),
-        Text("Expense"),
         Text("Withdraw"),
+        Text("Expense"),
         Text("Balance"),
         // Text("Currency")
       ]),
       TableRow(children: <Widget>[
         TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
-            child: Text("All", style: _style)),
-        TransactionCell(
-            value: widget.transactionProvider.allExpenses,
-            currency: currencyAll),
+            child: Text("All ${currencyAll?.name}", style: _style)),
         TransactionCell(
             value: widget.transactionProvider.allWithdraws,
+            currency: currencyAll),
+        TransactionCell(
+            value: widget.transactionProvider.allExpenses,
             currency: currencyAll),
         TransactionCell(
             value: widget.transactionProvider.allBalance,

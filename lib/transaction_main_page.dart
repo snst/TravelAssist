@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_converter_page.dart';
 import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/currency_rate_widget.dart';
 import 'package:travel_assist/drawer_widget.dart';
@@ -14,7 +13,9 @@ import 'package:travel_assist/export_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionMainPage extends StatefulWidget {
-  const TransactionMainPage({super.key});
+  const TransactionMainPage({super.key, required this.drawer});
+  static int pageIndex = 0;
+  final DrawerWidget drawer;
   @override
   State<TransactionMainPage> createState() => _TransactionMainPageState();
 }
@@ -71,7 +72,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Money"),
+        title: const Text("Expenses"),
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
@@ -96,15 +97,11 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
         if (_selectedSubPageIndex == 1) {
           return TransactionBalanceSubPage(
               transactionProvider: tp, currencyProvider: cp);
-        } else if (_selectedSubPageIndex == 2) {
-          return CurrencyConverterWidget(
-            currencyProvider: cp,
-          );
         } else {
           return TransactionListSubpage(onShowEditDialog: _showEditDialog);
         }
       }(),
-      drawer: const DrawerWidget(),
+      drawer: widget.drawer,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -128,10 +125,6 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.squarePollHorizontal),
             label: 'Statistics',
-          ),
-          BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.calculator),
-            label: 'Calculator',
           ),
         ],
         currentIndex: _selectedSubPageIndex,

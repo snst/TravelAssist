@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/calculator.dart';
+import 'package:travel_assist/payment_provider.dart';
 import 'todo_provider.dart';
 import 'currency_provider.dart';
 import 'transaction_provider.dart';
@@ -16,6 +17,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => CurrencyProvider()),
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
         ChangeNotifierProvider(create: (context) => Calculator()),
+        ChangeNotifierProvider(create: (context) => PaymentProvider()),
       ],
       child: const MyApp(),
     ),

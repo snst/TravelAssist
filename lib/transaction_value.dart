@@ -1,4 +1,5 @@
 import 'package:travel_assist/currency.dart';
+import 'package:travel_assist/travel_assist_utils.dart';
 
 class TransactionValue {
   TransactionValue(this.value, this.currency);
@@ -9,9 +10,10 @@ class TransactionValue {
   String get currencyString => currency != null ? currency.toString() : "?";
   @override
   String toString() => "$valueString$currencyString";
+  String toShortString() => "${removeTrailingZeros(valueString)}$currencyString";
 
-  void reset()
-  {
+
+  void reset() {
     value = 0;
     currency = null;
   }

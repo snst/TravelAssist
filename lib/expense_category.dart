@@ -31,5 +31,9 @@ class ExpenseCategoryManager {
     ExpenseCategory("Credit card", const FaIcon(FontAwesomeIcons.creditCard)),
   ];
 
+  static int getByName(String name) {
+    return list.firstWhere((element) => element.name == name).id;
+  }
+
   static ExpenseCategory at(int i) => list[i];
 }

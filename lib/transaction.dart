@@ -10,9 +10,10 @@ part 'transaction.g.dart';
 enum TransactionTypeEnum {
   cashPayment,
   cardPayment,
-  electronicPayment,
   withdrawal,
-  balance;
+  balance,
+  exchange,
+  deposit;
 }
 
 @collection

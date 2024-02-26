@@ -67,10 +67,10 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Text(currency.toString(), style: _style)),
-        TransactionCell(value: transactionValue, currency: currency),
         TransactionCell(
             value: widget.transactionProvider.withdrawPerCurrency[currencyName],
             currency: currency),
+        TransactionCell(value: transactionValue, currency: currency),
         TransactionCell(
             value: widget.transactionProvider.balancePerCurrency[currencyName],
             currency: currency),

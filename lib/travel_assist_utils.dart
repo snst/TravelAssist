@@ -19,6 +19,13 @@ double safeConvertToDouble(String input) {
   }
 }
 
+String removeTrailingZeros(String inputString) {
+  if (inputString.endsWith('.00')) {
+    return inputString.substring(0, inputString.length - 3);
+  }
+  return inputString;
+}
+
 String formatDateWithoutTime(DateTime dateTime) {
   final formatter = DateFormat('dd.MM.yyyy');
   return formatter.format(dateTime);

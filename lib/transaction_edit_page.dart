@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/currency.dart';
+import 'package:travel_assist/payment_chooser_widget.dart';
+import 'package:travel_assist/payment_provider.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'transaction.dart';
 import 'currency_provider.dart';
@@ -28,12 +31,27 @@ class TransactionEditPage extends StatefulWidget {
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
   ExpenseCategory selectedExpense = ExpenseCategoryManager.list[0];
-  //bool modified = false;
+  double withdrawFee = 0;
 
   void saveAndClose(BuildContext context) {
     if (widget.modifiedItem.name.isNotEmpty) {
       widget.item.update(widget.modifiedItem);
-      TransactionProvider.getInstance(context).add(widget.item);
+      final tp = TransactionProvider.getInstance(context);
+      tp.add(widget.item);
+
+      if (widget.newItem &&
+          withdrawFee > 0 &&
+          widget.modifiedItem.isWithdrawal) {
+        final fee = Transaction(
+            date: DateTime.now(),
+            value: withdrawFee,
+            currency: widget.modifiedItem.currency,
+            type: TransactionTypeEnum.cardPayment,
+            name: 'Withdraw fee for ${widget.modifiedItem.name}',
+            categoryKey: ExpenseCategoryManager.getByName("Fee"));
+        tp.add(fee);
+      }
+
       Navigator.of(context).pop();
     }
   }
@@ -53,6 +71,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     }
   }
 
+  void onPaymentChanged(Payment payment) {}
+
   @override
   Widget build(BuildContext context) {
     CurrencyProvider currencyProvider =
@@ -63,49 +83,50 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false,
           //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: //Text(widget.title)),
               Row(
-        children: [
-          Flexible(
-            child: TextField(
-              textAlign: TextAlign.right,
-              controller: TextEditingController()
-                ..text = widget.modifiedItem.value == 0
-                    ? ""
-                    : widget.modifiedItem.valueString,
-              decoration: const InputDecoration(hintText: 'Amount'),
-              onChanged: (value) {
-                //modified = true;
-                widget.modifiedItem.value = safeConvertToDouble(value);
-              },
-              autofocus: widget.newItem,
-              style: const TextStyle(
-                fontSize: 30,
-                //color: Colors.blue.shade700,
-                fontWeight: FontWeight.w600,
+            children: [
+              Flexible(
+                child: TextField(
+                  textAlign: TextAlign.right,
+                  controller: TextEditingController()
+                    ..text = widget.modifiedItem.value == 0
+                        ? ""
+                        : widget.modifiedItem.valueString,
+                  decoration: const InputDecoration(hintText: 'Amount'),
+                  onChanged: (value) {
+                    //modified = true;
+                    widget.modifiedItem.value = safeConvertToDouble(value);
+                  },
+                  autofocus: widget.newItem,
+                  style: const TextStyle(
+                    fontSize: 30,
+                    //color: Colors.blue.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  autocorrect: false,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
+                  ],
+                ),
               ),
-              autocorrect: false,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
-              ],
-            ),
-          ),
-          CurrencyChooserWidget(
-              currencies: currencyProvider.getVisibleItemsWith(currencyProvider
-                  .getCurrencyFromTransaction(widget.modifiedItem)),
-              selected: currencyProvider
-                  .getCurrencyFromTransaction(widget.modifiedItem),
-              onChanged: (currency) {
-                setState(() {
-                  widget.modifiedItem.currency = currency.name;
-                });
-              })
-        ],
-      )),
+              CurrencyChooserWidget(
+                  currencies: currencyProvider.getVisibleItemsWith(
+                      currencyProvider
+                          .getCurrencyFromTransaction(widget.modifiedItem)),
+                  selected: currencyProvider
+                      .getCurrencyFromTransaction(widget.modifiedItem),
+                  onChanged: (currency) {
+                    setState(() {
+                      widget.modifiedItem.currency = currency.name;
+                    });
+                  })
+            ],
+          )),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
         child: SingleChildScrollView(
@@ -117,11 +138,60 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
               TextField(
                 controller: TextEditingController()
                   ..text = widget.modifiedItem.name,
-                decoration: const InputDecoration(hintText: 'Name'),
+                decoration: const InputDecoration(hintText: 'Description'),
                 onChanged: (value) => widget.modifiedItem.name = value,
                 autofocus: false,
               ),
-              if (!widget.modifiedItem.isWithdrawal) ...[
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 18, 0, 12),
+                child: SegmentedButton<TransactionTypeEnum>(
+                  showSelectedIcon: false,
+                  segments: const <ButtonSegment<TransactionTypeEnum>>[
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.cashPayment,
+                      icon: FaIcon(FontAwesomeIcons.coins),
+                    ),
+                    /*ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.cardPayment,
+                      icon: FaIcon(FontAwesomeIcons.creditCard),
+                    ),*/
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.deposit,
+                      icon: FaIcon(FontAwesomeIcons.sackDollar),
+                    ),
+                    /*ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.exchange,
+                      icon: FaIcon(FontAwesomeIcons.moneyBillTransfer),
+                    ),
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.withdrawal,
+                      icon: Icon(
+                        Icons.atm,
+                        size: 40,
+                      ),
+                    ),*/
+                    ButtonSegment<TransactionTypeEnum>(
+                      value: TransactionTypeEnum.balance,
+                      icon: FaIcon(FontAwesomeIcons.scaleBalanced),
+                    )
+                  ],
+                  selected: <TransactionTypeEnum>{widget.modifiedItem.type},
+                  onSelectionChanged: (Set<TransactionTypeEnum> newSelection) {
+                    setState(() {
+                      widget.modifiedItem.type = newSelection.first;
+                    });
+                  },
+                ),
+              ),
+
+              if (widget.modifiedItem.type == TransactionTypeEnum.cashPayment ||
+                  widget.modifiedItem.type ==
+                      TransactionTypeEnum.deposit) ...[
+                PaymentChooserWidget(onChanged: onPaymentChanged)
+              ],
+
+              if (widget.modifiedItem.type == TransactionTypeEnum.cashPayment) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                   child: Align(
@@ -188,40 +258,95 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 },
                 secondary: const FaIcon(FontAwesomeIcons.sackDollar),
               ),*/
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 18, 0, 12),
-                child: SegmentedButton<TransactionTypeEnum>(
-                  showSelectedIcon: false,
-                  segments: const <ButtonSegment<TransactionTypeEnum>>[
-                    ButtonSegment<TransactionTypeEnum>(
-                      value: TransactionTypeEnum.cashPayment,
-                      icon: FaIcon(FontAwesomeIcons.coins),
-                    ),
-                    ButtonSegment<TransactionTypeEnum>(
-                      value: TransactionTypeEnum.cardPayment,
-                      icon: FaIcon(FontAwesomeIcons.creditCard),
-                    ),
-                    ButtonSegment<TransactionTypeEnum>(
-                      value: TransactionTypeEnum.electronicPayment,
-                      icon: FaIcon(FontAwesomeIcons.paypal),
-                    ),
-                    ButtonSegment<TransactionTypeEnum>(
-                      value: TransactionTypeEnum.withdrawal,
-                      icon: FaIcon(FontAwesomeIcons.moneyBills),
-                    ),
-                    ButtonSegment<TransactionTypeEnum>(
-                      value: TransactionTypeEnum.balance,
-                      icon: FaIcon(FontAwesomeIcons.scaleBalanced),
-                    )
-                  ],
-                  selected: <TransactionTypeEnum>{widget.modifiedItem.type},
-                  onSelectionChanged: (Set<TransactionTypeEnum> newSelection) {
+
+              /*
+              if (widget.modifiedItem.type == TransactionTypeEnum.withdrawal ||
+                  widget.modifiedItem.type ==
+                      TransactionTypeEnum.cardPayment) ...[
+                TypeAheadField(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    decoration: InputDecoration(
+                        hintText: 'Card',
+                        suffixIcon: IconButton(
+                          onPressed: controller.clear,
+                          icon: const Icon(Icons.clear),
+                        )),
+                    controller: controller, //TextEditingController()
+                    //..text = widget.modifiedItem.category,
+                  ),
+                  suggestionsCallback: (pattern) {
+                    //widget.modifiedItem.category = pattern;
+
+                    List<String> strlist = epay
+                        .where((item) =>
+                            item.toLowerCase().contains(pattern.toLowerCase()))
+                        .toList();
+                    //if (!strlist.contains(pattern)) {
+                    //  strlist.insert(0, pattern);
+                    //}
+                    return strlist;
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      title: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) {
                     setState(() {
-                      widget.modifiedItem.type = newSelection.first;
+                      // widget.modifiedItem.category = suggestion;
                     });
                   },
                 ),
-              ),
+                SingleChildScrollView(
+                  //reverse: true,
+                  scrollDirection: Axis.horizontal,
+                  child: SegmentedButton<TransactionTypeEnum>(
+                    showSelectedIcon: false,
+                    segments: const <ButtonSegment<TransactionTypeEnum>>[
+                      ButtonSegment<TransactionTypeEnum>(
+                        value: TransactionTypeEnum.cashPayment,
+                        label: Text("Revolut"),
+                      ),
+                      ButtonSegment<TransactionTypeEnum>(
+                        value: TransactionTypeEnum.cardPayment,
+                        label: Text("VISA DKB"),
+                      ),
+                      ButtonSegment<TransactionTypeEnum>(
+                        value: TransactionTypeEnum.deposit,
+                        label: Text("Revolut"),
+                      ),
+                      ButtonSegment<TransactionTypeEnum>(
+                        value: TransactionTypeEnum.exchange,
+                        label: Text("EC"),
+                      ),
+                      ButtonSegment<TransactionTypeEnum>(
+                        value: TransactionTypeEnum.withdrawal,
+                        label: Text("VISA PB"),
+                      ),
+                    ],
+                    selected: <TransactionTypeEnum>{widget.modifiedItem.type},
+                    onSelectionChanged:
+                        (Set<TransactionTypeEnum> newSelection) {
+                      setState(() {
+                        // widget.modifiedItem.type = newSelection.first;
+                      });
+                    },
+                  ),
+                ),
+              ],*/
+              if (widget.modifiedItem.isWithdrawal && widget.newItem) ...[
+                TextField(
+                  controller: TextEditingController()
+                    ..text = withdrawFee != 0
+                        ? Currency.formatValue(withdrawFee)
+                        : "",
+                  decoration: InputDecoration(
+                      hintText: 'Withdraw fee ${widget.modifiedItem.currency}'),
+                  onChanged: (value) =>
+                      withdrawFee = safeConvertToDouble(value),
+                  autofocus: false,
+                ),
+              ],
               /*
               Padding(
                   padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),

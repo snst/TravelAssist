@@ -8,7 +8,7 @@ class CalculatorOp {
   String op;
   @override
   String toString() {
-    return value != null ? value.toString() : " $op ";
+    return value != null ? value!.toShortString() : " $op ";
   }
 }
 

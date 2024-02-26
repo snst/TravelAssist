@@ -36,4 +36,8 @@ class ExpenseCategoryManager {
   }
 
   static ExpenseCategory at(int i) => list[i];
+
+  static getByIndex(int i) {
+    return i >= 0 && i < list.length ? list[i] : list[0];
+  }
 }

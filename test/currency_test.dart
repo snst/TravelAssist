@@ -1,6 +1,5 @@
 // Import the test package and Counter class
 import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/transaction.dart';
 import 'package:test/test.dart';
 
 void main() {

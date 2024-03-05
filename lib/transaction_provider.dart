@@ -16,10 +16,13 @@ class TransactionProvider extends ChangeNotifier with Storage {
   TransactionValue? allExpenses;
   TransactionValue? allWithdraws;
   TransactionValue? allBalance;
+  bool useDb;
 
-  TransactionProvider() {
-    db = openDB();
-    init();
+  TransactionProvider({this.useDb = true}) {
+    if (useDb) {
+      db = openDB();
+      init();
+    }
   }
 
   List<Transaction> _items = [];
@@ -37,46 +40,58 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return Provider.of<TransactionProvider>(context, listen: false);
   }
 
-/*
-  void initCurrencies(CurrencyProvider cp) {
-    for (var t in items) {
-      t.currency = cp.getCurrencyById(t.currencyKey);
-    }
-  }*/
-
   void add(Transaction item) async {
     addList([item]);
   }
 
   void addList(List<Transaction> items) async {
-    final isar = await db;
-    await isar!.writeTxn(() async {
+    if (useDb) {
+      final isar = await db;
+      await isar!.writeTxn(() async {
+        for (final item in items) {
+          await isar.transactions.put(item);
+          if (!_items.contains(item)) {
+            _items.add(item);
+          }
+        }
+        notifyListeners();
+      });
+    } else {
       for (final item in items) {
-        await isar.transactions.put(item);
         if (!_items.contains(item)) {
           _items.add(item);
         }
       }
       notifyListeners();
-    });
+    }
   }
 
   void delete(Transaction item) async {
-    final isar = await db;
-    await isar!.writeTxn(() async {
-      await isar.transactions.delete(item.id);
+    if (useDb) {
+      final isar = await db;
+      await isar!.writeTxn(() async {
+        await isar.transactions.delete(item.id);
+        _items.remove(item);
+        notifyListeners();
+      });
+    } else {
       _items.remove(item);
       notifyListeners();
-    });
+    }
   }
 
   void clear() async {
-    final isar = await db;
-    await isar!.writeTxn(() async {
-      await isar.transactions.clear();
+    if (useDb) {
+      final isar = await db;
+      await isar!.writeTxn(() async {
+        await isar.transactions.clear();
+        _items.clear();
+        notifyListeners();
+      });
+    } else {
       _items.clear();
       notifyListeners();
-    });
+    }
   }
 
   List<Transaction> getSortedTransactions(DateTime? until) {
@@ -90,43 +105,9 @@ class TransactionProvider extends ChangeNotifier with Storage {
   }
 
   int transactionComparison(Transaction a, Transaction b) {
-    /*
-      DateTime normalizedDate1 = DateTime(date1.year, date1.month, date1.day);
-      DateTime normalizedDate2 = DateTime(date2.year, date2.month, date2.day);
-      return normalizedDate1.isAtSameMomentAs(normalizedDate2);
-*/
     var ret = a.date.compareTo(b.date);
-    //if (ret == 0) {
-    //  ret = a.type.index.compareTo(b.type.index);
-    //}
     return ret;
   }
-
-/*
-  TransactionResult calculate(Currency currency, DateTime? until) {
-    TransactionResult result = TransactionResult();
-    List<Transaction> items = getSortedTransactions(until);
-    for (final item in items) {
-      double value = item.convertTo(currency);
-      switch (item.type) {
-        case TransactionTypeEnum.inpayment:
-          result.sumInpayment += value;
-          break;
-        case TransactionTypeEnum.expense:
-          result.sumExpense += value;
-          break;
-        default:
-          break;
-      }
-    }
-    result.balance = result.sumInpayment - result.sumExpense;
-    result.days = items.length == 0
-        ? 1
-        : items.last.date.difference(items.first.date).inDays + 1;
-    result.expensePerDay = result.sumExpense / result.days;
-    return result;
-  }
-  */
 
   void caluculateAll(CurrencyProvider currencyProvider) {
     allExpenses = TransactionValue(0, currencyProvider.getHomeCurrency());

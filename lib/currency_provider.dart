@@ -9,11 +9,14 @@ import 'currency.dart';
 import 'storage.dart';
 
 class CurrencyProvider extends ChangeNotifier with Storage {
-  CurrencyProvider() {
-    db = openDB();
-    init();
+  CurrencyProvider({this.useDb = true}) {
+    if (useDb) {
+      db = openDB();
+      init();
+    }
   }
 
+  bool useDb;
   final HashMap<String, Currency> _currencyMap = HashMap();
   List<Currency> get allItems => _currencyMap.values.toList();
   List<Currency> get visibleItems => allItems
@@ -69,23 +72,34 @@ class CurrencyProvider extends ChangeNotifier with Storage {
 
   void add(Currency item) async {
     updateHomeCurrency(item);
-    final isar = await db;
-    await isar!.writeTxn(() async {
-      await isar.currencys.put(item);
+    if (useDb) {
+      final isar = await db;
+      await isar!.writeTxn(() async {
+        await isar.currencys.put(item);
+        _currencyMap.removeWhere((key, value) => value == item);
+        _currencyMap[item.name] = item;
+        notifyListeners();
+      });
+    } else {
       _currencyMap.removeWhere((key, value) => value == item);
       _currencyMap[item.name] = item;
       notifyListeners();
-    });
+    }
   }
 
   void delete(Currency item) async {
     updateHomeCurrency(item);
-    final isar = await db;
-    await isar!.writeTxn(() async {
-      await isar.currencys.delete(item.id);
+    if (useDb) {
+      final isar = await db;
+      await isar!.writeTxn(() async {
+        await isar.currencys.delete(item.id);
+        _currencyMap.removeWhere((key, value) => value == item);
+        notifyListeners();
+      });
+    } else {
       _currencyMap.removeWhere((key, value) => value == item);
       notifyListeners();
-    });
+    }
   }
 
   Currency? getHomeCurrency() {

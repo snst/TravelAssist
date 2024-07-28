@@ -35,37 +35,56 @@ class TransactionEditPage extends StatefulWidget {
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
   double withdrawFee = 0;
-  //Transaction? modifiedItem;
+  Payment? paymentMethod;
 
   void saveAndClose(BuildContext context) {
-    if (widget.modifiedItem.name.isNotEmpty) {
-      widget.item.update(widget.modifiedItem);
-      final tp = TransactionProvider.getInstance(context);
-      tp.add(widget.item);
-
-      if (widget.newItem &&
-          withdrawFee > 0 &&
-          widget.modifiedItem.isWithdrawal) {
-        final fee = Transaction(
-            date: DateTime.now(),
-            value: withdrawFee,
-            currency: widget.modifiedItem.currency,
-            type: TransactionTypeEnum.cardPayment,
-            name: 'Withdraw fee for ${widget.modifiedItem.name}',
-            categoryKey: ExpenseCategoryManager.getByName("Fee"));
-        tp.add(fee);
+    if (widget.modifiedItem.name.isEmpty) {
+      if (widget.modifiedItem.type == TransactionTypeEnum.expense) {
+        widget.modifiedItem.name =
+            ExpenseCategoryManager.getByIndex(widget.modifiedItem.categoryKey)
+                .name;
       }
-
-      Navigator.of(context).pop();
+      else if (widget.modifiedItem.type == TransactionTypeEnum.deposit) {
+        widget.modifiedItem.name = "Deposit";
+      } else {
+        widget.modifiedItem.name = "?";
+      }
     }
+    widget.modifiedItem.method = paymentMethod!.name;
+    widget.item.update(widget.modifiedItem);
+    final tp = TransactionProvider.getInstance(context);
+    tp.add(widget.item);
+
+    if (widget.newItem && withdrawFee > 0 && widget.modifiedItem.isWithdrawal) {
+      final fee = Transaction(
+          date: DateTime.now(),
+          value: withdrawFee,
+          currency: widget.modifiedItem.currency,
+          type: TransactionTypeEnum.expense,
+          name: 'Withdraw fee for ${widget.modifiedItem.name}',
+          method: paymentMethod!.name,
+          categoryKey: ExpenseCategoryManager.getByName("Fee"));
+      tp.add(fee);
+    }
+
+    Navigator.of(context).pop();
   }
 
-  void onPaymentChanged(Payment payment) {}
+  void onPaymentChanged(Payment payment) {
+    setState(() {
+      paymentMethod = payment;
+      widget.modifiedItem.method = payment.name;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     CurrencyProvider currencyProvider =
         Provider.of<CurrencyProvider>(context, listen: false);
+    PaymentProvider paymentProvider =
+        Provider.of<PaymentProvider>(context, listen: false);
+
+    paymentMethod ??= paymentProvider.items.first;
 
     return Scaffold(
       appBar: AppBar(
@@ -77,26 +96,29 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
           reverse: true,
           child: Column(
             children: <Widget>[
-              WidgetTransactionDescriptionInput(widget: widget),
+              WidgetTransactionDescriptionInput(
+                  widget: widget, hintText: getHint(widget.modifiedItem.type)),
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
+                  widget.modifiedItem.type == TransactionTypeEnum.deposit) ...[
+                PaymentChooserWidget(onChanged: onPaymentChanged)
+              ],
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
+                WidgetTransactionExpenseCategoryChooser(
+                    transaction: widget.modifiedItem),
+                widgetExcludeFromDailyAverage(),
+              ],
               WidgetTransactionTypeChooser(
                 transactionType: widget.modifiedItem.type,
                 onChanged: (val) => setState(() {
                   widget.modifiedItem.type = val;
                 }),
               ),
-              if (widget.modifiedItem.type == TransactionTypeEnum.cashPayment ||
-                  widget.modifiedItem.type == TransactionTypeEnum.deposit) ...[
-                PaymentChooserWidget(onChanged: onPaymentChanged)
-              ],
-              if (widget.modifiedItem.type ==
-                  TransactionTypeEnum.cashPayment) ...[
-                WidgetTransactionExpenseCategoryChooser(
-                    transaction: widget.modifiedItem),
-                widgetExcludeFromDailyAverage(),
-              ],
               if (widget.modifiedItem.isWithdrawal && widget.newItem) ...[
                 WidgetTransactionWithdrawalFeeInput(
                   transaction: widget.modifiedItem,
+                  onChanged: (value) {
+                    withdrawFee = value;
+                  },
                 ),
               ],
               WidgetDateChooser(
@@ -105,12 +127,12 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   widget.modifiedItem.date = val;
                 }),
               ),
+              widgetButtons(context),
               WidgetCommentInput(
                   comment: widget.modifiedItem.comment,
                   onChanged: (val) => setState(() {
                         widget.modifiedItem.comment = val;
                       })),
-              widgetButtons(context),
             ],
           ),
         ),
@@ -175,7 +197,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
 
   Padding widgetButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(children: [
         const Spacer(),
         IconButton(

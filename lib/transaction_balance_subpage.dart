@@ -22,71 +22,137 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
   final TextStyle _style = const TextStyle(fontSize: 16);
   Currency? selCurrencyAll;
 
+  TableRow makeRow(String title, TransactionValue? tv, Currency? homeCurrency) {
+    return TableRow(children: <Widget>[
+      TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Text("", style: _style)),
+      TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Text(tv.toString(), style: _style)),
+      TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Text(tv!.convertTo(homeCurrency).toString(), style: _style)),
+      
+      
+      //TransactionCell(value: tv, currency: tv!.currency),
+    ]);
+  }
+
+  TableRow makeRowHeader(String a, {String b = "", String c = ""}) {
+    final TextStyle _style = const TextStyle(fontSize: 18);
+    return TableRow(
+      children: [
+        TableCell(
+          child: Text(a, style: _style),
+        ),
+        TableCell(
+          child: Text(b, style: _style),
+        ),
+        TableCell(
+          child: Text(c, style: _style),
+        ),
+      ],
+    );
+  }
+
+/*
+  Widget createSection(String title, Balance balance, Currency? currency) {
+    currency ??= widget.currencyProvider.getHomeCurrency();
+    return Table(
+      children: [
+        TableRow(children: <Widget>[
+          TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Text(title, style: _style)),
+          TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Text(currency.toString(), style: _style)),
+        ]),
+        if (!balance.allDeposits!.isZero()) ...[
+          makeRow("all deposit", balance.allDeposits!.convertTo(currency))
+        ],
+        if (!balance.cardDeposits!.isZero()) ...[
+          makeRow("card deposit", balance.cardDeposits!.convertTo(currency))
+        ],
+        if (!balance.cashDeposits!.isZero()) ...[
+          makeRow("cash deposit", balance.cashDeposits!.convertTo(currency))
+        ],
+        if (!balance.allExpenses!.isZero()) ...[
+          makeRow("Expenses all", balance.allExpenses!.convertTo(currency))
+        ],
+        if (!balance.cardExpenses!.isZero()) ...[
+          makeRow("Expenses card", balance.cardExpenses!.convertTo(currency))
+        ],
+        if (!balance.cashExpenses!.isZero()) ...[
+          makeRow("Expenses cash", balance.cashExpenses!.convertTo(currency))
+        ],
+        if (!balance.cashBalance!.isZero()) ...[
+          makeRow("cash balance", balance.cashBalance!.convertTo(currency))
+        ],
+      ],
+    );
+  }
+*/
   @override
   Widget build(BuildContext context) {
-    widget.transactionProvider.caluculateAll(widget.currencyProvider);
+    final tp = widget.transactionProvider;
+    tp.caluculateAll(widget.currencyProvider);
     selCurrencyAll ??= widget.currencyProvider.getHomeCurrency();
 
     final currencyAll = selCurrencyAll;
-    var tableRows = <TableRow>[
-      const TableRow(children: <Widget>[
-        Text("Curreny"),
-        Text("Withdraw"),
-        Text("Expense"),
-        Text("Balance"),
-        // Text("Currency")
-      ]),
-      TableRow(children: <Widget>[
-        TableCell(
-            verticalAlignment: TableCellVerticalAlignment.middle,
-            child: Text("All ${currencyAll?.name}", style: _style)),
-        TransactionCell(
-            value: widget.transactionProvider.allWithdraws,
-            currency: currencyAll),
-        TransactionCell(
-            value: widget.transactionProvider.allExpenses,
-            currency: currencyAll),
-        TransactionCell(
-            value: widget.transactionProvider.allBalance,
-            currency: currencyAll),
-        /*CurrencyChooserWidget(
-            currencies: widget.currencyProvider.items,
-            selected: widget.selCurrencyAll,
-            onChanged: (sel) {
-              setState(() {
-                widget.selCurrencyAll = sel;
-              });
-            })*/
-      ])
-    ];
+    List<Widget> children = [];
 
-    widget.transactionProvider.expensePerCurrency
-        .forEach((currencyName, transactionValue) {
-      final currency = widget.currencyProvider.getCurrencyByName(currencyName);
-      tableRows.add(TableRow(children: <Widget>[
-        TableCell(
-            verticalAlignment: TableCellVerticalAlignment.middle,
-            child: Text(currency.toString(), style: _style)),
-        TransactionCell(
-            value: widget.transactionProvider.withdrawPerCurrency[currencyName],
-            currency: currency),
-        TransactionCell(value: transactionValue, currency: currency),
-        TransactionCell(
-            value: widget.transactionProvider.balancePerCurrency[currencyName],
-            currency: currency),
-        /* CurrencyChooserWidget(
-            style: _style,
-            currencies: widget.currencyProvider.items,
-            selected: widget.selCurrencyMap[k],
-            onChanged: (sel) {
-              setState(() {
-                widget.selCurrency[k] = sel;
-              });
-            })*/
-      ]));
+    // tp.balancePerCurrency.forEach((k, v) => children.add(
+    //     createSection(k, v, widget.currencyProvider.getCurrencyByName(k))));
+
+    List<TableRow> rowsAllDeposits = [makeRowHeader('All Deposits', c:tp.balancePerCurrency['Sum']!.allDeposits!.toString())];
+    List<TableRow> rowsCardDeposits = [makeRowHeader('Card Deposits', c:tp.balancePerCurrency['Sum']!.cardDeposits!.toString())];
+    List<TableRow> rowsCashDeposits = [makeRowHeader('Cash Deposits', c:tp.balancePerCurrency['Sum']!.cashDeposits!.toString())];
+    List<TableRow> rowsAllExpenses = [makeRowHeader('All Expenses', c:tp.balancePerCurrency['Sum']!.allExpenses!.toString())];
+    List<TableRow> rowsCardExpenses = [makeRowHeader('Card Expenses', c:tp.balancePerCurrency['Sum']!.cardExpenses!.toString())];
+    List<TableRow> rowsCashExpenses = [makeRowHeader('Cash Expenses', c:tp.balancePerCurrency['Sum']!.cashExpenses!.toString())];
+    List<TableRow> rowsCashBalance = [makeRowHeader('Cash Balance', c:tp.balancePerCurrency['Sum']!.cashBalance!.toString())];
+
+    tp.balancePerCurrency.forEach((currencyName, balance) {
+      if (currencyName != 'Sum') {
+        if (!balance.allDeposits!.isZero()) {
+          rowsAllDeposits.add(makeRow(currencyName, balance.allDeposits, currencyAll));
+        }
+        if (!balance.cardDeposits!.isZero()) {
+          rowsCardDeposits.add(makeRow(currencyName, balance.cardDeposits, currencyAll));
+        }
+        if (!balance.cashDeposits!.isZero()) {
+          rowsCashDeposits.add(makeRow(currencyName, balance.cashDeposits, currencyAll));
+        }
+        if (!balance.allExpenses!.isZero()) {
+          rowsAllExpenses.add(makeRow(currencyName, balance.allExpenses, currencyAll));
+        }
+        if (!balance.cardExpenses!.isZero()) {
+          rowsCardExpenses.add(makeRow(currencyName, balance.cardExpenses, currencyAll));
+        }
+        if (!balance.cashExpenses!.isZero()) {
+          rowsCashExpenses.add(makeRow(currencyName, balance.cashExpenses, currencyAll));
+        }
+        if (!balance.cashBalance!.isZero()) {
+          rowsCashBalance.add(makeRow(currencyName, balance.cashBalance, currencyAll));
+        }
+      }
     });
 
-    return Table(children: tableRows);
+    children.add(Table(
+      children: rowsAllExpenses +
+          rowsCashExpenses +
+          rowsCardExpenses +
+          rowsAllDeposits +
+          rowsCardDeposits +
+          rowsCashDeposits +
+          rowsCashBalance,
+    ));
+
+    return Column(
+      children: children,
+    );
   }
 }
 

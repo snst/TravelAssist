@@ -24,12 +24,12 @@ class _WidgetTransactionTypeChooserState extends State<WidgetTransactionTypeChoo
   Widget build(BuildContext context) {
     transactionType ??= widget.transactionType;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 18, 0, 12),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
       child: SegmentedButton<TransactionTypeEnum>(
         showSelectedIcon: false,
         segments: const <ButtonSegment<TransactionTypeEnum>>[
           ButtonSegment<TransactionTypeEnum>(
-            value: TransactionTypeEnum.cashPayment,
+            value: TransactionTypeEnum.expense,
             icon: FaIcon(FontAwesomeIcons.coins),
           ),
           ButtonSegment<TransactionTypeEnum>(

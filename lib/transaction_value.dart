@@ -11,6 +11,7 @@ class TransactionValue {
   @override
   String toString() => "$valueString$currencyString";
   String toShortString() => "${removeTrailingZeros(valueString)}$currencyString";
+  bool isZero() => value == 0;
 
 
   void reset() {

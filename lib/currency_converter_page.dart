@@ -67,6 +67,13 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
       focusNodes = List.generate(
           currencyProvider.visibleItems.length, (index) => FocusNode());
     }
+
+    if (calculator!.showResult()) {
+      for (int j = 0; j < currencyProvider.visibleItems.length; j++) {
+        controllers?[j].text = calculator!.sum.convertTo(currencyProvider.visibleItems[j]).valueString;
+      }
+    }
+
     const buttonStyle = TextStyle(fontSize: 30);
     return Scaffold(
         appBar: AppBar(

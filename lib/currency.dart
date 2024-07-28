@@ -19,6 +19,7 @@ class Currency {
   Id id = Isar.autoIncrement;
   String name;
   double value;
+  @enumerated
   CurrencyStateEnum state;
 
   double convertTo(double value, Currency? to) {

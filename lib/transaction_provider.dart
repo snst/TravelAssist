@@ -4,18 +4,60 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'storage.dart';
 import 'transaction.dart';
 
-class TransactionProvider extends ChangeNotifier with Storage {
-  final Map<String, TransactionValue> expensePerCurrency = HashMap();
-  final Map<String, TransactionValue> withdrawPerCurrency = HashMap();
-  final Map<String, TransactionValue> balancePerCurrency = HashMap();
+class Balance {
+  Currency currency;
+  TransactionValue? cardDeposits;
+  TransactionValue? cashDeposits;
+  TransactionValue? allDeposits;
+  TransactionValue? cardExpenses;
+  TransactionValue? cashExpenses;
   TransactionValue? allExpenses;
-  TransactionValue? allWithdraws;
-  TransactionValue? allBalance;
+  TransactionValue? cashBalance;
+
+  Balance({required this.currency}) {
+    reset();
+  }
+
+  void reset() {
+    cardDeposits = TransactionValue(0, currency);
+    cashDeposits = TransactionValue(0, currency);
+    allDeposits = TransactionValue(0, currency);
+    cardExpenses = TransactionValue(0, currency);
+    cashExpenses = TransactionValue(0, currency);
+    allExpenses = TransactionValue(0, currency);
+    cashBalance = TransactionValue(0, currency);
+  }
+
+  void add(Transaction transaction, TransactionValue tv) {
+    if (transaction.isDeposit) {
+      if (transaction.isCash) {
+        cashDeposits!.add(tv);
+      } else {
+        cardDeposits!.add(tv);
+      }
+      allDeposits!.add(tv);
+      cashBalance!.add(tv);
+    } else {
+      if (transaction.isCash) {
+        cashExpenses!.add(tv);
+        cashBalance!.sub(tv);
+      } else {
+        cardExpenses!.add(tv);
+      }
+      allExpenses!.add(tv);
+    }
+  }
+}
+
+class TransactionProvider extends ChangeNotifier with Storage {
+  final Map<String, Balance> balancePerCurrency = HashMap<String, Balance>();
+  final Map<String, Balance> balancePerMethod = HashMap<String, Balance>();
   bool useDb;
 
   TransactionProvider({this.useDb = true}) {
@@ -109,30 +151,38 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return ret;
   }
 
-  void caluculateAll(CurrencyProvider currencyProvider) {
-    allExpenses = TransactionValue(0, currencyProvider.getHomeCurrency());
-    allWithdraws = TransactionValue(0, currencyProvider.getHomeCurrency());
-    allBalance = TransactionValue(0, currencyProvider.getHomeCurrency());
+  List<String> getUsedPaymentMethods() {
+    List<String> methods = [];
+    for (final transaction in items) {
+      if (!methods.contains(transaction.method)) {
+        methods.add(transaction.method);
+      }
+    }
+    return methods;
+  }
 
+  void caluculateAll(CurrencyProvider currencyProvider) {
+    final homeCurrency = currencyProvider.getHomeCurrency();
+    final usedMethods = getUsedPaymentMethods();
+    balancePerCurrency.clear();
+    balancePerMethod.clear();
+
+    String sumAllHomeCurrency = 'Sum';// in ' + homeCurrency!.name;
+
+    balancePerCurrency[sumAllHomeCurrency] = Balance(currency: homeCurrency!);
     for (final currency in currencyProvider.visibleItems) {
-      expensePerCurrency[currency.name] = TransactionValue(0, currency);
-      withdrawPerCurrency[currency.name] = TransactionValue(0, currency);
-      balancePerCurrency[currency.name] = TransactionValue(0, currency);
+      balancePerCurrency[currency.name] = Balance(currency: currency);
+    }
+    for (final method in usedMethods) {
+      balancePerMethod[method] = Balance(currency: homeCurrency!);
     }
 
     for (final transaction in items) {
       final tv = currencyProvider.getTransactionValue(transaction);
-      if (transaction.isWithdrawal) {
-        allWithdraws?.add(tv);
-        allBalance?.add(tv);
-        withdrawPerCurrency[transaction.currency]?.add(tv);
-        balancePerCurrency[transaction.currency]?.add(tv);
-      } else {
-        allExpenses?.add(tv);
-        allBalance?.sub(tv);
-        expensePerCurrency[transaction.currency]?.add(tv);
-        balancePerCurrency[transaction.currency]?.sub(tv);
-      }
+
+      balancePerCurrency[transaction.currencyString]?.add(transaction, tv);
+      balancePerMethod[transaction.method]?.add(transaction, tv);
+      balancePerCurrency[sumAllHomeCurrency]!.add(transaction, tv);
     }
   }
 

@@ -8,12 +8,18 @@ part 'transaction.g.dart';
 // flutter packages pub run build_runner build
 
 enum TransactionTypeEnum {
-  cashPayment,
-  cardPayment,
-  withdrawal,
-  balance,
-  exchange,
-  deposit;
+  expense,
+  deposit,
+  balance;
+}
+
+String getHint(TransactionTypeEnum type) {
+  switch(type)
+  {
+    case TransactionTypeEnum.expense: return "Expense";
+    case TransactionTypeEnum.deposit: return "Deposit";
+    case TransactionTypeEnum.balance: return "Balance";
+  }
 }
 
 @collection
@@ -23,11 +29,12 @@ class Transaction {
     this.name = "",
     this.value = 0.0,
     this.currency = "",
-    this.type = TransactionTypeEnum.cashPayment,
+    this.type = TransactionTypeEnum.expense,
     required this.date,
     this.categoryKey = 0,
     this.comment = "",
     this.exlcudeFromAverage = false,
+    this.method = ""
   });
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -41,6 +48,7 @@ class Transaction {
   @enumerated
   TransactionTypeEnum type;
   bool exlcudeFromAverage;
+  String method;
 
   @override
   String toString() {
@@ -48,7 +56,16 @@ class Transaction {
   }
 
   @ignore
-  bool get isWithdrawal => type == TransactionTypeEnum.withdrawal;
+  bool get isCash => method.isEmpty || method == "Cash";
+
+  @ignore
+  bool get isWithdrawal => type == TransactionTypeEnum.deposit && !isCash;
+
+  @ignore
+  bool get isDeposit => type == TransactionTypeEnum.deposit;
+
+  @ignore
+  bool get isCashDeposit => type == TransactionTypeEnum.deposit && isCash;
 
   @ignore
   String get dateString => DateFormat('EEEE, d MMMM y').format(date);
@@ -78,6 +95,7 @@ class Transaction {
     comment = other.comment;
     currency = other.currency;
     exlcudeFromAverage = other.exlcudeFromAverage;
+    method = other.method;
   }
 
   Transaction clone() {

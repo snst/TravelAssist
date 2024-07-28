@@ -17,9 +17,10 @@ class TransactionListItemWidget extends StatelessWidget {
   final void Function(Transaction transaction) onEditItem;
 
   Widget getIcon(Transaction transaction) {
-    if (transaction.isWithdrawal) {
-      return const FaIcon(FontAwesomeIcons.sackDollar, color: Colors.greenAccent);
-    } else{
+    if (transaction.isDeposit) {
+      return const FaIcon(FontAwesomeIcons.sackDollar,
+          color: Colors.greenAccent);
+    } else {
       return ExpenseCategoryManager.at(transaction.categoryKey).icon;
     }
   }
@@ -33,34 +34,37 @@ class TransactionListItemWidget extends StatelessWidget {
       return const CircularProgressIndicator();
     }
 
-    final valueHome = currencyProvider.convertTo(transaction, currencyProvider.getHomeCurrency()).toString();
+    final valueHome = currencyProvider
+        .convertTo(transaction, currencyProvider.getHomeCurrency())
+        .toString();
     final valueLocal = transaction.valueCurrencyString;
 
     return Card(
         //height: 50,
         child: ListTile(
-          onTap: () {
-            onEditItem(transaction);
-          },
-          visualDensity: const VisualDensity(vertical: -4),
-          leading: getIcon(transaction),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(transaction.name),
-              Column(children: [
-                Text(valueHome),
-                Text(valueLocal, style: detailStyle)
-              ])
-            ],
-          ),
-          /*subtitle: Row(
+      onTap: () {
+        onEditItem(transaction);
+      },
+      visualDensity: const VisualDensity(vertical: -4),
+      leading: getIcon(transaction),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(children: [
+            Text(transaction.name),
+            Text(transaction.method, style: detailStyle)
+          ]),
+          Column(
+              children: [Text(valueHome), Text(valueLocal, style: detailStyle)])
+        ],
+      ),
+      /*subtitle: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               //Text(ExpenseCategoryManager.at(item.categoryKey).name, style: detailStyle),
               Text(valueLocal, style: detailStyle),
             ],
           ),*/
-        ));
+    ));
   }
 }

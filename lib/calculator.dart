@@ -10,6 +10,10 @@ class CalculatorOp {
   String toString() {
     return value != null ? value!.toShortString() : " $op ";
   }
+
+  bool isResult() {
+    return op == "=";
+  }
 }
 
 class Calculator extends ChangeNotifier {
@@ -46,6 +50,9 @@ class Calculator extends ChangeNotifier {
 
   void pushValue(TransactionValue val) {
     if (_operations.isEmpty || _operations.last.op.isNotEmpty) {
+      if (_operations.isNotEmpty && _operations.last.op.isNotEmpty && _operations.last.op == "=") {
+        _operations.last.op = "+";
+      }
       _operations.add(CalculatorOp(value: val));
     }
   }
@@ -82,5 +89,9 @@ class Calculator extends ChangeNotifier {
 
   void calculate() {
     addOperation("=");
+  }
+
+  bool showResult() {
+    return _operations.length > 0 && _operations.last.isResult();
   }
 }

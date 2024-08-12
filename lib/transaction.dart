@@ -64,6 +64,9 @@ class Transaction {
   @ignore
   bool get isDeposit => type == TransactionTypeEnum.deposit;
 
+@ignore
+  bool get isExpense => type == TransactionTypeEnum.expense;
+
   @ignore
   bool get isCashDeposit => type == TransactionTypeEnum.deposit && isCash;
 

@@ -92,6 +92,6 @@ class Calculator extends ChangeNotifier {
   }
 
   bool showResult() {
-    return _operations.length > 0 && _operations.last.isResult();
+    return _operations.isNotEmpty && _operations.last.isResult();
   }
 }

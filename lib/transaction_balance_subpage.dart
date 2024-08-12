@@ -133,17 +133,17 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     ));
 
     children.add(BalanceRowWidget(
-        text1: 'Cash', tv1: null, tv2: balance.expenseCash, header: true));
+        text1: 'Cash', tv1: null, tv2: balance.expenseCash, styleEnum: BalanceRowWidgetEnum.subheader));
     balance.expenseByMethodCurrencyCash.forEach((key, tv) {
       children.add(BalanceRowWidget(
           text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
 
     children.add(BalanceRowWidget(
-        text1: 'Card', tv1: null, tv2: balance.expenseCard, header: true));
+        text1: 'Card', tv1: null, tv2: balance.expenseCard, styleEnum: BalanceRowWidgetEnum.subheader));
     balance.expenseByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: key, tv1: null, tv2: tv.convertTo(homeCurrency)));
+          text1: key, tv1: null, tv2: tv.convertTo(homeCurrency), styleEnum: BalanceRowWidgetEnum.method));
 
       balance.expenseByMethodCurrencyCard.forEach((key2, tv) {
         if (key2.startsWith(key)) {
@@ -174,6 +174,23 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
               text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
         }
       });
+    });
+
+
+    // Cash funds
+    children.add(Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: BalanceRowHeader(
+        FontAwesomeIcons.sackDollar,
+        "Cash funds",
+        balance.cashFunds.convertTo(homeCurrency),
+        Colors.lightBlueAccent,
+      ),
+    ));
+
+    balance.cashFundsByCurrency.forEach((key, tv) {
+          children.add(BalanceRowWidget(
+              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
 
     return SingleChildScrollView(

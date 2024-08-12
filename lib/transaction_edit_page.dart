@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/payment_chooser_widget.dart';
-import 'package:travel_assist/payment_provider.dart';
+//import 'package:travel_assist/payment_provider.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
 import 'package:travel_assist/widget_transaction_type_chooser.dart';
@@ -15,6 +15,8 @@ import 'currency_provider.dart';
 import 'expense_category.dart';
 import 'travel_assist_utils.dart';
 import 'currency_chooser_widget.dart';
+import 'payment_method.dart';
+import 'payment_method_provider.dart';
 
 class TransactionEditPage extends StatefulWidget {
   TransactionEditPage({
@@ -35,7 +37,7 @@ class TransactionEditPage extends StatefulWidget {
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
   double withdrawFee = 0;
-  Payment? paymentMethod;
+  PaymentMethod? paymentMethod;
 
   void saveAndClose(BuildContext context) {
     if (widget.modifiedItem.name.isEmpty) {
@@ -70,7 +72,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     Navigator.of(context).pop();
   }
 
-  void onPaymentChanged(Payment payment) {
+  void onPaymentChanged(PaymentMethod payment) {
     setState(() {
       paymentMethod = payment;
       widget.modifiedItem.method = payment.name;
@@ -81,10 +83,10 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
   Widget build(BuildContext context) {
     CurrencyProvider currencyProvider =
         Provider.of<CurrencyProvider>(context, listen: false);
-    PaymentProvider paymentProvider =
-        Provider.of<PaymentProvider>(context, listen: false);
+    PaymentMethodProvider provider =
+        Provider.of<PaymentMethodProvider>(context, listen: false);
 
-    paymentMethod ??= paymentProvider.items.first;
+    paymentMethod ??= provider.allItems.first;
 
     return Scaffold(
       appBar: AppBar(

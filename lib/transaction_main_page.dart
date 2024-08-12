@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/payment_method.dart';
+import 'package:travel_assist/payment_method_provider.dart';
 import 'package:travel_assist/currency_rate_widget.dart';
+import 'package:travel_assist/payment_method_widget.dart';
 import 'package:travel_assist/drawer_widget.dart';
 import 'package:travel_assist/transaction_balance_subpage.dart';
 import 'package:travel_assist/transaction_list_subpage.dart';
@@ -45,6 +48,17 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
     }));
   }
 
+  void showPaymentMethodsPage(
+      BuildContext context, PaymentMethodProvider paymentMethodProvider) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Payment methods"),
+          ),
+          body: PaymentMethodsPage(provider: paymentMethodProvider));
+    }));
+  }
+
   void showCurrencySettingsPage(BuildContext context, TransactionProvider tp) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return Scaffold(
@@ -64,6 +78,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
   Widget build(BuildContext context) {
     final cp = context.watch<CurrencyProvider>();
     final tp = context.watch<TransactionProvider>();
+    final pmp = context.watch<PaymentMethodProvider>();
     shownCurrency ??= cp.getHomeCurrency();
 
     if (null == shownCurrency) {
@@ -77,7 +92,8 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
           PopupMenuButton<int>(
             itemBuilder: (context) => [
               const PopupMenuItem(value: 0, child: Text("Currency rates")),
-              const PopupMenuItem(value: 1, child: Text("Settings")),
+              const PopupMenuItem(value: 1, child: Text("Payment Methods")),
+              const PopupMenuItem(value: 2, child: Text("Settings")),
             ],
             elevation: 2,
             onSelected: (value) {
@@ -86,6 +102,9 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
                   showCurrenyRatesPage(context, cp);
                   break;
                 case 1:
+                  showPaymentMethodsPage(context, pmp);
+                  break;
+                case 2:
                   showCurrencySettingsPage(context, tp);
                   break;
               }

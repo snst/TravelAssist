@@ -28,12 +28,15 @@ class Balance {
       HashMap<String, TransactionValue>();
   final Map<String, TransactionValue> withdrawalByMethodCurrencyCard =
       HashMap<String, TransactionValue>();
+  final Map<String, TransactionValue> cashFundsByCurrency =
+      HashMap<String, TransactionValue>();
 
   late TransactionValue expenseAll;
   late TransactionValue balanceCash;
   late TransactionValue expenseCash;
   late TransactionValue expenseCard;
   late TransactionValue withdrawalAll;
+  late TransactionValue cashFunds;
 
   TransactionValue initTransaction() {
     return TransactionValue(0, currencyProvider.getHomeCurrency());
@@ -45,6 +48,7 @@ class Balance {
     expenseCard = initTransaction();
     balanceCash = initTransaction();
     withdrawalAll = initTransaction();
+    cashFunds = initTransaction();
   }
 
   void initMap(Map<String, TransactionValue> map, final Transaction transaction,
@@ -96,12 +100,17 @@ class Balance {
 
       if (transaction.isWithdrawal) {
         withdrawalAll.add(tv);
-        initMap(withdrawalByMethod, transaction, key:transaction.method);
+        initMap(withdrawalByMethod, transaction, key: transaction.method);
         withdrawalByMethod[transaction.method]!.add(tv);
 
         String key = '${transaction.method} ${transaction.currencyString}';
-        initMap(withdrawalByMethodCurrencyCard, transaction, key:key);
+        initMap(withdrawalByMethodCurrencyCard, transaction, key: key);
         withdrawalByMethodCurrencyCard[key]!.add(tv);
+      }
+      else if (transaction.isCashDeposit) {
+        cashFunds.add(tv);
+        initMap(cashFundsByCurrency, transaction, key: transaction.currencyString);
+        cashFundsByCurrency[transaction.currencyString]!.add(tv);
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:travel_assist/travel_assist_utils.dart';
 import 'currency.dart';
 import 'currency_provider.dart';
@@ -12,9 +13,9 @@ class CurrencyRatesPage extends StatefulWidget {
 }
 
 class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
-  Future<void> _showCurrencyDialog(
+  Future<void> _showEditDialog(
       BuildContext context,
-      CurrencyProvider currencyProvider,
+      CurrencyProvider provider,
       Currency currency,
       bool newItem) async {
     TextEditingController numberController = TextEditingController();
@@ -22,7 +23,6 @@ class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
     CurrencyStateEnum currencyState = currency.state;
     numberController.text = currency.value.toString();
     stringController.text = currency.name;
-    CurrencyProvider cp = currencyProvider;
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -90,7 +90,7 @@ class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
               if (!newItem)
                 TextButton(
                   onPressed: () {
-                    cp.delete(currency);
+                    provider.delete(currency);
                     Navigator.of(context).pop(); // Close the AlertDialog
                   },
                   child: const Text('Delete'),
@@ -100,7 +100,7 @@ class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
                   currency.name = stringController.text;
                   currency.value = safeConvertToDouble(numberController.text);
                   currency.state = currencyState;
-                  cp.add(currency);
+                  provider.add(currency);
                   Navigator.of(context).pop(); // Close the AlertDialog
                   //}
                 },
@@ -115,30 +115,31 @@ class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<CurrencyProvider>();
     return Scaffold(
       body: ListView.builder(
-        itemCount: widget.currencyProvider.allItems.length,
+        itemCount: provider.allItems.length,
         itemBuilder: (context, index) => Card(
           child: ListTile(
             onTap: () {
-              _showCurrencyDialog(context, widget.currencyProvider,
-                  widget.currencyProvider.allItems[index], false);
+              _showEditDialog(context, provider,
+                  provider.allItems[index], false);
             },
             leading:
-                FaIcon(switch (widget.currencyProvider.allItems[index].state) {
+                FaIcon(switch (provider.allItems[index].state) {
               CurrencyStateEnum.home => FontAwesomeIcons.house,
               CurrencyStateEnum.hide => FontAwesomeIcons.eyeSlash,
               _ => FontAwesomeIcons.eye
             }),
             title: Text(
-                '${widget.currencyProvider.allItems[index].value} ${widget.currencyProvider.allItems[index].name}'),
+                '${provider.allItems[index].value} ${provider.allItems[index].name}'),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showCurrencyDialog(
-              context, widget.currencyProvider, Currency(), true);
+          _showEditDialog(
+              context, provider, Currency(), true);
         },
         tooltip: 'Add currency',
         child: const Icon(Icons.add),

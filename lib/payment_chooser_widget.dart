@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/payment_provider.dart';
+import 'package:travel_assist/payment_method_provider.dart';
+import 'payment_method.dart';
 
 class PaymentChooserWidget extends StatefulWidget {
   const PaymentChooserWidget({super.key, required this.onChanged});
 
-  final void Function(Payment payment) onChanged;
+  final void Function(PaymentMethod paymentMethod) onChanged;
 
   @override
   State<PaymentChooserWidget> createState() => _PaymentChooserWidgetState();
 }
 
 class _PaymentChooserWidgetState extends State<PaymentChooserWidget> {
-  Payment? selected;
+  PaymentMethod? selected;
   @override
   Widget build(BuildContext context) {
-    PaymentProvider paymentProvider =
-        Provider.of<PaymentProvider>(context, listen: false);
+    PaymentMethodProvider provider =
+        Provider.of<PaymentMethodProvider>(context, listen: false);
 
-    selected ??= paymentProvider.items.first;
+    selected ??= provider.allItems.first;
 
-    List<ButtonSegment<Payment>> segments = [];
-    for (final payment in paymentProvider.items) {
+    List<ButtonSegment<PaymentMethod>> segments = [];
+    for (final payment in provider.allItems) {
       segments.add(
-          ButtonSegment<Payment>(value: payment, label: Text(payment.name)));
+          ButtonSegment<PaymentMethod>(value: payment, label: Text(payment.name)));
     }
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: SegmentedButton<Payment>(
+      child: SegmentedButton<PaymentMethod>(
         showSelectedIcon: false,
         segments: segments,
-        selected: <Payment>{selected!},
-        onSelectionChanged: (Set<Payment> newSelected) {
+        selected: <PaymentMethod>{selected!},
+        onSelectionChanged: (Set<PaymentMethod> newSelected) {
           setState(() {
             selected = newSelected.first;
             widget.onChanged(newSelected.first);

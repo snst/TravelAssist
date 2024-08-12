@@ -2,21 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:travel_assist/transaction_value.dart';
 
+  enum BalanceRowWidgetEnum {
+  normal,
+  subheader,
+  method,
+}
+
 class BalanceRowWidget extends StatelessWidget {
   final String? text1;
   final TransactionValue? tv1;
   final TransactionValue? tv2;
-  final bool header;
+  final BalanceRowWidgetEnum styleEnum;
+
+
 
   BalanceRowWidget(
       {required this.text1,
       required this.tv1,
       required this.tv2,
-      this.header = false});
+      this.styleEnum = BalanceRowWidgetEnum.normal});
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = TextStyle(fontSize: header ? 18 : 16);
+    final TextStyle style = TextStyle(fontSize: styleEnum==BalanceRowWidgetEnum.subheader ? 18 : 16,
+     fontWeight: styleEnum==BalanceRowWidgetEnum.method ? FontWeight.bold : FontWeight.normal);
+    //final TextStyle styleBold = TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
     return Row(
       children: <Widget>[
         Padding(

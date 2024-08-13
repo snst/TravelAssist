@@ -4,9 +4,10 @@ import 'package:travel_assist/payment_method_provider.dart';
 import 'payment_method.dart';
 
 class PaymentChooserWidget extends StatefulWidget {
-  const PaymentChooserWidget({super.key, required this.onChanged});
+  const PaymentChooserWidget({super.key, required this.onChanged, required this.selectedPaymentMethodName});
 
   final void Function(PaymentMethod paymentMethod) onChanged;
+  final String selectedPaymentMethodName;
 
   @override
   State<PaymentChooserWidget> createState() => _PaymentChooserWidgetState();
@@ -19,6 +20,7 @@ class _PaymentChooserWidgetState extends State<PaymentChooserWidget> {
     PaymentMethodProvider provider =
         Provider.of<PaymentMethodProvider>(context, listen: false);
 
+    selected ??= provider.getByName(widget.selectedPaymentMethodName);
     selected ??= provider.allItems.first;
 
     List<ButtonSegment<PaymentMethod>> segments = [];

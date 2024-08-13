@@ -45,8 +45,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
         widget.modifiedItem.name =
             ExpenseCategoryManager.getByIndex(widget.modifiedItem.categoryKey)
                 .name;
-      }
-      else if (widget.modifiedItem.type == TransactionTypeEnum.deposit) {
+      } else if (widget.modifiedItem.type == TransactionTypeEnum.deposit) {
         widget.modifiedItem.name = "Deposit";
       } else {
         widget.modifiedItem.name = "?";
@@ -98,11 +97,26 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
           reverse: true,
           child: Column(
             children: <Widget>[
-              WidgetTransactionDescriptionInput(
-                  widget: widget, hintText: getHint(widget.modifiedItem.type)),
+              Row(
+                children: [
+                  Expanded(
+                    child: WidgetTransactionDescriptionInput(
+                        widget: widget,
+                        hintText: getHint(widget.modifiedItem.type)),
+                  ),
+                  WidgetDateChooser(
+                    date: widget.modifiedItem.date,
+                    onChanged: (val) => setState(() {
+                      widget.modifiedItem.date = val;
+                    }),
+                  ),
+                ],
+              ),
               if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
                   widget.modifiedItem.type == TransactionTypeEnum.deposit) ...[
-                PaymentChooserWidget(onChanged: onPaymentChanged)
+                PaymentChooserWidget(
+                    onChanged: onPaymentChanged,
+                    selectedPaymentMethodName: widget.modifiedItem.method)
               ],
               if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
                 WidgetTransactionExpenseCategoryChooser(
@@ -123,12 +137,6 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   },
                 ),
               ],
-              WidgetDateChooser(
-                date: widget.modifiedItem.date,
-                onChanged: (val) => setState(() {
-                  widget.modifiedItem.date = val;
-                }),
-              ),
               widgetButtons(context),
               WidgetCommentInput(
                   comment: widget.modifiedItem.comment,

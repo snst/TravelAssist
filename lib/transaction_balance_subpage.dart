@@ -57,55 +57,53 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     );
   }
 
-/*
-  Widget createSection(String title, Balance balance, Currency? currency) {
-    currency ??= widget.currencyProvider.getHomeCurrency();
-    return Table(
-      children: [
-        TableRow(children: <Widget>[
-          TableCell(
-              verticalAlignment: TableCellVerticalAlignment.middle,
-              child: Text(title, style: _style)),
-          TableCell(
-              verticalAlignment: TableCellVerticalAlignment.middle,
-              child: Text(currency.toString(), style: _style)),
-        ]),
-        if (!balance.allDeposits!.isZero()) ...[
-          makeRow("all deposit", balance.allDeposits!.convertTo(currency))
-        ],
-        if (!balance.cardDeposits!.isZero()) ...[
-          makeRow("card deposit", balance.cardDeposits!.convertTo(currency))
-        ],
-        if (!balance.cashDeposits!.isZero()) ...[
-          makeRow("cash deposit", balance.cashDeposits!.convertTo(currency))
-        ],
-        if (!balance.allExpenses!.isZero()) ...[
-          makeRow("Expenses all", balance.allExpenses!.convertTo(currency))
-        ],
-        if (!balance.cardExpenses!.isZero()) ...[
-          makeRow("Expenses card", balance.cardExpenses!.convertTo(currency))
-        ],
-        if (!balance.cashExpenses!.isZero()) ...[
-          makeRow("Expenses cash", balance.cashExpenses!.convertTo(currency))
-        ],
-        if (!balance.cashBalance!.isZero()) ...[
-          makeRow("cash balance", balance.cashBalance!.convertTo(currency))
-        ],
-      ],
-    );
+  void showExpenses(String title, List<Widget> children, Balance balance) {
+    // Expenses
+    children.add(BalanceRowHeader(
+      FontAwesomeIcons.sackDollar,
+      title,
+      balance.expenseAll.convertTo(homeCurrency),
+      Colors.redAccent,
+    ));
+
+    children.add(BalanceRowWidget(
+        text1: 'Cash',
+        tv1: null,
+        tv2: balance.expenseCash,
+        styleEnum: BalanceRowWidgetEnum.subheader));
+    balance.expenseByMethodCurrencyCash.forEach((key, tv) {
+      children.add(BalanceRowWidget(
+          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+    });
+
+    children.add(BalanceRowWidget(
+        text1: 'Card',
+        tv1: null,
+        tv2: balance.expenseCard,
+        styleEnum: BalanceRowWidgetEnum.subheader));
+    balance.expenseByMethod.forEach((key, tv) {
+      children.add(BalanceRowWidget(
+          text1: key,
+          tv1: null,
+          tv2: tv.convertTo(homeCurrency),
+          styleEnum: BalanceRowWidgetEnum.method));
+
+      balance.expenseByMethodCurrencyCard.forEach((key2, tv) {
+        if (key2.startsWith(key)) {
+          children.add(BalanceRowWidget(
+              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+        }
+      });
+    });
   }
-*/
+
   @override
   Widget build(BuildContext context) {
     final tp = widget.transactionProvider;
     var balance = tp.caluculateAll(widget.currencyProvider);
-    
-    final homeCurrency = widget.currencyProvider.getHomeCurrency();
-    const styleHeader = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 20, // Optional: specify font size
-    );
+    var expensesPerDay = tp.caluculateExpensesPerDay(widget.currencyProvider);
 
+    homeCurrency = widget.currencyProvider.getHomeCurrency();
     List<Widget> children = [];
 
     // Cash
@@ -122,36 +120,10 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     balance.balanceByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
           text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
-    });    
-
-    // Expenses
-    children.add(BalanceRowHeader(
-      FontAwesomeIcons.sackDollar,
-      "Expenses",
-      balance.expenseAll.convertTo(homeCurrency),
-      Colors.redAccent,
-    ));
-
-    children.add(BalanceRowWidget(
-        text1: 'Cash', tv1: null, tv2: balance.expenseCash, styleEnum: BalanceRowWidgetEnum.subheader));
-    balance.expenseByMethodCurrencyCash.forEach((key, tv) {
-      children.add(BalanceRowWidget(
-          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
 
-    children.add(BalanceRowWidget(
-        text1: 'Card', tv1: null, tv2: balance.expenseCard, styleEnum: BalanceRowWidgetEnum.subheader));
-    balance.expenseByMethod.forEach((key, tv) {
-      children.add(BalanceRowWidget(
-          text1: key, tv1: null, tv2: tv.convertTo(homeCurrency), styleEnum: BalanceRowWidgetEnum.method));
-
-      balance.expenseByMethodCurrencyCard.forEach((key2, tv) {
-        if (key2.startsWith(key)) {
-          children.add(BalanceRowWidget(
-              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
-        }
-      });
-    });
+    showExpenses("Expenses", children, balance);
+    showExpenses("Ø Expenses (${expensesPerDay.days}d)", children, expensesPerDay);
 
     // Withdrawal
     children.add(Padding(
@@ -176,7 +148,6 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       });
     });
 
-
     // Cash funds
     children.add(Padding(
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -189,68 +160,27 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     ));
 
     balance.cashFundsByCurrency.forEach((key, tv) {
-          children.add(BalanceRowWidget(
-              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+      children.add(BalanceRowWidget(
+          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
-
-    return SingleChildScrollView(
-        reverse: true, child: Column(children: children));
-
-    /*
-    final currencyAll = selCurrencyAll;
-    List<Widget> children = [];
-
-    // tp.balancePerCurrency.forEach((k, v) => children.add(
-    //     createSection(k, v, widget.currencyProvider.getCurrencyByName(k))));
-
-    List<TableRow> rowsAllDeposits = [makeRowHeader('All Deposits', c:tp.balancePerCurrency['Sum']!.allDeposits!.toString())];
-    List<TableRow> rowsCardDeposits = [makeRowHeader('Card Deposits', c:tp.balancePerCurrency['Sum']!.cardDeposits!.toString())];
-    List<TableRow> rowsCashDeposits = [makeRowHeader('Cash Deposits', c:tp.balancePerCurrency['Sum']!.cashDeposits!.toString())];
-    List<TableRow> rowsAllExpenses = [makeRowHeader('All Expenses', c:tp.balancePerCurrency['Sum']!.allExpenses!.toString())];
-    List<TableRow> rowsCardExpenses = [makeRowHeader('Card Expenses', c:tp.balancePerCurrency['Sum']!.cardExpenses!.toString())];
-    List<TableRow> rowsCashExpenses = [makeRowHeader('Cash Expenses', c:tp.balancePerCurrency['Sum']!.cashExpenses!.toString())];
-    List<TableRow> rowsCashBalance = [makeRowHeader('Cash Balance', c:tp.balancePerCurrency['Sum']!.cashBalance!.toString())];
-
-    tp.balancePerCurrency.forEach((currencyName, balance) {
-      if (currencyName != 'Sum') {
-        if (!balance.allDeposits!.isZero()) {
-          rowsAllDeposits.add(makeRow(currencyName, balance.allDeposits, currencyAll));
-        }
-        if (!balance.cardDeposits!.isZero()) {
-          rowsCardDeposits.add(makeRow(currencyName, balance.cardDeposits, currencyAll));
-        }
-        if (!balance.cashDeposits!.isZero()) {
-          rowsCashDeposits.add(makeRow(currencyName, balance.cashDeposits, currencyAll));
-        }
-        if (!balance.allExpenses!.isZero()) {
-          rowsAllExpenses.add(makeRow(currencyName, balance.allExpenses, currencyAll));
-        }
-        if (!balance.cardExpenses!.isZero()) {
-          rowsCardExpenses.add(makeRow(currencyName, balance.cardExpenses, currencyAll));
-        }
-        if (!balance.cashExpenses!.isZero()) {
-          rowsCashExpenses.add(makeRow(currencyName, balance.cashExpenses, currencyAll));
-        }
-        if (!balance.cashBalance!.isZero()) {
-          rowsCashBalance.add(makeRow(currencyName, balance.cashBalance, currencyAll));
-        }
-      }
-    });
-
-    children.add(Table(
-      children: rowsAllExpenses +
-          rowsCashExpenses +
-          rowsCardExpenses +
-          rowsAllDeposits +
-          rowsCardDeposits +
-          rowsCashDeposits +
-          rowsCashBalance,
-    ));
-
+/*
     return Column(
-      children: children,
-    );
-    */
+      children: [
+        CheckboxListTile(
+          title: const Text('Average per day'),
+          value: showAveragePerDay,
+          onChanged: (bool? value) {
+            setState(() {
+              showAveragePerDay = !showAveragePerDay;
+            });
+          },
+        ),
+        SingleChildScrollView(reverse: true, child: Column(children: children)),
+      ],
+    );*/
+
+      return  SingleChildScrollView(reverse: false, child: Column(children: children));
+     
   }
 }
 

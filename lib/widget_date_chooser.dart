@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/formatter.dart';
+//import 'package:travel_assist/formatter.dart';
 
 class WidgetDateChooser extends StatefulWidget {
   const WidgetDateChooser({
@@ -20,6 +20,18 @@ class _WidgetDateChooserState extends State<WidgetDateChooser> {
   @override
   Widget build(BuildContext context) {
     date ??= widget.date;
+
+    return IconButton(
+            // Back
+            iconSize: 30,
+            icon: const Icon(
+              Icons.calendar_month_outlined,
+            ),
+            onPressed: () {
+              selectDate(context);
+            });
+
+    /*
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: OutlinedButton(
@@ -28,7 +40,7 @@ class _WidgetDateChooserState extends State<WidgetDateChooser> {
         },
         child: Text(Formatter.dateToString(date)),
       ),
-    );
+    );*/
   }
 
   Future<void> selectDate(BuildContext context) async {

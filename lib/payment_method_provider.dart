@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/payment_method.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/transaction_value.dart';
+//import 'package:travel_assist/transaction.dart';
+//import 'package:travel_assist/transaction_value.dart';
 //import 'payment_provider.dart';
 import 'storage.dart';
 
@@ -36,6 +36,10 @@ class PaymentMethodProvider extends ChangeNotifier with Storage {
 
   static PaymentMethodProvider getInstance(BuildContext context) {
     return Provider.of<PaymentMethodProvider>(context, listen: false);
+  }
+
+  PaymentMethod? getByName(String name) {
+    return _paymentMethodMap.containsKey(name) ? _paymentMethodMap[name] : null;
   }
 
   void add(PaymentMethod item) async {

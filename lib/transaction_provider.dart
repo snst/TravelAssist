@@ -32,11 +32,12 @@ class Balance {
       HashMap<String, TransactionValue>();
 
   late TransactionValue expenseAll;
-  late TransactionValue balanceCash;
   late TransactionValue expenseCash;
   late TransactionValue expenseCard;
   late TransactionValue withdrawalAll;
   late TransactionValue cashFunds;
+  late TransactionValue balanceCash;
+  int days = 1;
 
   TransactionValue initTransaction() {
     return TransactionValue(0, currencyProvider.getHomeCurrency());
@@ -60,9 +61,8 @@ class Balance {
     }
   }
 
-  void add(final Transaction transaction) {
-    final tv = currencyProvider.getTransactionValue(transaction);
-
+  bool processExpense(
+      final Transaction transaction, final TransactionValue tv) {
     if (transaction.isExpense) {
       if (transaction.isCash) {
         balanceCash.sub(tv);
@@ -89,7 +89,14 @@ class Balance {
       }
 
       expenseAll.add(tv);
-    } else if (transaction.isDeposit) {
+      return true;
+    }
+    return false;
+  }
+
+  bool processDeposit(
+      final Transaction transaction, final TransactionValue tv) {
+    if (transaction.isDeposit) {
       initMap(depositByCurrency, transaction);
       depositByCurrency[transaction.currency]!.add(tv);
 
@@ -106,64 +113,24 @@ class Balance {
         String key = '${transaction.method} ${transaction.currencyString}';
         initMap(withdrawalByMethodCurrencyCard, transaction, key: key);
         withdrawalByMethodCurrencyCard[key]!.add(tv);
-      }
-      else if (transaction.isCashDeposit) {
+      } else if (transaction.isCashDeposit) {
         cashFunds.add(tv);
-        initMap(cashFundsByCurrency, transaction, key: transaction.currencyString);
+        initMap(cashFundsByCurrency, transaction,
+            key: transaction.currencyString);
         cashFundsByCurrency[transaction.currencyString]!.add(tv);
       }
+      return true;
+    }
+    return false;
+  }
+
+  void add(final Transaction transaction) {
+    final tv = currencyProvider.getTransactionValue(transaction);
+    if (!processExpense(transaction, tv)) {
+      processDeposit(transaction, tv);
     }
   }
 }
-
-/*
-
-class Balance {
-  Currency currency;
-  TransactionValue? cardDeposits;
-  TransactionValue? cashDeposits;
-  TransactionValue? allDeposits;
-  TransactionValue? cardExpenses;
-  TransactionValue? cashExpenses;
-  TransactionValue? allExpenses;
-  TransactionValue? cashBalance;
-
-  Balance({required this.currency}) {
-    reset();
-  }
-
-  void reset() {
-    cardDeposits = TransactionValue(0, currency);
-    cashDeposits = TransactionValue(0, currency);
-    allDeposits = TransactionValue(0, currency);
-    cardExpenses = TransactionValue(0, currency);
-    cashExpenses = TransactionValue(0, currency);
-    allExpenses = TransactionValue(0, currency);
-    cashBalance = TransactionValue(0, currency);
-  }
-
-  void add(Transaction transaction, TransactionValue tv) {
-    if (transaction.isDeposit) {
-      if (transaction.isCash) {
-        cashDeposits!.add(tv);
-      } else {
-        cardDeposits!.add(tv);
-      }
-      allDeposits!.add(tv);
-      cashBalance!.add(tv);
-    } else {
-      if (transaction.isCash) {
-        cashExpenses!.add(tv);
-        cashBalance!.sub(tv);
-      } else {
-        cardExpenses!.add(tv);
-      }
-      allExpenses!.add(tv);
-    }
-  }
-}
-
-*/
 
 class TransactionProvider extends ChangeNotifier with Storage {
   bool useDb;
@@ -275,42 +242,39 @@ class TransactionProvider extends ChangeNotifier with Storage {
       balance.add(transaction);
     }
     return balance;
+  }
 
-    /*
-    final homeCurrency = currencyProvider.getHomeCurrency();
-    final usedMethods = getUsedPaymentMethods();
-    balancePerCurrency.clear();
-    balancePerMethod.clear();
-    balancePerMethodAndCurrency.clear();
-
-    String sumAllHomeCurrency = 'Sum';
-    balancePerCurrency[sumAllHomeCurrency] = Balance(currency: homeCurrency!);
-*/
-/*    for (final currency in currencyProvider.visibleItems) {
-      balancePerCurrency[currency.name] = Balance(currency: currency);
-    }
-    for (final method in usedMethods) {
-      balancePerMethod[method] = Balance(currency: homeCurrency!);
-    }
-    */
-/*
+  Balance caluculateExpensesPerDay(CurrencyProvider currencyProvider) {
+    var balance = Balance(currencyProvider: currencyProvider);
     for (final transaction in items) {
-      final tv = currencyProvider.getTransactionValue(transaction);
-      String key = '${transaction.method} ${transaction.currencyString}';
-      if (!balancePerMethodAndCurrency.containsKey(key)) {
-        balancePerMethodAndCurrency[key] = Balance(currency: currencyProvider.getCurrencyByName(transaction.currency)!);
+      if (transaction.isExpense && !transaction.exlcudeFromAverage) {
+        balance.add(transaction);
       }
-      balancePerMethodAndCurrency[key]!.add(transaction, tv);
-
-      if (!balancePerMethod.containsKey(transaction.method)) {
-        balancePerMethod[transaction.method] = Balance(currency: homeCurrency);
-      }
-
-      //balancePerCurrency[transaction.currencyString]?.add(transaction, tv);
-      balancePerMethod[transaction.method]?.add(transaction, tv);
-      balancePerCurrency[sumAllHomeCurrency]!.add(transaction, tv);
     }
-    */
+
+    if (items.isNotEmpty) {
+      var start = items.first.groupDate;
+      var end = items.last.groupDate;
+      balance.days = end.difference(start).inDays + 1;
+
+      balance.expenseAll.value /= balance.days;
+      balance.expenseCash.value /= balance.days;
+      balance.expenseCard.value /= balance.days;
+
+      balance.expenseByMethodCurrencyCash.forEach((key, tv) {
+        tv.value /= balance.days;
+      });
+
+      balance.expenseByMethod.forEach((key, tv) {
+        tv.value /= balance.days;
+      });
+
+      balance.expenseByMethodCurrencyCard.forEach((key2, tv) {
+        tv.value /= balance.days;
+      });
+    }
+
+    return balance;
   }
 
   String toJson() {

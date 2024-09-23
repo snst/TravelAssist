@@ -21,6 +21,9 @@ class PaymentMethodProvider extends ChangeNotifier with Storage {
   final chashItem = PaymentMethod(name: "Cash", cash: true);
   final HashMap<String, PaymentMethod> _paymentMethodMap = HashMap();
   List<PaymentMethod> get allItems => [chashItem] + _paymentMethodMap.values.toList();
+  List<String> get allItemsAsString => allItems.map((obj) => obj.name).toList();
+  PaymentMethod get defaultMethod => chashItem;
+  PaymentMethod getDefaultMethod() { return chashItem; }
 
   void init() async {
     final isar = await db;

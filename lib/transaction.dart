@@ -13,29 +13,49 @@ enum TransactionTypeEnum {
   balance;
 }
 
+final List<String> transactionTypeList = ["Expense", "Withdrawal", "Balance"];
+TransactionTypeEnum transactionTypeStringToEnum(String name) {
+  if (name == transactionTypeList[0])
+    return TransactionTypeEnum.expense;
+  else if (name == transactionTypeList[1])
+    return TransactionTypeEnum.deposit;
+  else
+    return TransactionTypeEnum.balance;
+}
+
+String transactionTypeEnumToString(TransactionTypeEnum type) {
+  if (type == TransactionTypeEnum.expense)
+    return transactionTypeList[0];
+  else if (type == TransactionTypeEnum.deposit)
+    return transactionTypeList[1];
+  else
+    return transactionTypeList[2];
+}
+
 String getHint(TransactionTypeEnum type) {
-  switch(type)
-  {
-    case TransactionTypeEnum.expense: return "Expense";
-    case TransactionTypeEnum.deposit: return "Deposit";
-    case TransactionTypeEnum.balance: return "Balance";
+  switch (type) {
+    case TransactionTypeEnum.expense:
+      return "Expense";
+    case TransactionTypeEnum.deposit:
+      return "Deposit";
+    case TransactionTypeEnum.balance:
+      return "Balance";
   }
 }
 
 @collection
 @JsonSerializable()
 class Transaction {
-  Transaction({
-    this.name = "",
-    this.value = 0.0,
-    this.currency = "",
-    this.type = TransactionTypeEnum.expense,
-    required this.date,
-    this.categoryKey = 0,
-    this.comment = "",
-    this.exlcudeFromAverage = false,
-    this.method = ""
-  });
+  Transaction(
+      {this.name = "",
+      this.value = 0.0,
+      this.currency = "",
+      this.type = TransactionTypeEnum.expense,
+      required this.date,
+      this.categoryKey = 0,
+      this.comment = "",
+      this.exlcudeFromAverage = false,
+      this.method = ""});
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   Id id = Isar.autoIncrement;
@@ -64,7 +84,7 @@ class Transaction {
   @ignore
   bool get isDeposit => type == TransactionTypeEnum.deposit;
 
-@ignore
+  @ignore
   bool get isExpense => type == TransactionTypeEnum.expense;
 
   @ignore

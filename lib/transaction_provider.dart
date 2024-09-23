@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'storage.dart';
@@ -234,6 +235,26 @@ class TransactionProvider extends ChangeNotifier with Storage {
       }
     }
     return methods;
+  }
+
+  TransactionValue calcBalance(
+      CurrencyProvider currencyProvider, Currency? currency) {
+    TransactionValue sum = TransactionValue(0, currency);
+    if (currency != null) {
+      for (final transaction in items) {
+        if (transaction.currency == currency.name) {
+            final tv = currencyProvider.getTransactionValue(transaction);
+          if (transaction.isDeposit) {
+            sum.add(tv);
+
+          }
+          else if (transaction.isExpense && transaction.isCash) {
+            sum.sub(tv);
+          }
+        }
+      }
+    }
+    return sum;
   }
 
   Balance caluculateAll(CurrencyProvider currencyProvider) {

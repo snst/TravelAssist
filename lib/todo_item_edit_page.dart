@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_assist/widget_combobox.dart';
 import 'todo_item.dart';
 import 'todo_provider.dart';
 
@@ -61,6 +62,13 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  WidgetComboBox(selectedText: widget.modifiedItem.category, hintText: 'Category', onChanged: (suggestion) {
+                    setState(() {
+                        widget.modifiedItem.category = suggestion;
+                      });
+                  },
+                  items: categories,),
+                  /*
                   TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(
                       decoration: InputDecoration(
@@ -96,6 +104,7 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                       });
                     },
                   ),
+                  */
                   Row(children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),

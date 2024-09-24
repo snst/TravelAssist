@@ -6,6 +6,7 @@ import 'package:travel_assist/currency.dart';
 //import 'package:travel_assist/payment_provider.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
+import 'package:travel_assist/widget_combobox.dart';
 import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
 import 'package:travel_assist/widget_transaction_type_chooser.dart';
 import 'package:travel_assist/widget_comment_input.dart';
@@ -134,6 +135,9 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 selected: widget.modifiedItem.method,
                 onItemSelected: _onItemSelected,
               ),
+              WidgetComboBox(selectedText: widget.modifiedItem.method, hintText: 'Method', onChanged: _onItemSelected,
+                  items: provider.allItemsAsString,),
+
               if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
                 WidgetTransactionExpenseCategoryChooser(
                     transaction: widget.modifiedItem),

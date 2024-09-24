@@ -52,23 +52,21 @@ class Transaction {
       this.currency = "",
       this.type = TransactionTypeEnum.expense,
       required this.date,
-      this.categoryKey = 0,
-      this.comment = "",
+      this.category = "",
       this.exlcudeFromAverage = false,
       this.method = ""});
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   Id id = Isar.autoIncrement;
   String name;
+  String category;
+  String method;
   double value;
   String currency;
   DateTime date;
-  int categoryKey;
-  String comment;
+  bool exlcudeFromAverage;
   @enumerated
   TransactionTypeEnum type;
-  bool exlcudeFromAverage;
-  String method;
 
   @override
   String toString() {
@@ -114,8 +112,7 @@ class Transaction {
     value = other.value;
     type = other.type;
     date = other.date;
-    categoryKey = other.categoryKey;
-    comment = other.comment;
+    category = other.category;
     currency = other.currency;
     exlcudeFromAverage = other.exlcudeFromAverage;
     method = other.method;

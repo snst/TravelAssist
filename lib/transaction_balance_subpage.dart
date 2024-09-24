@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:travel_assist/balance.dart';
 import 'package:travel_assist/balance_row_widget.dart';
 import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
@@ -153,7 +154,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
-        "Cash funds",
+        "Cash deposit",
         balance.cashFunds.convertTo(homeCurrency),
         Colors.lightBlueAccent,
       ),

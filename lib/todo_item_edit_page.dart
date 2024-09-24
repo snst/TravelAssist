@@ -62,12 +62,17 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  WidgetComboBox(selectedText: widget.modifiedItem.category, hintText: 'Category', onChanged: (suggestion) {
-                    setState(() {
+                  WidgetComboBox(
+                    controller: TextEditingController(),
+                    selectedText: widget.modifiedItem.category,
+                    hintText: 'Category',
+                    onChanged: (suggestion) {
+                      setState(() {
                         widget.modifiedItem.category = suggestion;
                       });
-                  },
-                  items: categories,),
+                    },
+                    items: categories,
+                  ),
                   /*
                   TypeAheadField(
                     textFieldConfiguration: TextFieldConfiguration(

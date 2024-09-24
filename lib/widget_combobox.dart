@@ -5,6 +5,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 class WidgetComboBox extends StatelessWidget {
   WidgetComboBox({
     super.key,
+    required this.controller,
     required this.selectedText,
     required this.hintText,
     required this.onChanged,
@@ -15,7 +16,7 @@ class WidgetComboBox extends StatelessWidget {
   final String selectedText;
   final String hintText;
   final Function(String) onChanged;
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController controller;// = TextEditingController();
   final List<String> items;
 
   @override
@@ -38,7 +39,8 @@ class WidgetComboBox extends StatelessWidget {
         List<String> strlist = items
             .where((item) => item.toLowerCase().contains(pattern.toLowerCase()))
             .toList();
-        if (!strlist.contains(pattern)) {
+        
+        if (pattern.isNotEmpty && !strlist.contains(pattern)) {
           strlist.insert(0, pattern);
         }
         return strlist;

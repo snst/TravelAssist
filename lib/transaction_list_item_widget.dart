@@ -17,11 +17,14 @@ class TransactionListItemWidget extends StatelessWidget {
   final void Function(Transaction transaction) onEditItem;
 
   Widget getIcon(Transaction transaction) {
+    
     if (transaction.isDeposit) {
       return const FaIcon(FontAwesomeIcons.sackDollar,
-          color: Colors.greenAccent);
+          //color: Colors.greenAccent,
+          );
     } else {
-      return ExpenseCategoryManager.at(transaction.categoryKey).icon;
+      return const FaIcon(FontAwesomeIcons.cartShopping);
+      //return ExpenseCategoryManager.at(transaction.categoryKey).icon;
     }
   }
 
@@ -51,14 +54,12 @@ class TransactionListItemWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(children: [
-            Text(transaction.name),
+            Text(transaction.category + (transaction.category.isNotEmpty ? " " : "") + transaction.name),
             Text(transaction.method, style: detailStyle)
-          ],
-          crossAxisAlignment: CrossAxisAlignment.start),
+          ], crossAxisAlignment: CrossAxisAlignment.start),
           Column(
               children: [Text(valueHome), Text(valueLocal, style: detailStyle)],
-                        crossAxisAlignment: CrossAxisAlignment.end),
-
+              crossAxisAlignment: CrossAxisAlignment.end),
         ],
       ),
       /*subtitle: Row(

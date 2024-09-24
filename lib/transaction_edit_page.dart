@@ -7,7 +7,7 @@ import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'package:travel_assist/widget_combobox.dart';
-import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
+//import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
 import 'package:travel_assist/widget_transaction_type_chooser.dart';
 import 'package:travel_assist/widget_comment_input.dart';
 import 'package:travel_assist/widget_date_chooser.dart';
@@ -40,43 +40,43 @@ class TransactionEditPage extends StatefulWidget {
 }
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
-  double withdrawFee = 0;
+  final TextEditingController categoryController = TextEditingController();
 
   void saveAndClose(BuildContext context) {
     final tp = TransactionProvider.getInstance(context);
     if (widget.modifiedItem.name.isEmpty) {
       if (widget.modifiedItem.type == TransactionTypeEnum.expense) {
-        widget.modifiedItem.name =
-            ExpenseCategoryManager.getByIndex(widget.modifiedItem.categoryKey)
-                .name;
+        //widget.modifiedItem.name = "";
+        //ExpenseCategoryManager.getByIndex(widget.modifiedItem.categoryKey)
+        //    .name;
       } else if (widget.modifiedItem.type == TransactionTypeEnum.deposit) {
-        widget.modifiedItem.name = "Deposit";
+        //widget.modifiedItem.name = "Deposit";
       } else {
-        widget.modifiedItem.name = "Balance";
+        //widget.modifiedItem.name = "Balance";
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
         TransactionValue val = tp.calcBalance(cp, currency);
         double difference = val.value - widget.modifiedItem.value;
-        widget.modifiedItem.name = "Balance ${widget.modifiedItem.valueCurrencyString}";
+        widget.modifiedItem.name =
+            "Balance ${widget.modifiedItem.valueCurrencyString}";
         widget.modifiedItem.value = difference;
-
       }
     }
+    switch (widget.modifiedItem.type) {
+      case TransactionTypeEnum.expense:
+        widget.modifiedItem.category = categoryController.text;
+        break;
+      case TransactionTypeEnum.deposit:
+        widget.modifiedItem.category = "Withdrawal";
+        break;
+      case TransactionTypeEnum.balance:
+        widget.modifiedItem.category = "Balance";
+        break;
+    }
+
     //widget.modifiedItem.method = paymentMethod;
     widget.item.update(widget.modifiedItem);
     tp.add(widget.item);
-
-    /*if (widget.newItem && withdrawFee > 0 && widget.modifiedItem.isWithdrawal) {
-      final fee = Transaction(
-          date: DateTime.now(),
-          value: withdrawFee,
-          currency: widget.modifiedItem.currency,
-          type: TransactionTypeEnum.expense,
-          name: 'Withdraw fee for ${widget.modifiedItem.name}',
-          method: widget.modifiedItem.method,
-          categoryKey: ExpenseCategoryManager.getByName("Fee"));
-      tp.add(fee);
-    }*/
 
     Navigator.of(context).pop();
   }
@@ -104,13 +104,29 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
           reverse: true,
           child: Column(
             children: <Widget>[
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
+                // CATEGORY
+                WidgetComboBox(
+                  controller: categoryController,
+                  selectedText: widget.modifiedItem.category,
+                  hintText: '',
+                  onChanged: (p0) {
+                    setState(() {
+                      widget.modifiedItem.category = p0;
+                    });
+                  },
+                  items: TransactionProvider.getInstance(context)
+                      .getCategoryList(),
+                ),
+              ],
               Row(
                 children: [
                   Expanded(
-                    child: WidgetTransactionDescriptionInput(
-                        widget: widget,
-                        hintText: getHint(widget.modifiedItem.type)),
-                  ),
+                      child: WidgetTransactionDescriptionInput(
+                    widget: widget,
+                    //hintText: getHint(widget.modifiedItem.type)),
+                    hintText: "",
+                  )),
                   WidgetDateChooser(
                     date: widget.modifiedItem.date,
                     onChanged: (val) => setState(() {
@@ -119,9 +135,17 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   ),
                 ],
               ),
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
+                widgetExcludeFromDailyAverage(),
+              ],
               if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
                   widget.modifiedItem.type == TransactionTypeEnum.deposit)
                 ...[],
+              HorizontalListView(
+                items: provider.allItemsAsString,
+                selected: widget.modifiedItem.method,
+                onItemSelected: _onItemSelected,
+              ),
               HorizontalListView(
                   items: transactionTypeList,
                   selected:
@@ -130,25 +154,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                         widget.modifiedItem.type =
                             transactionTypeStringToEnum(name);
                       })),
-              HorizontalListView(
-                items: provider.allItemsAsString,
-                selected: widget.modifiedItem.method,
-                onItemSelected: _onItemSelected,
-              ),
-              WidgetComboBox(selectedText: widget.modifiedItem.method, hintText: 'Method', onChanged: _onItemSelected,
-                  items: provider.allItemsAsString,),
-
-              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
-                WidgetTransactionExpenseCategoryChooser(
-                    transaction: widget.modifiedItem),
-                widgetExcludeFromDailyAverage(),
-              ],
               widgetButtons(context),
-              WidgetCommentInput(
-                  comment: widget.modifiedItem.comment,
-                  onChanged: (val) => setState(() {
-                        widget.modifiedItem.comment = val;
-                      })),
             ],
           ),
         ),

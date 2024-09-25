@@ -14,27 +14,34 @@ enum TransactionTypeEnum {
   deposit;
 }
 
-final List<String> transactionTypeList = ["Expense", "Withdrawal", "Balance", "Deposit"];
+final List<String> transactionTypeList = [
+  "Expense",
+  "Withdrawal",
+  "Balance",
+  "Deposit"
+];
 TransactionTypeEnum transactionTypeStringToEnum(String name) {
-  if (name == transactionTypeList[0])
+  if (name == transactionTypeList[0]) {
     return TransactionTypeEnum.expense;
-  else if (name == transactionTypeList[1])
+  } else if (name == transactionTypeList[1]) {
     return TransactionTypeEnum.withdrawal;
-  else if (name == transactionTypeList[2])
+  } else if (name == transactionTypeList[2]) {
     return TransactionTypeEnum.balance;
-  else
+  } else {
     return TransactionTypeEnum.deposit;
+  }
 }
 
 String transactionTypeEnumToString(TransactionTypeEnum type) {
-  if (type == TransactionTypeEnum.expense)
+  if (type == TransactionTypeEnum.expense) {
     return transactionTypeList[0];
-  else if (type == TransactionTypeEnum.withdrawal)
+  } else if (type == TransactionTypeEnum.withdrawal) {
     return transactionTypeList[1];
-  else if (type == TransactionTypeEnum.balance)
+  } else if (type == TransactionTypeEnum.balance) {
     return transactionTypeList[2];
-  else
+  } else {
     return transactionTypeList[3];
+  }
 }
 
 String getHint(TransactionTypeEnum type) {
@@ -88,6 +95,9 @@ class Transaction {
 
   @ignore
   bool get isExpense => type == TransactionTypeEnum.expense;
+
+@ignore
+  bool get isBalance => type == TransactionTypeEnum.balance;
 
   @ignore
   bool get isCashDeposit => type == TransactionTypeEnum.deposit;

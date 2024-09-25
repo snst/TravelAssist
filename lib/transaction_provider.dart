@@ -148,7 +148,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
           final tv = currencyProvider.getTransactionValue(transaction);
           if (transaction.isWithdrawal || transaction.isCashDeposit) {
             sum.add(tv);
-          } else if (transaction.isExpense && transaction.isCash) {
+          } else if (transaction.isExpense && transaction.isCash || transaction.isBalance) {
             sum.sub(tv);
           }
         }

@@ -42,7 +42,6 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     final tp = TransactionProvider.getInstance(context);
     if (widget.modifiedItem.name.isEmpty) {
       if (widget.modifiedItem.type == TransactionTypeEnum.balance) {
-        //widget.modifiedItem.name = "Balance";
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
         TransactionValue val = tp.calcBalance(cp, currency);

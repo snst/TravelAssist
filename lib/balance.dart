@@ -12,7 +12,7 @@ class Balance {
   final Map<String, TransactionValue> expenseByMethodCurrencyCash =
       HashMap<String, TransactionValue>();
 
-  final Map<String, TransactionValue> balanceByCurrency =
+  final Map<String, TransactionValue> haveCashByCurrency =
       HashMap<String, TransactionValue>();
 
   final Map<String, TransactionValue> depositByCurrency =
@@ -22,14 +22,18 @@ class Balance {
       HashMap<String, TransactionValue>();
   final Map<String, TransactionValue> withdrawalByMethodCurrencyCard =
       HashMap<String, TransactionValue>();
-  final Map<String, TransactionValue> cashFundsByCurrency =
+  final Map<String, TransactionValue> cashDepositByCurrency =
+      HashMap<String, TransactionValue>();
+
+  final Map<String, TransactionValue> balanceByCurrency =
       HashMap<String, TransactionValue>();
 
   late TransactionValue expenseAll;
   late TransactionValue expenseCash;
   late TransactionValue expenseCard;
   late TransactionValue withdrawalAll;
-  late TransactionValue cashFunds;
+  late TransactionValue cashDeposit;
+  late TransactionValue haveCash;
   late TransactionValue balanceCash;
   int days = 1;
 
@@ -41,9 +45,10 @@ class Balance {
     expenseAll = initTransaction();
     expenseCash = initTransaction();
     expenseCard = initTransaction();
-    balanceCash = initTransaction();
+    haveCash = initTransaction();
     withdrawalAll = initTransaction();
-    cashFunds = initTransaction();
+    cashDeposit = initTransaction();
+    balanceCash = initTransaction();
   }
 
   void initMap(Map<String, TransactionValue> map, final Transaction transaction,
@@ -57,13 +62,13 @@ class Balance {
 
   bool processExpense(
       final Transaction transaction, final TransactionValue tv) {
-    if (transaction.isExpense) {
+    if (transaction.isExpense || transaction.isBalance) {
       if (transaction.isCash) {
-        balanceCash.sub(tv);
+        haveCash.sub(tv);
         expenseCash.add(tv);
 
-        initMap(balanceByCurrency, transaction);
-        balanceByCurrency[transaction.currency]!.sub(tv);
+        initMap(haveCashByCurrency, transaction);
+        haveCashByCurrency[transaction.currency]!.sub(tv);
       } else {
         expenseCard.add(tv);
       }
@@ -83,7 +88,7 @@ class Balance {
       }
 
       expenseAll.add(tv);
-      return true;
+      return transaction.isExpense;
     }
     return false;
   }
@@ -94,10 +99,10 @@ class Balance {
       initMap(depositByCurrency, transaction);
       depositByCurrency[transaction.currency]!.add(tv);
 
-      balanceCash.add(tv);
+      haveCash.add(tv);
 
-      initMap(balanceByCurrency, transaction);
-      balanceByCurrency[transaction.currency]!.add(tv);
+      initMap(haveCashByCurrency, transaction);
+      haveCashByCurrency[transaction.currency]!.add(tv);
 
       if (transaction.isWithdrawal) {
         withdrawalAll.add(tv);
@@ -108,11 +113,24 @@ class Balance {
         initMap(withdrawalByMethodCurrencyCard, transaction, key: key);
         withdrawalByMethodCurrencyCard[key]!.add(tv);
       } else if (transaction.isCashDeposit) {
-        cashFunds.add(tv);
-        initMap(cashFundsByCurrency, transaction,
+        cashDeposit.add(tv);
+        initMap(cashDepositByCurrency, transaction,
             key: transaction.currencyString);
-        cashFundsByCurrency[transaction.currencyString]!.add(tv);
+        cashDepositByCurrency[transaction.currencyString]!.add(tv);
       }
+      return true;
+    }
+    return false;
+  }
+
+  bool processBalance(
+      final Transaction transaction, final TransactionValue tv) {
+    if (transaction.isBalance) {
+      balanceCash.add(tv);
+
+      initMap(balanceByCurrency, transaction);
+      balanceByCurrency[transaction.currency]!.add(tv);
+
       return true;
     }
     return false;
@@ -121,7 +139,9 @@ class Balance {
   void add(final Transaction transaction) {
     final tv = currencyProvider.getTransactionValue(transaction);
     if (!processExpense(transaction, tv)) {
-      processDeposit(transaction, tv);
+      if (!processDeposit(transaction, tv)) {
+        processBalance(transaction, tv);
+      }
     }
   }
 }

@@ -84,7 +84,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         styleEnum: BalanceRowWidgetEnum.subheader));
     balance.expenseByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: key,
+          text1: "  " + key,
           tv1: null,
           tv2: tv.convertTo(homeCurrency),
           styleEnum: BalanceRowWidgetEnum.method));
@@ -113,12 +113,12 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
         "Cash",
-        balance.balanceCash.convertTo(homeCurrency),
+        balance.haveCash.convertTo(homeCurrency),
         Colors.yellowAccent,
       ),
     ));
 
-    balance.balanceByCurrency.forEach((key, tv) {
+    balance.haveCashByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
           text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
@@ -139,7 +139,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
 
     balance.withdrawalByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: key, tv1: null, tv2: tv.convertTo(homeCurrency)));
+          text1: "  " + key, tv1: null, tv2: tv.convertTo(homeCurrency), styleEnum: BalanceRowWidgetEnum.method));
 
       balance.withdrawalByMethodCurrencyCard.forEach((key2, tv) {
         if (key2.startsWith(key)) {
@@ -155,30 +155,32 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
         "Cash deposit",
-        balance.cashFunds.convertTo(homeCurrency),
+        balance.cashDeposit.convertTo(homeCurrency),
         Colors.lightBlueAccent,
       ),
     ));
 
-    balance.cashFundsByCurrency.forEach((key, tv) {
+    balance.cashDepositByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
           text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
     });
-/*
-    return Column(
-      children: [
-        CheckboxListTile(
-          title: const Text('Average per day'),
-          value: showAveragePerDay,
-          onChanged: (bool? value) {
-            setState(() {
-              showAveragePerDay = !showAveragePerDay;
-            });
-          },
-        ),
-        SingleChildScrollView(reverse: true, child: Column(children: children)),
-      ],
-    );*/
+
+    // Balance 
+    children.add(Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: BalanceRowHeader(
+        FontAwesomeIcons.sackDollar,
+        "Cash balance",
+        balance.balanceCash.convertTo(homeCurrency),
+        Colors.blueAccent,
+      ),
+    ));
+
+    balance.balanceByCurrency.forEach((key, tv) {
+      children.add(BalanceRowWidget(
+          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+    });
+
 
       return  SingleChildScrollView(reverse: false, child: Column(children: children));
      

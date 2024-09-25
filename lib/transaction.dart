@@ -9,27 +9,32 @@ part 'transaction.g.dart';
 
 enum TransactionTypeEnum {
   expense,
-  deposit,
-  balance;
+  withdrawal,
+  balance,
+  deposit;
 }
 
-final List<String> transactionTypeList = ["Expense", "Withdrawal", "Balance"];
+final List<String> transactionTypeList = ["Expense", "Withdrawal", "Balance", "Deposit"];
 TransactionTypeEnum transactionTypeStringToEnum(String name) {
   if (name == transactionTypeList[0])
     return TransactionTypeEnum.expense;
   else if (name == transactionTypeList[1])
-    return TransactionTypeEnum.deposit;
-  else
+    return TransactionTypeEnum.withdrawal;
+  else if (name == transactionTypeList[2])
     return TransactionTypeEnum.balance;
+  else
+    return TransactionTypeEnum.deposit;
 }
 
 String transactionTypeEnumToString(TransactionTypeEnum type) {
   if (type == TransactionTypeEnum.expense)
     return transactionTypeList[0];
-  else if (type == TransactionTypeEnum.deposit)
+  else if (type == TransactionTypeEnum.withdrawal)
     return transactionTypeList[1];
-  else
+  else if (type == TransactionTypeEnum.balance)
     return transactionTypeList[2];
+  else
+    return transactionTypeList[3];
 }
 
 String getHint(TransactionTypeEnum type) {
@@ -38,6 +43,8 @@ String getHint(TransactionTypeEnum type) {
       return "Expense";
     case TransactionTypeEnum.deposit:
       return "Deposit";
+    case TransactionTypeEnum.withdrawal:
+      return "Withdrawal";
     case TransactionTypeEnum.balance:
       return "Balance";
   }
@@ -77,16 +84,13 @@ class Transaction {
   bool get isCash => method.isEmpty || method == "Cash";
 
   @ignore
-  bool get isWithdrawal => type == TransactionTypeEnum.deposit && !isCash;
-
-  @ignore
-  bool get isDeposit => type == TransactionTypeEnum.deposit;
+  bool get isWithdrawal => type == TransactionTypeEnum.withdrawal;
 
   @ignore
   bool get isExpense => type == TransactionTypeEnum.expense;
 
   @ignore
-  bool get isCashDeposit => type == TransactionTypeEnum.deposit && isCash;
+  bool get isCashDeposit => type == TransactionTypeEnum.deposit;
 
   @ignore
   String get dateString => DateFormat('EEEE, d MMMM y').format(date);

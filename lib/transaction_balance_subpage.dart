@@ -64,7 +64,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       FontAwesomeIcons.sackDollar,
       title,
       balance.expenseAll.convertTo(homeCurrency),
-      Colors.redAccent,
+      Colors.orangeAccent,
     ));
 
     children.add(BalanceRowWidget(
@@ -114,7 +114,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         FontAwesomeIcons.sackDollar,
         "Cash",
         balance.balanceCash.convertTo(homeCurrency),
-        Colors.greenAccent,
+        Colors.yellowAccent,
       ),
     ));
 
@@ -133,7 +133,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         FontAwesomeIcons.sackDollar,
         "Withdrawal",
         balance.withdrawalAll.convertTo(homeCurrency),
-        Colors.blueAccent,
+        Colors.greenAccent,
       ),
     ));
 
@@ -149,7 +149,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       });
     });
 
-    // Cash funds
+    // Cash deposit
     children.add(Padding(
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(

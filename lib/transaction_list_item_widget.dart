@@ -17,15 +17,29 @@ class TransactionListItemWidget extends StatelessWidget {
   final void Function(Transaction transaction) onEditItem;
 
   Widget getIcon(Transaction transaction) {
-    
-    if (transaction.isDeposit) {
-      return const FaIcon(FontAwesomeIcons.sackDollar,
-          //color: Colors.greenAccent,
-          );
-    } else {
-      return const FaIcon(FontAwesomeIcons.cartShopping);
-      //return ExpenseCategoryManager.at(transaction.categoryKey).icon;
+    switch (transaction.type) {
+      case TransactionTypeEnum.expense:
+        return const FaIcon(
+          FontAwesomeIcons.cartShopping,
+          color: Colors.orangeAccent,
+        );
+      case TransactionTypeEnum.withdrawal:
+        return const FaIcon(
+          FontAwesomeIcons.moneyBills,
+          color: Colors.greenAccent,
+        );
+      case TransactionTypeEnum.balance:
+        return const FaIcon(
+          FontAwesomeIcons.scaleBalanced,
+          color: Colors.blueAccent,
+        );
+      case TransactionTypeEnum.deposit:
+        return const FaIcon(
+          FontAwesomeIcons.sackDollar,
+          color: Colors.lightBlueAccent,
+        );
     }
+    
   }
 
   @override
@@ -54,7 +68,9 @@ class TransactionListItemWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(children: [
-            Text(transaction.category + (transaction.category.isNotEmpty ? " " : "") + transaction.name),
+            Text(transaction.category +
+                (transaction.category.isNotEmpty ? " " : "") +
+                transaction.name),
             Text(transaction.method, style: detailStyle)
           ], crossAxisAlignment: CrossAxisAlignment.start),
           Column(

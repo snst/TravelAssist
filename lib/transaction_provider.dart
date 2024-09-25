@@ -102,6 +102,18 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return sortedUniqueStrings;
   }
 
+    List<String> getPaymentMethodList() {
+    Map<String, int> occurrenceMap = {};
+    for (final transaction in items) {
+      final str = transaction.method;
+      occurrenceMap[str] = (occurrenceMap[str] ?? 0) + 1;
+    }
+    List<String> sortedUniqueStrings = occurrenceMap.keys.toList()
+      ..sort((a, b) => occurrenceMap[b]!.compareTo(occurrenceMap[a]!));
+
+    return sortedUniqueStrings;
+  }
+
   List<Transaction> getSortedTransactions(DateTime? until) {
     List<Transaction> ret = items;
     if (until != null) {
@@ -134,7 +146,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
       for (final transaction in items) {
         if (transaction.currency == currency.name) {
           final tv = currencyProvider.getTransactionValue(transaction);
-          if (transaction.isDeposit) {
+          if (transaction.isWithdrawal || transaction.isCashDeposit) {
             sum.add(tv);
           } else if (transaction.isExpense && transaction.isCash) {
             sum.sub(tv);

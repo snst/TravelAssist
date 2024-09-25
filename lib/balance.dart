@@ -90,7 +90,7 @@ class Balance {
 
   bool processDeposit(
       final Transaction transaction, final TransactionValue tv) {
-    if (transaction.isDeposit) {
+    if (transaction.isWithdrawal || transaction.isCashDeposit) {
       initMap(depositByCurrency, transaction);
       depositByCurrency[transaction.currency]!.add(tv);
 

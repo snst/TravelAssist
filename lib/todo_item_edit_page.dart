@@ -66,6 +66,7 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                     controller: TextEditingController(),
                     selectedText: widget.modifiedItem.category,
                     hintText: 'Category',
+                    filter:true,
                     onChanged: (suggestion) {
                       setState(() {
                         widget.modifiedItem.category = suggestion;

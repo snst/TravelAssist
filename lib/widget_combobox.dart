@@ -8,6 +8,7 @@ class WidgetComboBox extends StatelessWidget {
     required this.controller,
     required this.selectedText,
     required this.hintText,
+    required this.filter,
     required this.onChanged,
     required this.items,
 
@@ -18,6 +19,7 @@ class WidgetComboBox extends StatelessWidget {
   final Function(String) onChanged;
   final TextEditingController controller;// = TextEditingController();
   final List<String> items;
+  final bool filter;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +38,14 @@ class WidgetComboBox extends StatelessWidget {
         //widget.modifiedItem.category = pattern;
         //onChanged(pattern);
 
-        List<String> strlist = items
+        List<String> strlist;
+        if (filter) {
+         strlist = items
             .where((item) => item.toLowerCase().contains(pattern.toLowerCase()))
             .toList();
+        } else {
+          strlist = items.toList();
+        }
         
         if (pattern.isNotEmpty && !strlist.contains(pattern)) {
           strlist.insert(0, pattern);

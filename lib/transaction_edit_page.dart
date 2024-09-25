@@ -8,18 +8,13 @@ import 'package:travel_assist/transaction_provider.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'package:travel_assist/widget_combobox.dart';
 //import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
-import 'package:travel_assist/widget_transaction_type_chooser.dart';
-import 'package:travel_assist/widget_comment_input.dart';
+//import 'package:travel_assist/widget_transaction_type_chooser.dart';
 import 'package:travel_assist/widget_date_chooser.dart';
-import 'package:travel_assist/horizontal_selector_widget.dart';
 import 'package:travel_assist/widget_transaction_description_input.dart';
-import 'package:travel_assist/widget_transaction_withdrawal_fee_input.dart';
 import 'transaction.dart';
 import 'currency_provider.dart';
-import 'expense_category.dart';
 import 'travel_assist_utils.dart';
 import 'currency_chooser_widget.dart';
-//import 'payment_method.dart';
 import 'payment_method_provider.dart';
 
 class TransactionEditPage extends StatefulWidget {
@@ -41,17 +36,12 @@ class TransactionEditPage extends StatefulWidget {
 
 class _TransactionEditPageState extends State<TransactionEditPage> {
   final TextEditingController categoryController = TextEditingController();
+  final TextEditingController paymentMethodController = TextEditingController();
 
   void saveAndClose(BuildContext context) {
     final tp = TransactionProvider.getInstance(context);
     if (widget.modifiedItem.name.isEmpty) {
-      if (widget.modifiedItem.type == TransactionTypeEnum.expense) {
-        //widget.modifiedItem.name = "";
-        //ExpenseCategoryManager.getByIndex(widget.modifiedItem.categoryKey)
-        //    .name;
-      } else if (widget.modifiedItem.type == TransactionTypeEnum.deposit) {
-        //widget.modifiedItem.name = "Deposit";
-      } else {
+      if (widget.modifiedItem.type == TransactionTypeEnum.balance) {
         //widget.modifiedItem.name = "Balance";
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
@@ -65,12 +55,18 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     switch (widget.modifiedItem.type) {
       case TransactionTypeEnum.expense:
         widget.modifiedItem.category = categoryController.text;
+        widget.modifiedItem.method = paymentMethodController.text;
         break;
       case TransactionTypeEnum.deposit:
+        widget.modifiedItem.category = "Deposit";
+        widget.modifiedItem.method = "";
+        break;
+      case TransactionTypeEnum.withdrawal:
         widget.modifiedItem.category = "Withdrawal";
         break;
       case TransactionTypeEnum.balance:
-        widget.modifiedItem.category = "Balance";
+        widget.modifiedItem.category = "";
+        widget.modifiedItem.method = "";
         break;
     }
 
@@ -94,6 +90,12 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     PaymentMethodProvider provider =
         Provider.of<PaymentMethodProvider>(context, listen: false);
 
+    //String proposedPaymentMethod = "";
+    final l = TransactionProvider.getInstance(context).getPaymentMethodList();
+    if (l.isNotEmpty) {
+      if (widget.modifiedItem.method == "") widget.modifiedItem.method = l[0];
+    }
+
     return Scaffold(
       appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -109,7 +111,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 WidgetComboBox(
                   controller: categoryController,
                   selectedText: widget.modifiedItem.category,
-                  hintText: '',
+                  hintText: 'Category',
+                  filter: true,
                   onChanged: (p0) {
                     setState(() {
                       widget.modifiedItem.category = p0;
@@ -119,41 +122,71 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                       .getCategoryList(),
                 ),
               ],
-              Row(
-                children: [
-                  Expanded(
-                      child: WidgetTransactionDescriptionInput(
-                    widget: widget,
-                    //hintText: getHint(widget.modifiedItem.type)),
-                    hintText: "",
-                  )),
-                  WidgetDateChooser(
-                    date: widget.modifiedItem.date,
-                    onChanged: (val) => setState(() {
-                      widget.modifiedItem.date = val;
-                    }),
-                  ),
-                ],
+              // DESCRIPTION
+              WidgetTransactionDescriptionInput(
+                widget: widget,
+                hintText: "Description",
+                //hintText: getHint(widget.modifiedItem.type)),
               ),
               if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
                 widgetExcludeFromDailyAverage(),
               ],
-              if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
-                  widget.modifiedItem.type == TransactionTypeEnum.deposit)
-                ...[],
-              HorizontalListView(
-                items: provider.allItemsAsString,
-                selected: widget.modifiedItem.method,
-                onItemSelected: _onItemSelected,
+              //    if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
+              //       widget.modifiedItem.type == TransactionTypeEnum.deposit)
+              //    ...[],
+              Row(
+                children: [
+                  SizedBox(
+                    width: 130,
+                    child: DropdownButton(
+                      value: widget.modifiedItem.type,
+                      isExpanded: true,
+                      items: const [
+                        DropdownMenuItem(
+                            value: TransactionTypeEnum.expense,
+                            child: Text("Expense")),
+                        DropdownMenuItem(
+                            value: TransactionTypeEnum.withdrawal,
+                            child: Text("Withdrawal")),
+                        DropdownMenuItem(
+                            value: TransactionTypeEnum.balance,
+                            child: Text("Balance")),
+                        DropdownMenuItem(
+                            value: TransactionTypeEnum.deposit,
+                            child: Text("Deposit")),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          widget.modifiedItem.type = value!;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  if (widget.modifiedItem.type ==
+                      TransactionTypeEnum.expense || widget.modifiedItem.type ==
+                      TransactionTypeEnum.withdrawal) ...[
+                    Expanded(
+                      child: WidgetComboBox(
+                        controller: paymentMethodController,
+                        selectedText: widget.modifiedItem.method,
+                        hintText: '',
+                        filter: false,
+                        onChanged: (p0) {
+                          setState(() {
+                            widget.modifiedItem.method = p0;
+                          });
+                        },
+                        items: TransactionProvider.getInstance(context)
+                            .getPaymentMethodList(),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              HorizontalListView(
-                  items: transactionTypeList,
-                  selected:
-                      transactionTypeEnumToString(widget.modifiedItem.type),
-                  onItemSelected: (name) => setState(() {
-                        widget.modifiedItem.type =
-                            transactionTypeStringToEnum(name);
-                      })),
+
               widgetButtons(context),
             ],
           ),
@@ -219,8 +252,14 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
 
   Padding widgetButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: Row(children: [
+        WidgetDateChooser(
+          date: widget.modifiedItem.date,
+          onChanged: (val) => setState(() {
+            widget.modifiedItem.date = val;
+          }),
+        ),
         const Spacer(),
         IconButton(
             // Back

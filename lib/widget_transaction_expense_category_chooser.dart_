@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:travel_assist/expense_category.dart';
-import 'package:travel_assist/transaction.dart';
+import 'expense_category.dart';
+import 'transaction.dart';
 
 class WidgetTransactionExpenseCategoryChooser extends StatefulWidget {
   const WidgetTransactionExpenseCategoryChooser({

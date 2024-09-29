@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/widget_combobox.dart';
+import 'widget_combobox.dart';
 import 'todo_item.dart';
 import 'todo_provider.dart';
 
@@ -66,7 +65,7 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                     controller: TextEditingController(),
                     selectedText: widget.modifiedItem.category,
                     hintText: 'Category',
-                    filter:true,
+                    filter: true,
                     onChanged: (suggestion) {
                       setState(() {
                         widget.modifiedItem.category = suggestion;
@@ -74,43 +73,6 @@ class _PackedItemPageState extends State<TodoItemEditPage> {
                     },
                     items: categories,
                   ),
-                  /*
-                  TypeAheadField(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      decoration: InputDecoration(
-                          hintText: 'Category',
-                          suffixIcon: IconButton(
-                            onPressed: controller.clear,
-                            icon: const Icon(Icons.clear),
-                          )),
-                      controller: controller, //TextEditingController()
-                      //..text = widget.modifiedItem.category,
-                    ),
-                    suggestionsCallback: (pattern) {
-                      widget.modifiedItem.category = pattern;
-
-                      List<String> strlist = categories
-                          .where((item) => item
-                              .toLowerCase()
-                              .contains(pattern.toLowerCase()))
-                          .toList();
-                      if (!strlist.contains(pattern)) {
-                        strlist.insert(0, pattern);
-                      }
-                      return strlist;
-                    },
-                    itemBuilder: (context, suggestion) {
-                      return ListTile(
-                        title: Text(suggestion),
-                      );
-                    },
-                    onSuggestionSelected: (suggestion) {
-                      setState(() {
-                        widget.modifiedItem.category = suggestion;
-                      });
-                    },
-                  ),
-                  */
                   Row(children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),

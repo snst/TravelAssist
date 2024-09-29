@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/globals.dart';
-import 'package:travel_assist/transaction_value.dart';
+import 'globals.dart';
+import 'transaction_value.dart';
 
 enum BalanceRowWidgetEnum {
   normal,
@@ -15,7 +15,7 @@ class BalanceRowWidget extends StatelessWidget {
   //final BalanceRowWidgetEnum styleEnum;
   final TextStyle style;
 
-  BalanceRowWidget({
+  BalanceRowWidget({super.key, 
     required this.text1,
     required this.tv1,
     required this.tv2,

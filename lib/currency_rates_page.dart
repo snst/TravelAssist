@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/travel_assist_utils.dart';
+import 'travel_assist_utils.dart';
 import 'currency.dart';
 import 'currency_provider.dart';
+import 'drawer_widget.dart';
 
 class CurrencyRatesPage extends StatefulWidget {
-  const CurrencyRatesPage({super.key, required this.currencyProvider});
-  final CurrencyProvider currencyProvider;
-  @override
+  const CurrencyRatesPage({super.key, required this.drawer});
+  static int pageIndex = 3;
+  final DrawerWidget drawer;  @override
   State<CurrencyRatesPage> createState() => _CurrencyRatesPageState();
 }
 
@@ -115,31 +116,35 @@ class _CurrencyRatesPageState extends State<CurrencyRatesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<CurrencyProvider>();
+    final currencyProvider = context.watch<CurrencyProvider>();
     return Scaffold(
+        appBar: AppBar(
+          title: const Text("Currency Rates"),
+        ),
+        drawer: widget.drawer,      
       body: ListView.builder(
-        itemCount: provider.allItems.length,
+        itemCount: currencyProvider.allItems.length,
         itemBuilder: (context, index) => Card(
           child: ListTile(
             onTap: () {
-              _showEditDialog(context, provider,
-                  provider.allItems[index], false);
+              _showEditDialog(context, currencyProvider,
+                  currencyProvider.allItems[index], false);
             },
             leading:
-                FaIcon(switch (provider.allItems[index].state) {
+                FaIcon(switch (currencyProvider.allItems[index].state) {
               CurrencyStateEnum.home => FontAwesomeIcons.house,
               CurrencyStateEnum.hide => FontAwesomeIcons.eyeSlash,
               _ => FontAwesomeIcons.eye
             }),
             title: Text(
-                '${provider.allItems[index].value} ${provider.allItems[index].name}'),
+                '${currencyProvider.allItems[index].value} ${currencyProvider.allItems[index].name}'),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showEditDialog(
-              context, provider, Currency(), true);
+              context, currencyProvider, Currency(), true);
         },
         tooltip: 'Add currency',
         child: const Icon(Icons.add),

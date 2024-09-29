@@ -1,5 +1,5 @@
 import 'package:isar/isar.dart';
-import 'package:travel_assist/currency.dart';
+import 'currency.dart';
 import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:json_annotation/json_annotation.dart';

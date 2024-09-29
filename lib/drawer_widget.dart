@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:travel_assist/currency_converter_page.dart';
-import 'package:travel_assist/todo_list_page.dart';
-import 'package:travel_assist/transaction_main_page.dart';
+import 'package:travel_assist/currency_rates_page.dart';
+import 'currency_converter_page.dart';
+import 'todo_list_page.dart';
+import 'transaction_main_page.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({
@@ -43,6 +44,14 @@ class DrawerWidget extends StatelessWidget {
             selected: selectedPageIndex == TodoListPage.pageIndex,
             onTap: () {
               controller.jumpToPage(TodoListPage.pageIndex);
+            },
+          ),
+          ListTile(
+            leading: const FaIcon(FontAwesomeIcons.arrowTrendUp),
+            title: const Text('Currency Rates'),
+            selected: selectedPageIndex == CurrencyRatesPage.pageIndex,
+            onTap: () {
+              controller.jumpToPage(CurrencyRatesPage.pageIndex);
             },
           ),
         ],

@@ -1,5 +1,5 @@
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/travel_assist_utils.dart';
+import 'currency.dart';
+import 'travel_assist_utils.dart';
 
 class TransactionValue {
   TransactionValue(this.value, this.currency);

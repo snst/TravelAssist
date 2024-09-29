@@ -3,8 +3,8 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/transaction_value.dart';
+import 'transaction.dart';
+import 'transaction_value.dart';
 import 'currency.dart';
 import 'storage.dart';
 

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/transaction_provider.dart';
-import 'package:travel_assist/transaction_list_item_widget.dart';
+import 'transaction.dart';
+import 'transaction_provider.dart';
+import 'transaction_list_item_widget.dart';
 
 class TransactionListSubpage extends StatefulWidget {
   const TransactionListSubpage({

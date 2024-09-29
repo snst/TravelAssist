@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/drawer_widget.dart';
-import 'package:travel_assist/todo_list_page.dart';
-import 'package:travel_assist/transaction_main_page.dart';
-import 'package:travel_assist/currency_converter_page.dart';
+import 'currency_rates_page.dart';
+import 'drawer_widget.dart';
+import 'todo_list_page.dart';
+import 'transaction_main_page.dart';
+import 'currency_converter_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -23,6 +24,7 @@ class _WelcomePageState extends State<WelcomePage> {
         TransactionMainPage(drawer: drawer),
         CurrencyConverterPage(drawer: drawer),
         TodoListPage(drawer: drawer),
+        CurrencyRatesPage(drawer: drawer),
       ],
     );
   }

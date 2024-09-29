@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/travel_assist_utils.dart';
+import 'currency.dart';
+import 'transaction.dart';
+import 'travel_assist_utils.dart';
 
 class WidgetTransactionWithdrawalFeeInput extends StatelessWidget {
   const WidgetTransactionWithdrawalFeeInput({

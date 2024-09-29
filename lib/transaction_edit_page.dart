@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-//import 'package:travel_assist/payment_chooser_widget.dart';
-//import 'package:travel_assist/payment_provider.dart';
-import 'package:travel_assist/transaction_provider.dart';
-import 'package:travel_assist/transaction_value.dart';
-import 'package:travel_assist/widget_combobox.dart';
-//import 'package:travel_assist/widget_transaction_expense_category_chooser.dart';
-//import 'package:travel_assist/widget_transaction_type_chooser.dart';
-import 'package:travel_assist/widget_date_chooser.dart';
-import 'package:travel_assist/widget_transaction_description_input.dart';
+import 'package:travel_assist/globals.dart';
+import 'currency.dart';
+import 'transaction_provider.dart';
+import 'transaction_value.dart';
+import 'widget_combobox.dart';
+import 'widget_date_chooser.dart';
+import 'widget_transaction_description_input.dart';
 import 'transaction.dart';
 import 'currency_provider.dart';
 import 'travel_assist_utils.dart';
 import 'currency_chooser_widget.dart';
+import 'package:flutter_spinbox/material.dart';
 
 class TransactionEditPage extends StatefulWidget {
   TransactionEditPage({
@@ -85,7 +83,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     CurrencyProvider currencyProvider =
         Provider.of<CurrencyProvider>(context, listen: false);
 
-    final l = TransactionProvider.getInstance(context).getPaymentMethodList(false);
+    final l =
+        TransactionProvider.getInstance(context).getPaymentMethodList(false);
     if (l.isNotEmpty) {
       if (widget.modifiedItem.method == "") widget.modifiedItem.method = l[0];
     }
@@ -117,9 +116,12 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 ),
               ],
               // DESCRIPTION
-              WidgetTransactionDescriptionInput(
-                widget: widget,
-                hintText: "Description",
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: WidgetTransactionDescriptionInput(
+                  widget: widget,
+                  hintText: "Description",
+                ),
               ),
               if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
                 widgetExcludeFromDailyAverage(),
@@ -128,28 +130,36 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                 children: [
                   SizedBox(
                     width: 130,
-                    child: DropdownButton(
-                      value: widget.modifiedItem.type,
-                      isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(
-                            value: TransactionTypeEnum.expense,
-                            child: Text("Expense")),
-                        DropdownMenuItem(
-                            value: TransactionTypeEnum.withdrawal,
-                            child: Text("Withdrawal")),
-                        DropdownMenuItem(
-                            value: TransactionTypeEnum.balance,
-                            child: Text("Correction")),
-                        DropdownMenuItem(
-                            value: TransactionTypeEnum.deposit,
-                            child: Text("Deposit")),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          widget.modifiedItem.type = value!;
-                        });
-                      },
+                    child: Container(
+                      decoration: BorderStyles.box,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 3, 1, 3),
+                        child: DropdownButton(
+                          value: widget.modifiedItem.type,
+                          isExpanded: true,
+                          underline: SizedBox(),
+                          // decoration: ,
+                          items: const [
+                            DropdownMenuItem(
+                                value: TransactionTypeEnum.expense,
+                                child: Text("Expense")),
+                            DropdownMenuItem(
+                                value: TransactionTypeEnum.withdrawal,
+                                child: Text("Withdrawal")),
+                            DropdownMenuItem(
+                                value: TransactionTypeEnum.balance,
+                                child: Text("Correction")),
+                            DropdownMenuItem(
+                                value: TransactionTypeEnum.deposit,
+                                child: Text("Deposit")),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              widget.modifiedItem.type = value!;
+                            });
+                          },
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -171,13 +181,33 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                         },
                         items: TransactionProvider.getInstance(context)
                             .getPaymentMethodList(widget.modifiedItem.type ==
-                          TransactionTypeEnum.withdrawal),
+                                TransactionTypeEnum.withdrawal),
                       ),
                     ),
                   ],
                 ],
               ),
 
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      SpinBox(
+                        value: 1, //widget.modifiedItem.used.toDouble(),
+                        decoration: const InputDecoration(
+                            constraints: BoxConstraints.tightFor(
+                              width: 170,
+                            ),
+                            labelText: 'Average Days'),
+                        //onChanged: (value) => widget.modifiedItem.used = value.toInt(),
+                        onChanged: (value) {},
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               widgetButtons(context),
             ],
           ),

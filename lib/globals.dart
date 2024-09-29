@@ -34,10 +34,22 @@ class AppFonstSize {
   static const double balanceEntry = 16;
 }
 
-
 class AppBalanceStyle {
-  static const TextStyle subheader = TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
-  static const TextStyle method = TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal);
-  static const TextStyle normal = TextStyle(fontSize: 16, fontWeight: FontWeight.normal, fontStyle: FontStyle.italic);
+  static const TextStyle subheader =
+      TextStyle(fontSize: 18, fontWeight: FontWeight.bold);
+  static const TextStyle method = TextStyle(
+      fontSize: 16, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal);
+  static const TextStyle normal = TextStyle(
+      fontSize: 16, fontWeight: FontWeight.normal, fontStyle: FontStyle.italic);
+}
 
+class BorderStyles {
+  static final OutlineInputBorder input =
+      OutlineInputBorder(borderRadius: BorderRadius.circular(10));
+static final BoxDecoration box = 
+      BoxDecoration(
+              //border: Border.all(color: Colors.blue, width: 2.0), // Border color and width
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10.0), // Optional: rounded corners
+            );
 }

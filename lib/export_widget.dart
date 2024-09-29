@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/travel_assist_utils.dart';
+import 'travel_assist_utils.dart';
 
 class ExportWidget extends StatelessWidget {
   const ExportWidget({

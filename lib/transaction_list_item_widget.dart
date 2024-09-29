@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/globals.dart';
+import 'currency.dart';
+import 'globals.dart';
 import 'currency_provider.dart';
 import 'transaction.dart';
 

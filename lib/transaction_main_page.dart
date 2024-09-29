@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_provider.dart';
-import 'package:travel_assist/currency_rate_widget.dart';
-import 'package:travel_assist/drawer_widget.dart';
-import 'package:travel_assist/transaction_balance_subpage.dart';
-import 'package:travel_assist/transaction_list_subpage.dart';
-import 'package:travel_assist/transaction_provider.dart';
-import 'package:travel_assist/transaction_edit_page.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/export_widget.dart';
+import 'currency.dart';
+import 'currency_provider.dart';
+//import 'currency_rates_page.dart';
+import 'drawer_widget.dart';
+import 'transaction_balance_subpage.dart';
+import 'transaction_list_subpage.dart';
+import 'transaction_provider.dart';
+import 'transaction_edit_page.dart';
+import 'transaction.dart';
+import 'export_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionMainPage extends StatefulWidget {
@@ -34,6 +34,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
     );
   }
 
+/*
   void showCurrenyRatesPage(
       BuildContext context, CurrencyProvider currencyProvider) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -43,7 +44,7 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
           ),
           body: CurrencyRatesPage(currencyProvider: currencyProvider));
     }));
-  }
+  }*/
 
 
   void showCurrencySettingsPage(BuildContext context, TransactionProvider tp) {
@@ -77,15 +78,15 @@ class _TransactionMainPageState extends State<TransactionMainPage> {
         actions: [
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 0, child: Text("Currency rates")),
+              //const PopupMenuItem(value: 0, child: Text("Currency rates")),
               const PopupMenuItem(value: 1, child: Text("Settings")),
             ],
             elevation: 1,
             onSelected: (value) {
               switch (value) {
-                case 0:
-                  showCurrenyRatesPage(context, cp);
-                  break;
+                //case 0:
+                //  showCurrenyRatesPage(context, cp);
+                //  break;
                 case 1:
                   showCurrencySettingsPage(context, tp);
                   break;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_chooser_widget.dart';
-import 'package:travel_assist/currency_provider.dart';
-import 'package:travel_assist/transaction_value.dart';
+import 'currency.dart';
+import 'currency_chooser_widget.dart';
+import 'currency_provider.dart';
+import 'transaction_value.dart';
 
 class TransactionValueWidget extends StatefulWidget {
   const TransactionValueWidget(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/calculator.dart';
+import 'calculator.dart';
 import 'todo_provider.dart';
 import 'currency_provider.dart';
 import 'transaction_provider.dart';

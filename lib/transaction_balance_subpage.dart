@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:travel_assist/balance.dart';
-import 'package:travel_assist/balance_row_widget.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/currency_provider.dart';
-import 'package:travel_assist/globals.dart';
-import 'package:travel_assist/transaction_value.dart';
-import 'package:travel_assist/transaction_provider.dart';
+import 'balance.dart';
+import 'balance_row_widget.dart';
+import 'currency.dart';
+import 'currency_provider.dart';
+import 'globals.dart';
+import 'transaction_value.dart';
+import 'transaction_provider.dart';
 
 class TransactionBalanceSubPage extends StatefulWidget {
   const TransactionBalanceSubPage({
@@ -133,7 +133,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
 
     balance.withdrawalByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: "  " + key,
+          text1: "  ${key}",
           tv1: null,
           tv2: tv.convertTo(homeCurrency),
           style: AppBalanceStyle.method));

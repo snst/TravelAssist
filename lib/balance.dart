@@ -1,7 +1,7 @@
 import 'dart:collection';
-import 'package:travel_assist/currency_provider.dart';
-import 'package:travel_assist/transaction.dart';
-import 'package:travel_assist/transaction_value.dart';
+import 'currency_provider.dart';
+import 'transaction.dart';
+import 'transaction_value.dart';
 
 class Balance {
   CurrencyProvider currencyProvider;

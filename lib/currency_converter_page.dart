@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_assist/currency.dart';
-import 'package:travel_assist/drawer_widget.dart';
-import 'package:travel_assist/transaction_value.dart';
+import 'package:travel_assist/globals.dart';
+import 'currency.dart';
+import 'drawer_widget.dart';
+import 'transaction_value.dart';
 import 'currency_provider.dart';
 import 'travel_assist_utils.dart';
 import 'calculator.dart';
@@ -107,7 +108,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
                           FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
                         ],
                         decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
+                            border: BorderStyles.input,
                             labelText:
                                 currencyProvider.visibleItems[index].name,
                             labelStyle: const TextStyle(fontSize: 25),

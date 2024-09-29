@@ -15,7 +15,6 @@ import 'transaction.dart';
 import 'currency_provider.dart';
 import 'travel_assist_utils.dart';
 import 'currency_chooser_widget.dart';
-import 'payment_method_provider.dart';
 
 class TransactionEditPage extends StatefulWidget {
   TransactionEditPage({
@@ -69,7 +68,6 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
         break;
     }
 
-    //widget.modifiedItem.method = paymentMethod;
     widget.item.update(widget.modifiedItem);
     tp.add(widget.item);
 
@@ -86,11 +84,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
   Widget build(BuildContext context) {
     CurrencyProvider currencyProvider =
         Provider.of<CurrencyProvider>(context, listen: false);
-    PaymentMethodProvider provider =
-        Provider.of<PaymentMethodProvider>(context, listen: false);
 
-    //String proposedPaymentMethod = "";
-    final l = TransactionProvider.getInstance(context).getPaymentMethodList();
+    final l = TransactionProvider.getInstance(context).getPaymentMethodList(false);
     if (l.isNotEmpty) {
       if (widget.modifiedItem.method == "") widget.modifiedItem.method = l[0];
     }
@@ -125,14 +120,10 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
               WidgetTransactionDescriptionInput(
                 widget: widget,
                 hintText: "Description",
-                //hintText: getHint(widget.modifiedItem.type)),
               ),
               if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
                 widgetExcludeFromDailyAverage(),
               ],
-              //    if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
-              //       widget.modifiedItem.type == TransactionTypeEnum.deposit)
-              //    ...[],
               Row(
                 children: [
                   SizedBox(
@@ -149,7 +140,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                             child: Text("Withdrawal")),
                         DropdownMenuItem(
                             value: TransactionTypeEnum.balance,
-                            child: Text("Balance")),
+                            child: Text("Correction")),
                         DropdownMenuItem(
                             value: TransactionTypeEnum.deposit,
                             child: Text("Deposit")),
@@ -164,9 +155,9 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   SizedBox(
                     width: 10,
                   ),
-                  if (widget.modifiedItem.type ==
-                      TransactionTypeEnum.expense || widget.modifiedItem.type ==
-                      TransactionTypeEnum.withdrawal) ...[
+                  if (widget.modifiedItem.type == TransactionTypeEnum.expense ||
+                      widget.modifiedItem.type ==
+                          TransactionTypeEnum.withdrawal) ...[
                     Expanded(
                       child: WidgetComboBox(
                         controller: paymentMethodController,
@@ -179,7 +170,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                           });
                         },
                         items: TransactionProvider.getInstance(context)
-                            .getPaymentMethodList(),
+                            .getPaymentMethodList(widget.modifiedItem.type ==
+                          TransactionTypeEnum.withdrawal),
                       ),
                     ),
                   ],

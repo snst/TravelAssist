@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_assist/currency.dart';
+import 'package:travel_assist/globals.dart';
 import 'currency_provider.dart';
 import 'transaction.dart';
-import 'expense_category.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class TransactionListItemWidget extends StatelessWidget {
   const TransactionListItemWidget({
@@ -19,27 +18,14 @@ class TransactionListItemWidget extends StatelessWidget {
   Widget getIcon(Transaction transaction) {
     switch (transaction.type) {
       case TransactionTypeEnum.expense:
-        return const FaIcon(
-          FontAwesomeIcons.cartShopping,
-          color: Colors.orangeAccent,
-        );
+        return AppIcons.expense;
       case TransactionTypeEnum.withdrawal:
-        return const FaIcon(
-          FontAwesomeIcons.moneyBills,
-          color: Colors.greenAccent,
-        );
+        return AppIcons.withdrawal;
       case TransactionTypeEnum.balance:
-        return const FaIcon(
-          FontAwesomeIcons.scaleBalanced,
-          color: Colors.blueAccent,
-        );
+        return AppIcons.balance;
       case TransactionTypeEnum.deposit:
-        return const FaIcon(
-          FontAwesomeIcons.sackDollar,
-          color: Colors.lightBlueAccent,
-        );
+        return AppIcons.deposit;
     }
-    
   }
 
   @override
@@ -78,13 +64,6 @@ class TransactionListItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end),
         ],
       ),
-      /*subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //Text(ExpenseCategoryManager.at(item.categoryKey).name, style: detailStyle),
-              Text(valueLocal, style: detailStyle),
-            ],
-          ),*/
     ));
   }
 }

@@ -4,6 +4,7 @@ import 'package:travel_assist/balance.dart';
 import 'package:travel_assist/balance_row_widget.dart';
 import 'package:travel_assist/currency.dart';
 import 'package:travel_assist/currency_provider.dart';
+import 'package:travel_assist/globals.dart';
 import 'package:travel_assist/transaction_value.dart';
 import 'package:travel_assist/transaction_provider.dart';
 
@@ -41,58 +42,47 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
     ]);
   }
 
-  TableRow makeRowHeader(String a, {String b = "", String c = ""}) {
-    const TextStyle style = TextStyle(fontSize: 18);
-    return TableRow(
-      children: [
-        TableCell(
-          child: Text(a, style: style),
-        ),
-        TableCell(
-          child: Text(b, style: style),
-        ),
-        TableCell(
-          child: Text(c, style: style),
-        ),
-      ],
-    );
-  }
-
   void showExpenses(String title, List<Widget> children, Balance balance) {
     // Expenses
     children.add(BalanceRowHeader(
       FontAwesomeIcons.sackDollar,
       title,
       balance.expenseAll.convertTo(homeCurrency),
-      Colors.orangeAccent,
+      AppColors.expense,
     ));
 
     children.add(BalanceRowWidget(
         text1: 'Cash',
         tv1: null,
         tv2: balance.expenseCash,
-        styleEnum: BalanceRowWidgetEnum.subheader));
+        style: AppBalanceStyle.subheader));
     balance.expenseByMethodCurrencyCash.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+          text1: null,
+          tv1: tv,
+          tv2: tv.convertTo(homeCurrency),
+          style: AppBalanceStyle.normal));
     });
 
     children.add(BalanceRowWidget(
         text1: 'Card',
         tv1: null,
         tv2: balance.expenseCard,
-        styleEnum: BalanceRowWidgetEnum.subheader));
+        style: AppBalanceStyle.subheader));
     balance.expenseByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
           text1: "  " + key,
           tv1: null,
           tv2: tv.convertTo(homeCurrency),
-          styleEnum: BalanceRowWidgetEnum.method));
+          style: AppBalanceStyle.method));
 
       balance.expenseByMethodCurrencyCard.forEach((key2, tv) {
         if (key2.startsWith(key)) {
           children.add(BalanceRowWidget(
-              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+              text1: null,
+              tv1: tv,
+              tv2: tv.convertTo(homeCurrency),
+              style: AppBalanceStyle.normal));
         }
       });
     });
@@ -112,19 +102,23 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
-        "Cash",
+        "Cash Balance",
         balance.haveCash.convertTo(homeCurrency),
-        Colors.yellowAccent,
+        AppColors.cash,
       ),
     ));
 
     balance.haveCashByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+          text1: null,
+          tv1: tv,
+          tv2: tv.convertTo(homeCurrency),
+          style: AppBalanceStyle.normal));
     });
 
     showExpenses("Expenses", children, balance);
-    showExpenses("Ø Expenses (${expensesPerDay.days}d)", children, expensesPerDay);
+    showExpenses(
+        "Ø Expenses (${expensesPerDay.days}d)", children, expensesPerDay);
 
     // Withdrawal
     children.add(Padding(
@@ -133,18 +127,24 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         FontAwesomeIcons.sackDollar,
         "Withdrawal",
         balance.withdrawalAll.convertTo(homeCurrency),
-        Colors.greenAccent,
+        AppColors.withdrawal,
       ),
     ));
 
     balance.withdrawalByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: "  " + key, tv1: null, tv2: tv.convertTo(homeCurrency), styleEnum: BalanceRowWidgetEnum.method));
+          text1: "  " + key,
+          tv1: null,
+          tv2: tv.convertTo(homeCurrency),
+          style: AppBalanceStyle.method));
 
       balance.withdrawalByMethodCurrencyCard.forEach((key2, tv) {
         if (key2.startsWith(key)) {
           children.add(BalanceRowWidget(
-              text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+              text1: null,
+              tv1: tv,
+              tv2: tv.convertTo(homeCurrency),
+              style: AppBalanceStyle.normal));
         }
       });
     });
@@ -156,34 +156,43 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         FontAwesomeIcons.sackDollar,
         "Cash deposit",
         balance.cashDeposit.convertTo(homeCurrency),
-        Colors.lightBlueAccent,
+        AppColors.deposit,
       ),
     ));
 
     balance.cashDepositByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+          text1: null,
+          tv1: tv,
+          tv2: tv.convertTo(homeCurrency),
+          style: AppBalanceStyle.normal));
     });
 
-    // Balance 
+    // Balance
     children.add(Padding(
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
-        "Cash balance",
+        "Expense correction",
         balance.balanceCash.convertTo(homeCurrency),
-        Colors.blueAccent,
+        AppColors.balance,
       ),
     ));
 
     balance.balanceByCurrency.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: null, tv1: tv, tv2: tv.convertTo(homeCurrency)));
+          text1: null,
+          tv1: tv,
+          tv2: tv.convertTo(homeCurrency),
+          style: AppBalanceStyle.normal));
     });
 
+    children.add(SizedBox(
+      height: 100,
+    ));
 
-      return  SingleChildScrollView(reverse: false, child: Column(children: children));
-     
+    return SingleChildScrollView(
+        reverse: false, child: Column(children: children));
   }
 }
 

@@ -9,9 +9,10 @@ class TransactionValue {
   String get valueString => Currency.formatValue(value);
   String get currencyString => currency != null ? currency.toString() : "?";
   @override
-  String toString() => "$valueString$currencyString";
+  String toString() => "$valueString $currencyString";
   String toShortString() => "${removeTrailingZeros(valueString)}$currencyString";
   bool isZero() => value == 0;
+  String roundToString() => Currency.roundToString(value) + " " + currencyString;
 
 
   void reset() {

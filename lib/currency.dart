@@ -43,6 +43,9 @@ class Currency {
 
   static String formatValue(double value) => value.toStringAsFixed(2);
 
+  static String roundToString(double value) => value.round().toString();
+
+
   static String formatValueCurrency(double value, String currency) =>
       "${Currency.formatValue(value)} $currency";
 

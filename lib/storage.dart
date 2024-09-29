@@ -3,7 +3,6 @@ import 'package:path_provider/path_provider.dart';
 import 'currency.dart';
 import 'todo_item.dart';
 import 'transaction.dart';
-import 'payment_method.dart';
 
 mixin Storage {
   late Future<Isar?> db;
@@ -12,7 +11,7 @@ mixin Storage {
     if (Isar.instanceNames.isEmpty) {
       final dir = await getApplicationDocumentsDirectory();
       return await Isar.open(
-        [CurrencySchema, TodoItemSchema, TransactionSchema, PaymentMethodSchema],
+        [CurrencySchema, TodoItemSchema, TransactionSchema],
         directory: dir.path,
         inspector: true,
       );

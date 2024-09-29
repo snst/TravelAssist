@@ -14,48 +14,6 @@ enum TransactionTypeEnum {
   deposit;
 }
 
-final List<String> transactionTypeList = [
-  "Expense",
-  "Withdrawal",
-  "Balance",
-  "Deposit"
-];
-TransactionTypeEnum transactionTypeStringToEnum(String name) {
-  if (name == transactionTypeList[0]) {
-    return TransactionTypeEnum.expense;
-  } else if (name == transactionTypeList[1]) {
-    return TransactionTypeEnum.withdrawal;
-  } else if (name == transactionTypeList[2]) {
-    return TransactionTypeEnum.balance;
-  } else {
-    return TransactionTypeEnum.deposit;
-  }
-}
-
-String transactionTypeEnumToString(TransactionTypeEnum type) {
-  if (type == TransactionTypeEnum.expense) {
-    return transactionTypeList[0];
-  } else if (type == TransactionTypeEnum.withdrawal) {
-    return transactionTypeList[1];
-  } else if (type == TransactionTypeEnum.balance) {
-    return transactionTypeList[2];
-  } else {
-    return transactionTypeList[3];
-  }
-}
-
-String getHint(TransactionTypeEnum type) {
-  switch (type) {
-    case TransactionTypeEnum.expense:
-      return "Expense";
-    case TransactionTypeEnum.deposit:
-      return "Deposit";
-    case TransactionTypeEnum.withdrawal:
-      return "Withdrawal";
-    case TransactionTypeEnum.balance:
-      return "Balance";
-  }
-}
 
 @collection
 @JsonSerializable()

@@ -54,9 +54,7 @@ class TransactionListItemWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(children: [
-            Text(transaction.category +
-                (transaction.category.isNotEmpty ? " " : "") +
-                transaction.name),
+            Text(transaction.getCategoryNameStr()),
             Text(transaction.method, style: detailStyle)
           ], crossAxisAlignment: CrossAxisAlignment.start),
           Column(

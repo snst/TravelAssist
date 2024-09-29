@@ -37,7 +37,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
 
   void saveAndClose(BuildContext context) {
     final tp = TransactionProvider.getInstance(context);
-    if (widget.modifiedItem.name.isEmpty) {
+    /*if (widget.modifiedItem.name.isEmpty) {
       if (widget.modifiedItem.type == TransactionTypeEnum.balance) {
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
@@ -47,23 +47,30 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
             "Balance ${widget.modifiedItem.valueCurrencyString}";
         widget.modifiedItem.value = difference;
       }
-    }
+    }*/
     switch (widget.modifiedItem.type) {
-      case TransactionTypeEnum.expense:
+      case TransactionTypeEnum.balance:
+        CurrencyProvider cp = CurrencyProvider.getInstance(context);
+        Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
+        TransactionValue val = tp.calcBalance(cp, currency);
+        double difference = val.value - widget.modifiedItem.value;
+        widget.modifiedItem.name = widget.modifiedItem.valueCurrencyString;
+        widget.modifiedItem.value = difference;
+        widget.modifiedItem.method = "";
+        break;
+      //case TransactionTypeEnum.expense:
+      default:
         widget.modifiedItem.category = categoryController.text;
         widget.modifiedItem.method = paymentMethodController.text;
         break;
+      /*
       case TransactionTypeEnum.deposit:
         widget.modifiedItem.category = "Deposit";
         widget.modifiedItem.method = "";
         break;
       case TransactionTypeEnum.withdrawal:
         widget.modifiedItem.category = "Withdrawal";
-        break;
-      case TransactionTypeEnum.balance:
-        widget.modifiedItem.category = "";
-        widget.modifiedItem.method = "";
-        break;
+        break;*/
     }
 
     widget.item.update(widget.modifiedItem);
@@ -123,9 +130,8 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                   hintText: "Description",
                 ),
               ),
-              if (widget.modifiedItem.type == TransactionTypeEnum.expense) ...[
-                widgetExcludeFromDailyAverage(),
-              ],
+              if (widget.modifiedItem.type == TransactionTypeEnum.expense)
+                ...[],
               Row(
                 children: [
                   SizedBox(
@@ -195,14 +201,14 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                     children: [
                       const Spacer(),
                       SpinBox(
-                        value: 1, //widget.modifiedItem.used.toDouble(),
+                        value: widget.modifiedItem.averageDays.toDouble(),
                         decoration: const InputDecoration(
                             constraints: BoxConstraints.tightFor(
                               width: 170,
                             ),
                             labelText: 'Average Days'),
-                        //onChanged: (value) => widget.modifiedItem.used = value.toInt(),
-                        onChanged: (value) {},
+                        onChanged: (value) =>
+                            widget.modifiedItem.averageDays = value.toInt(),
                       ),
                     ],
                   ),
@@ -213,19 +219,6 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
           ),
         ),
       ),
-    );
-  }
-
-  CheckboxListTile widgetExcludeFromDailyAverage() {
-    return CheckboxListTile(
-      title: const Text('Exclude from daily average'),
-      value: widget.modifiedItem.exlcudeFromAverage,
-      onChanged: (bool? value) {
-        setState(() {
-          widget.modifiedItem.exlcudeFromAverage = value!;
-        });
-      },
-      //secondary: const FaIcon(FontAwesomeIcons.calendarDay),
     );
   }
 

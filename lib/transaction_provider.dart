@@ -104,7 +104,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
     Map<String, int> occurrenceMap = {};
     for (final transaction in items) {
       final str = transaction.method;
-      if (str.isNotEmpty && !(hideCash && str=="Cash")) {
+      if (str.isNotEmpty && !(hideCash && str == "Cash")) {
         occurrenceMap[str] = (occurrenceMap[str] ?? 0) + 1;
       }
     }
@@ -169,8 +169,14 @@ class TransactionProvider extends ChangeNotifier with Storage {
   Balance caluculateExpensesPerDay(CurrencyProvider currencyProvider) {
     var balance = Balance(currencyProvider: currencyProvider);
     for (final transaction in items) {
-      if (transaction.isExpense && !transaction.exlcudeFromAverage) {
-        balance.add(transaction);
+      if (transaction.isExpense && transaction.averageDays > 0) {
+        if (transaction.averageDays > 1) {
+          Transaction t = transaction.clone();
+          t.value /= transaction.averageDays;
+          balance.add(t);
+        } else {
+          balance.add(transaction);
+        }
       }
     }
 

@@ -14,7 +14,6 @@ enum TransactionTypeEnum {
   deposit;
 }
 
-
 @collection
 @JsonSerializable()
 class Transaction {
@@ -25,7 +24,7 @@ class Transaction {
       this.type = TransactionTypeEnum.expense,
       required this.date,
       this.category = "",
-      this.exlcudeFromAverage = false,
+      this.averageDays = 1,
       this.method = ""});
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -36,7 +35,7 @@ class Transaction {
   double value;
   String currency;
   DateTime date;
-  bool exlcudeFromAverage;
+  int averageDays;
   @enumerated
   TransactionTypeEnum type;
 
@@ -54,7 +53,7 @@ class Transaction {
   @ignore
   bool get isExpense => type == TransactionTypeEnum.expense;
 
-@ignore
+  @ignore
   bool get isBalance => type == TransactionTypeEnum.balance;
 
   @ignore
@@ -79,6 +78,19 @@ class Transaction {
         hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
   }
 
+  String getCategoryNameStr() {
+    switch (type) {
+      case TransactionTypeEnum.withdrawal:
+        return "Withdrawal ${name}";
+      case TransactionTypeEnum.deposit:
+        return "Deposit ${name}";
+      case TransactionTypeEnum.balance:
+        return "Balance ${name}";
+      default:
+        return "${category} ${name}";
+    }
+  }
+
   void update(Transaction other) {
     name = other.name;
     value = other.value;
@@ -86,7 +98,7 @@ class Transaction {
     date = other.date;
     category = other.category;
     currency = other.currency;
-    exlcudeFromAverage = other.exlcudeFromAverage;
+    averageDays = other.averageDays;
     method = other.method;
   }
 

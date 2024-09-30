@@ -12,7 +12,7 @@ class TransactionValue {
   String toString() => "$valueString $currencyString";
   String toShortString() => "${removeTrailingZeros(valueString)}$currencyString";
   bool isZero() => value == 0;
-  String roundToString() => Currency.roundToString(value) + " " + currencyString;
+  String roundToString() => "${Currency.roundToString(value)} $currencyString";
 
 
   void reset() {

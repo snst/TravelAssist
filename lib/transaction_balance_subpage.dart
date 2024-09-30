@@ -71,7 +71,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
         style: AppBalanceStyle.subheader));
     balance.expenseByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: "  " + key,
+          text1: "  $key",
           tv1: null,
           tv2: tv.convertTo(homeCurrency),
           style: AppBalanceStyle.method));
@@ -133,7 +133,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
 
     balance.withdrawalByMethod.forEach((key, tv) {
       children.add(BalanceRowWidget(
-          text1: "  ${key}",
+          text1: "  $key",
           tv1: null,
           tv2: tv.convertTo(homeCurrency),
           style: AppBalanceStyle.method));
@@ -173,7 +173,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
-        "Expense correction",
+        "Cash Count",
         balance.balanceCash.convertTo(homeCurrency),
         AppColors.balance,
       ),

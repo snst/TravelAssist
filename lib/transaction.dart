@@ -81,13 +81,13 @@ class Transaction {
   String getCategoryNameStr() {
     switch (type) {
       case TransactionTypeEnum.withdrawal:
-        return "Withdrawal ${name}";
+        return "Withdrawal $name";
       case TransactionTypeEnum.deposit:
-        return "Deposit ${name}";
+        return "Deposit $name";
       case TransactionTypeEnum.balance:
-        return "Balance ${name}";
+        return "Cash Count $name";
       default:
-        return "${category} ${name}";
+        return "$category $name";
     }
   }
 

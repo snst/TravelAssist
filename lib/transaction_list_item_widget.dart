@@ -53,13 +53,13 @@ class TransactionListItemWidget extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(children: [
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(transaction.getCategoryNameStr()),
             Text(transaction.method, style: detailStyle)
-          ], crossAxisAlignment: CrossAxisAlignment.start),
+          ]),
           Column(
-              children: [Text(valueHome), Text(valueLocal, style: detailStyle)],
-              crossAxisAlignment: CrossAxisAlignment.end),
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [Text(valueHome), Text(valueLocal, style: detailStyle)]),
         ],
       ),
     ));

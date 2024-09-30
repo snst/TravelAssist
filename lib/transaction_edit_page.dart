@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:travel_assist/globals.dart';
 import 'currency.dart';
 import 'transaction_provider.dart';
@@ -35,65 +35,69 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
   final TextEditingController categoryController = TextEditingController();
   final TextEditingController paymentMethodController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredValue();
+  }
+
+  String defaultCurrency = "";
+
+  Future<void> _loadStoredValue() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    defaultCurrency = prefs.getString('defaultCurreny') ?? "€";
+    setState(() {
+      if (widget.modifiedItem.currency == "") {
+        widget.modifiedItem.currency = defaultCurrency;
+      }
+    });
+  }
+
+  void _saveStoredValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('defaultCurreny', defaultCurrency);
+  }
+
   void saveAndClose(BuildContext context) {
     final tp = TransactionProvider.getInstance(context);
-    /*if (widget.modifiedItem.name.isEmpty) {
-      if (widget.modifiedItem.type == TransactionTypeEnum.balance) {
-        CurrencyProvider cp = CurrencyProvider.getInstance(context);
-        Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
-        TransactionValue val = tp.calcBalance(cp, currency);
-        double difference = val.value - widget.modifiedItem.value;
-        widget.modifiedItem.name =
-            "Balance ${widget.modifiedItem.valueCurrencyString}";
-        widget.modifiedItem.value = difference;
-      }
-    }*/
+
     switch (widget.modifiedItem.type) {
       case TransactionTypeEnum.balance:
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
         TransactionValue val = tp.calcBalance(cp, currency);
-        double difference = val.value - widget.modifiedItem.value;
+        double difference = widget.modifiedItem.value - val.value;
         widget.modifiedItem.name = widget.modifiedItem.valueCurrencyString;
         widget.modifiedItem.value = difference;
         widget.modifiedItem.method = "";
         break;
-      //case TransactionTypeEnum.expense:
       default:
         widget.modifiedItem.category = categoryController.text;
         widget.modifiedItem.method = paymentMethodController.text;
         break;
-      /*
-      case TransactionTypeEnum.deposit:
-        widget.modifiedItem.category = "Deposit";
-        widget.modifiedItem.method = "";
-        break;
-      case TransactionTypeEnum.withdrawal:
-        widget.modifiedItem.category = "Withdrawal";
-        break;*/
     }
 
     widget.item.update(widget.modifiedItem);
     tp.add(widget.item);
 
-    Navigator.of(context).pop();
-  }
+    if (widget.modifiedItem.currency != defaultCurrency) {
+      defaultCurrency = widget.modifiedItem.currency;
+      _saveStoredValues();
+    }
 
-  void _onItemSelected(String method) {
-    setState(() {
-      widget.modifiedItem.method = method;
-    });
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    CurrencyProvider currencyProvider =
-        Provider.of<CurrencyProvider>(context, listen: false);
+    CurrencyProvider currencyProvider = CurrencyProvider.getInstance(context);
 
-    final l =
-        TransactionProvider.getInstance(context).getPaymentMethodList(false);
-    if (l.isNotEmpty) {
-      if (widget.modifiedItem.method == "") widget.modifiedItem.method = l[0];
+    if (widget.modifiedItem.method == "") {
+      final paymentMethodList =
+          TransactionProvider.getInstance(context).getPaymentMethodList(false);
+      if (paymentMethodList.isNotEmpty) {
+        widget.modifiedItem.method = paymentMethodList[0];
+      }
     }
 
     return Scaffold(
@@ -135,7 +139,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
               Row(
                 children: [
                   SizedBox(
-                    width: 130,
+                    width: 135,
                     child: Container(
                       decoration: BorderStyles.box,
                       child: Padding(
@@ -154,7 +158,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                                 child: Text("Withdrawal")),
                             DropdownMenuItem(
                                 value: TransactionTypeEnum.balance,
-                                child: Text("Correction")),
+                                child: Text("Cash Count")),
                             DropdownMenuItem(
                                 value: TransactionTypeEnum.deposit,
                                 child: Text("Deposit")),

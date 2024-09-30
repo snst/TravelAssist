@@ -170,13 +170,13 @@ class TransactionProvider extends ChangeNotifier with Storage {
     var balance = Balance(currencyProvider: currencyProvider);
     for (final transaction in items) {
       if (transaction.isExpense && transaction.averageDays > 0) {
-        if (transaction.averageDays > 1) {
-          Transaction t = transaction.clone();
-          t.value /= transaction.averageDays;
-          balance.add(t);
-        } else {
+        //if (transaction.averageDays > 1) {
+        //  Transaction t = transaction.clone();
+        //  t.value /= transaction.averageDays;
+        //  balance.add(t);
+        //} else {
           balance.add(transaction);
-        }
+        //}
       }
     }
 

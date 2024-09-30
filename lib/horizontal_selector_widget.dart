@@ -5,7 +5,7 @@ class HorizontalListView extends StatefulWidget {
   final String selected;
   final ValueChanged<String> onItemSelected;
 
-  HorizontalListView({
+  HorizontalListView({super.key, 
     required this.items,
     required this.selected,
     required this.onItemSelected,

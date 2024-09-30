@@ -12,14 +12,12 @@ class BalanceRowWidget extends StatelessWidget {
   final String? text1;
   final TransactionValue? tv1;
   final TransactionValue? tv2;
-  //final BalanceRowWidgetEnum styleEnum;
   final TextStyle style;
 
   BalanceRowWidget({super.key, 
     required this.text1,
     required this.tv1,
     required this.tv2,
-    //this.styleEnum = BalanceRowWidgetEnum.normal,
     required this.style,
   });
 
@@ -56,7 +54,7 @@ class BalanceRowHeader extends StatelessWidget {
   final TransactionValue tv;
   final Color color;
   late TextStyle style;
-  BalanceRowHeader(this.icon, this.title, this.tv, this.color) {
+  BalanceRowHeader(this.icon, this.title, this.tv, this.color, {super.key}) {
     style = TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: AppFonstSize.balanceMainHeader,

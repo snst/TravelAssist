@@ -62,11 +62,11 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
     final tp = TransactionProvider.getInstance(context);
 
     switch (widget.modifiedItem.type) {
-      case TransactionTypeEnum.balance:
+      case TransactionTypeEnum.cashCorrection:
         CurrencyProvider cp = CurrencyProvider.getInstance(context);
         Currency? currency = cp.getCurrencyByName(widget.modifiedItem.currency);
-        TransactionValue val = tp.calcBalance(cp, currency);
-        double difference = widget.modifiedItem.value - val.value;
+        TransactionValue cash = tp.calcCurrentCash(cp, currency);
+        double difference = widget.modifiedItem.value - cash.value;
         widget.modifiedItem.name = widget.modifiedItem.valueCurrencyString;
         widget.modifiedItem.value = difference;
         widget.modifiedItem.method = "";
@@ -157,7 +157,7 @@ class _TransactionEditPageState extends State<TransactionEditPage> {
                                 value: TransactionTypeEnum.withdrawal,
                                 child: Text("Withdrawal")),
                             DropdownMenuItem(
-                                value: TransactionTypeEnum.balance,
+                                value: TransactionTypeEnum.cashCorrection,
                                 child: Text("Cash Count")),
                             DropdownMenuItem(
                                 value: TransactionTypeEnum.deposit,

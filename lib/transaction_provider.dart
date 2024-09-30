@@ -139,17 +139,18 @@ class TransactionProvider extends ChangeNotifier with Storage {
     return methods;
   }
 
-  TransactionValue calcBalance(
+  TransactionValue calcCurrentCash(
       CurrencyProvider currencyProvider, Currency? currency) {
     TransactionValue sum = TransactionValue(0, currency);
     if (currency != null) {
       for (final transaction in items) {
         if (transaction.currency == currency.name) {
           final tv = currencyProvider.getTransactionValue(transaction);
-          if (transaction.isWithdrawal || transaction.isCashDeposit) {
+          if (transaction.isWithdrawal ||
+              transaction.isCashDeposit ||
+              transaction.isCashCorrection) {
             sum.add(tv);
-          } else if (transaction.isExpense && transaction.isCash ||
-              transaction.isBalance) {
+          } else if (transaction.isExpense && transaction.isCash) {
             sum.sub(tv);
           }
         }
@@ -175,7 +176,7 @@ class TransactionProvider extends ChangeNotifier with Storage {
         //  t.value /= transaction.averageDays;
         //  balance.add(t);
         //} else {
-          balance.add(transaction);
+        balance.add(transaction);
         //}
       }
     }

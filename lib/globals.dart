@@ -22,7 +22,7 @@ class AppIcons {
     FontAwesomeIcons.sackDollar,
     color: AppColors.deposit,
   );
-  static const balance = FaIcon(
+  static const cashCount = FaIcon(
     FontAwesomeIcons.scaleBalanced,
     color: AppColors.balance,
   );

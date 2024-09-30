@@ -173,7 +173,7 @@ class _TransactionBalanceSubPageState extends State<TransactionBalanceSubPage> {
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: BalanceRowHeader(
         FontAwesomeIcons.sackDollar,
-        "Cash Count",
+        "Cash Correction",
         balance.balanceCash.convertTo(homeCurrency),
         AppColors.balance,
       ),

@@ -62,12 +62,11 @@ class Balance {
 
   bool processExpense(
       final Transaction transaction, final TransactionValue tv) {
-    if (transaction.isExpense || transaction.isBalance) {
+    if (transaction.isExpense) {
       if (transaction.isCash) {
+        initMap(haveCashByCurrency, transaction);
         haveCash.sub(tv);
         expenseCash.add(tv);
-
-        initMap(haveCashByCurrency, transaction);
         haveCashByCurrency[transaction.currency]!.sub(tv);
       } else {
         expenseCard.add(tv);
@@ -88,7 +87,16 @@ class Balance {
       }
 
       expenseAll.add(tv);
-      return transaction.isExpense;
+      return true;
+    } else if (transaction.isCashCorrection) {
+      initMap(haveCashByCurrency, transaction);
+      haveCash.add(tv);
+      expenseCash.sub(tv);
+      haveCashByCurrency[transaction.currency]!.add(tv);
+      String key = 'Cash ${transaction.currencyString}';
+      initMap(expenseByMethodCurrencyCash, transaction, key: key);
+      expenseByMethodCurrencyCash[key]!.sub(tv);
+      expenseAll.sub(tv);
     }
     return false;
   }
@@ -123,9 +131,9 @@ class Balance {
     return false;
   }
 
-  bool processBalance(
+  bool processCashCount(
       final Transaction transaction, final TransactionValue tv) {
-    if (transaction.isBalance) {
+    if (transaction.isCashCorrection) {
       balanceCash.add(tv);
 
       initMap(balanceByCurrency, transaction);
@@ -140,7 +148,7 @@ class Balance {
     final tv = currencyProvider.getTransactionValue(transaction);
     if (!processExpense(transaction, tv)) {
       if (!processDeposit(transaction, tv)) {
-        processBalance(transaction, tv);
+        processCashCount(transaction, tv);
       }
     }
   }

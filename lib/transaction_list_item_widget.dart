@@ -21,8 +21,8 @@ class TransactionListItemWidget extends StatelessWidget {
         return AppIcons.expense;
       case TransactionTypeEnum.withdrawal:
         return AppIcons.withdrawal;
-      case TransactionTypeEnum.balance:
-        return AppIcons.balance;
+      case TransactionTypeEnum.cashCorrection:
+        return AppIcons.cashCount;
       case TransactionTypeEnum.deposit:
         return AppIcons.deposit;
     }

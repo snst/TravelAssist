@@ -10,7 +10,7 @@ part 'transaction.g.dart';
 enum TransactionTypeEnum {
   expense,
   withdrawal,
-  balance,
+  cashCorrection,
   deposit;
 }
 
@@ -54,7 +54,7 @@ class Transaction {
   bool get isExpense => type == TransactionTypeEnum.expense;
 
   @ignore
-  bool get isBalance => type == TransactionTypeEnum.balance;
+  bool get isCashCorrection => type == TransactionTypeEnum.cashCorrection;
 
   @ignore
   bool get isCashDeposit => type == TransactionTypeEnum.deposit;
@@ -84,7 +84,7 @@ class Transaction {
         return "Withdrawal $name";
       case TransactionTypeEnum.deposit:
         return "Deposit $name";
-      case TransactionTypeEnum.balance:
+      case TransactionTypeEnum.cashCorrection:
         return "Cash Count $name";
       default:
         return "$category $name";
